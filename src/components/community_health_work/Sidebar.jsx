@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'; // Import PropTypes
@@ -29,7 +30,7 @@ function Sidebar({ isOpen }) {
     { id: 4, name: 'My Trainigs', path: '/chw/trainings', icon: <FcDepartment /> },
     { id: 5, name: 'My appointments', path: '/chw/appointments', icon: <MdOutlinePolicy /> },
     { id: 6, name: 'Activities', path: '/chw/activities', icon: <FaCommentDots /> },
-    { id: 7, name: 'Reports', path: `/chw/usercommentReplies/${userEmail}`, icon: <FaCommentDots /> },
+    { id: 7, name: 'Reports', path: `/chw/myReports`, icon: <FaCommentDots /> },
     { id: 8, name: 'My Certificates', path: `/chw/myCertificates`, icon: <FaCommentDots /> },
   ];
 

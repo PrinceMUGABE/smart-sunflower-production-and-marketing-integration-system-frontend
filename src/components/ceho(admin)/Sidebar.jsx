@@ -21,10 +21,11 @@ function Sidebar() {
     { id: 4, name: 'CHW', path: '/admin/worker', icon: <FaUsers /> },
     { id: 5, name: 'Training Candidates', path: '/admin/learner', icon: <FaUsers /> },
     { id: 6, name: 'Exam', path: '/admin/exams', icon: <BiSolidInstitution /> },
-    { id: 7, name: 'Reports', path: '/admin/reports', icon: <FcDepartment /> },
-    { id: 8, name: 'Exam Results', path: '/admin/results', icon: <FcDepartment /> },
-    { id: 9, name: 'Activities', path: '/admin/activities', icon: <FcDepartment /> },
-    { id: 10, name: 'Appointments', path: '/admin/appointments', icon: <FcDepartment /> },
+    
+    { id: 7, name: 'Exam Results', path: '/admin/results', icon: <FcDepartment /> },
+    // { id: 8, name: 'Reports', path: '/admin/reports', icon: <FcDepartment /> },
+    // { id: 9, name: 'Activities', path: '/admin/activities', icon: <FcDepartment /> },
+    // { id: 10, name: 'Appointments', path: '/admin/appointments', icon: <FcDepartment /> },
   ];
 
   return (

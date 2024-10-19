@@ -47,6 +47,9 @@ import AdminManageExamQuestions from "./components/pages/ceho/ManageExamQuestion
 import AdminManageExamResults from "./components/pages/ceho/ManageResults.jsx";
 import CommunityHealthWork_TakeTrainingExam from "./components/pages/chw/TakeNewTraingExam.jsx";
 import CommunityHealthWorkResults from "./components/pages/chw/MyAwards.jsx";
+import CommunityHealthWorkManageReports from "./components/pages/chw/MyReports.jsx";
+import AdminManageReports from "./components/pages/ceho/ManageReports.jsx";
+import CommunityHealthWorkManageActivities from "./components/pages/chw/MyActivities.jsx";
 
 
 
@@ -109,6 +112,7 @@ const App = () => {
             <Route path="/admin/viewExam/:id" element={<AdminManageExamQuestions />} />
 
             <Route path="/admin/results" element={<AdminManageExamResults />} />
+            <Route path="/admin/reports" element={<AdminManageReports />} />
 
           </Route>
 
@@ -127,6 +131,8 @@ const App = () => {
 
             <Route path="/chw/takeExam/:id" element={<CommunityHealthWork_TakeTrainingExam />} />
             <Route path="/chw/myCertificates" element={<CommunityHealthWorkResults />} />
+            <Route path="/chw/myReports" element={<CommunityHealthWorkManageReports />} />
+            <Route path="/chw/activities" element={<CommunityHealthWorkManageActivities />} />
 
 
             {/* <Route path="/organizer/profile" element={<OrganizerProfile />} /> */}
