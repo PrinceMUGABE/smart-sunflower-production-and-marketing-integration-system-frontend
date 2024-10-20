@@ -7,7 +7,7 @@ import MainLayout from "./components/MainLayout.jsx";
 import Login from "./components/auth/Login.jsx";
 import Register from "./components/auth/Register.jsx";
 import VerifyPassword from "./components/auth/VerifyPassword.jsx";
-import Home from './components/pages/chw/Home.jsx';
+
 import Users from './components/pages/ceho/Users.jsx';
 
 
@@ -50,6 +50,17 @@ import CommunityHealthWorkResults from "./components/pages/chw/MyAwards.jsx";
 import CommunityHealthWorkManageReports from "./components/pages/chw/MyReports.jsx";
 import AdminManageReports from "./components/pages/ceho/ManageReports.jsx";
 import CommunityHealthWorkManageActivities from "./components/pages/chw/MyActivities.jsx";
+import Citizen_ManageAppointments from "./components/pages/citizen/MyAppointments.jsx";
+import CitizenCreateAppointment from "./components/pages/citizen/CreateNewAppointment.jsx";
+import CitizenEditAppointment from "./components/pages/citizen/EditAppointment.jsx";
+import CitizenTrainings from "./components/pages/citizen/MyTrainings.jsx";
+import CitizenTrainingDetails from "./components/pages/citizen/MyTrainingDetails.jsx";
+import Citizen_ApplyNewTraining from "./components/pages/citizen/TakeNewTraining.jsx";
+import CitizenHome from "./components/pages/citizen/CitizenHome.jsx";
+import Citizen_TakeTrainingExam from "./components/pages/citizen/TakeExam.jsx";
+import CitizenResults from "./components/pages/citizen/MyCertificates.jsx";
+import CitizenCertificateView from "./components/pages/citizen/CiticenCertificate.jsx";
+import CommunityHealthWork_CertificateView from "./components/pages/chw/Certificate.jsx";
 
 
 
@@ -133,17 +144,27 @@ const App = () => {
             <Route path="/chw/myCertificates" element={<CommunityHealthWorkResults />} />
             <Route path="/chw/myReports" element={<CommunityHealthWorkManageReports />} />
             <Route path="/chw/activities" element={<CommunityHealthWorkManageActivities />} />
+            <Route path="/chw/viewCertificate/:id" element={<CommunityHealthWork_CertificateView />} />
 
-
-            {/* <Route path="/organizer/profile" element={<OrganizerProfile />} /> */}
           </Route>
-              {/* End of organizer route*/}
+              {/* End of community health work route*/}
 
-              {/* User Route */}
+              {/* Citizen Route */}
 
           <Route path="/citizen" element={<Citizen_Layout />}>
 
-              <Route index element={<Home />} />
+              <Route index element={<CitizenHome />} />
+              <Route path="/citizen/appointments" element={<Citizen_ManageAppointments />} />
+              <Route path="/citizen/createAppointment" element={<CitizenCreateAppointment />} />
+              <Route path="/citizen/editAppointment/:id" element={<CitizenEditAppointment />} />
+
+              <Route path="/citizen/trainings" element={<CitizenTrainings />} />
+              <Route path="/citizen/myTrainingDetails/:id" element={<CitizenTrainingDetails />} />
+              <Route path="/citizen/apply-training/:trainingId" element={<Citizen_ApplyNewTraining />} />
+              <Route path="/citizen/takeExam/:id" element={<Citizen_TakeTrainingExam />} />
+
+              <Route path="/citizen/certificates" element={<CitizenResults />} />
+              <Route path="/citizen/viewCertificate/:id" element={<CitizenCertificateView />} />
 
             
 

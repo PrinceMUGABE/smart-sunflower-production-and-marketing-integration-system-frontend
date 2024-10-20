@@ -176,9 +176,9 @@ function AdminManageExamResults() {
   {currentresults.length > 0 ? (
     currentresults.map((result) => (
       <tr key={result.id} className="bg-white border-b">
-        <td className="px-6 py-4 font-medium">{result.created_by?.first_name || "N/A"}</td>
-        <td className="px-6 py-4">{result.created_by?.last_name || "N/A"}</td>
-        <td className="px-6 py-4">{result.created_by?.user?.phone || "N/A"}</td>
+        <td className="px-6 py-4 font-medium">{result.candidate?.first_name || "N/A"}</td>
+        <td className="px-6 py-4">{result.candidate?.last_name || "N/A"}</td>
+        <td className="px-6 py-4">{result.candidate?.user?.phone || "N/A"}</td>
         <td className="px-6 py-4">{result.exam?.training?.name || "N/A"}</td>
         <td className="px-6 py-4">{result.total_marks}</td>
         <td className="px-6 py-4">{result.status}</td>

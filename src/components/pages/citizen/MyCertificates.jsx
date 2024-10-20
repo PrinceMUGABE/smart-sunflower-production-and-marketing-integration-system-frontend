@@ -6,7 +6,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 
-function CommunityHealthWorkResults() {
+function CitizenResults() {
   const [resultData, setResultData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [resultsPerPage] = useState(5);
@@ -123,7 +123,7 @@ function CommunityHealthWorkResults() {
                     {result.created_at ? new Date(result.created_at).toLocaleDateString() : "N/A"}
                   </td>
                   <td className="px-6 py-4">
-                    <Link to={`/chw/viewCertificate/${result.id}`} className="text-blue-600">View certificate</Link>
+                    <Link to={`/citizen/viewCertificate/${result.id}`} className="text-blue-600">View certificate</Link>
                   </td>
                 </tr>
               ))
@@ -156,4 +156,4 @@ function CommunityHealthWorkResults() {
   );
 }
 
-export default CommunityHealthWorkResults;
+export default CitizenResults;

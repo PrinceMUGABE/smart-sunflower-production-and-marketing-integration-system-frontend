@@ -1,17 +1,14 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './ChwHome.css'; // Ensure your CSS is imported properly
+import './CitizenHome.css'; // Ensure your CSS is imported properly
 import { useNavigate } from 'react-router-dom';
 
-function CommunityHealthWorkHome() {
+function CitizenHome() {
   const [trainingsData, setTrainingsData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const trainingsPerPage = 9; // Show 9 trainings per page (3x3 grid)
   const navigate = useNavigate(); // Use the navigate hook
-  const [userData, setUserData] = useState([]);
-
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,9 +21,7 @@ function CommunityHealthWorkHome() {
         console.error('Error fetching trainings:', error);
       }
     };
-
     fetchData();
-
   }, []);
 
   // Pagination logic
@@ -42,7 +37,7 @@ function CommunityHealthWorkHome() {
   const totalPages = Math.ceil(trainingsData.length / trainingsPerPage);
   // Function to navigate to the apply form with the selected training id
   const handleEnrollClick = (trainingId) => {
-    navigate(`/chw/apply-training/${trainingId}`); // Pass the training ID in the URL
+    navigate(`/citizen/apply-training/${trainingId}`); // Pass the training ID in the URL
   };
 
   return (
@@ -84,4 +79,4 @@ function CommunityHealthWorkHome() {
   );
 }
 
-export default CommunityHealthWorkHome;
+export default CitizenHome;

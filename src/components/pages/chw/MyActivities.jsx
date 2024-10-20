@@ -134,9 +134,10 @@ function CommunityHealthWorkManageActivities() {
 
   const filteredData = activityData.filter(
     (activity) =>
-      activity.activity?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      activity.created_date?.includes(searchQuery)
+      activity.name?.toLowerCase().includes(searchQuery.toLowerCase()) || // Correct field is 'name'
+      activity.created_at?.includes(searchQuery)
   );
+  
 
   const indexOfLastactivity = currentPage * activitysPerPage;
   const indexOfFirstactivity = indexOfLastactivity - activitysPerPage;
@@ -193,41 +194,36 @@ function CommunityHealthWorkManageActivities() {
             </tr>
           </thead>
           <tbody>
-            {currentactivitys.length > 0 ? (
-              currentactivitys.map((activity) => (
-                <tr key={activity.id} className="bg-white border-b">
-                  <td className="px-6 py-4 font-medium">
-                    {activity.name || "N/A"}
-                  </td>
-                  <td className="px-6 py-4">
-                    {activity.created_date
-                      ? new Date(activity.created_date).toLocaleDateString()
-                      : "N/A"}
-                  </td>
-                  <td className="px-6 py-4 flex items-center space-x-2">
-                    <button onClick={() => handleEdit(activity)}>
-                      <FontAwesomeIcon
-                        icon={faEdit}
-                        className="text-green-500"
-                      />
-                    </button>
-                    <button onClick={() => handleDelete(activity.id)}>
-                      <FontAwesomeIcon
-                        icon={faTrash}
-                        className="text-red-500"
-                      />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="px-6 py-4 text-center">
-                  No activitys found
-                </td>
-              </tr>
-            )}
-          </tbody>
+  {currentactivitys.length > 0 ? (
+    currentactivitys.map((activity) => (
+      <tr key={activity.id} className="bg-white border-b">
+        <td className="px-6 py-4 font-medium">
+          {activity.name || "N/A"}  {/* Use activity.name */}
+        </td>
+        <td className="px-6 py-4">
+          {activity.created_at
+            ? new Date(activity.created_at).toLocaleDateString()
+            : "N/A"}
+        </td>
+        <td className="px-6 py-4 flex items-center space-x-2">
+          <button onClick={() => handleEdit(activity)}>
+            <FontAwesomeIcon icon={faEdit} className="text-green-500" />
+          </button>
+          <button onClick={() => handleDelete(activity.id)}>
+            <FontAwesomeIcon icon={faTrash} className="text-red-500" />
+          </button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="4" className="px-6 py-4 text-center">
+        No activities found
+      </td>
+    </tr>
+  )}
+</tbody>
+
         </table>
       </div>
 

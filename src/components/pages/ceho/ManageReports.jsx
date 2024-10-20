@@ -164,12 +164,12 @@ function AdminManageReports() {
       </h1>
 
       <div className="flex flex-col md:flex-row justify-between mb-4">
-        <button
+        {/* <button
           className="px-4 py-2 bg-blue-500 text-white rounded mb-4 md:mb-0"
           onClick={() => setShowCreateModal(true)}
         >
           Create New Report
-        </button>
+        </button> */}
 
         <input
           type="text"

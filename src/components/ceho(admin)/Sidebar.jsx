@@ -23,7 +23,7 @@ function Sidebar() {
     { id: 6, name: 'Exam', path: '/admin/exams', icon: <BiSolidInstitution /> },
     
     { id: 7, name: 'Exam Results', path: '/admin/results', icon: <FcDepartment /> },
-    // { id: 8, name: 'Reports', path: '/admin/reports', icon: <FcDepartment /> },
+    { id: 8, name: 'Reports', path: '/admin/reports', icon: <FcDepartment /> },
     // { id: 9, name: 'Activities', path: '/admin/activities', icon: <FcDepartment /> },
     // { id: 10, name: 'Appointments', path: '/admin/appointments', icon: <FcDepartment /> },
   ];
