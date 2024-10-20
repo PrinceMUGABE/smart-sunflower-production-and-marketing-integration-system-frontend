@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -53,7 +54,7 @@ const Contact = () => {
             return;
         }
         try {
-            const response = await axios.post('http://127.0.0.1:8000/contact-us/', formData);
+            const response = await axios.post('http://127.0.0.1:8000/contact/', formData);
             if (response.status === 200) {
                 setMessage('Message sent successfully');
                 setFormData({

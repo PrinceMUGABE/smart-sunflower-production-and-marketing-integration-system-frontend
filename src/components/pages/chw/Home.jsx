@@ -6,14 +6,18 @@ import { useNavigate } from 'react-router-dom';
 
 function CommunityHealthWorkHome() {
   const [trainingsData, setTrainingsData] = useState([]);
+  
   const [currentPage, setCurrentPage] = useState(1);
   const trainingsPerPage = 9; // Show 9 trainings per page (3x3 grid)
   const navigate = useNavigate(); // Use the navigate hook
   const [userData, setUserData] = useState([]);
+  const [trainingData, setTrainingData] = useState([]);
 
   
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+
     const fetchData = async () => {
       try {
         const trainingsRes = await axios.get('http://127.0.0.1:8000/training/trainings/');
@@ -25,7 +29,29 @@ function CommunityHealthWorkHome() {
       }
     };
 
+    const fetchMyTrainings = async () => {
+      try {
+        const res = await axios.get('http://127.0.0.1:8000/trainingCandidate/my_trainings/', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (Array.isArray(res.data)) {
+          setTrainingData(res.data);
+        } else {
+          setTrainingData([]);
+        }
+      } catch (err) {
+        if (err.response && err.response.status === 401) {
+          alert("Session expired. Please log in again.");
+          navigate("/login");
+        }
+      }
+    };
+
+
+
     fetchData();
+    fetchMyTrainings();
+  
 
   }, []);
 
@@ -47,7 +73,7 @@ function CommunityHealthWorkHome() {
 
   return (
     <div className="mt-20">
-      <h2 className="text-lg font-semibold mb-4 text-center text-black">Trainings</h2>
+      <h2 className="text-lg mb-4 text-center text-black font-bold">Take Trainings For Your Proffesional Recognition</h2>
 
       {/* Display cards in a 3x3 grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">

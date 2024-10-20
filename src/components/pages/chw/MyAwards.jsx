@@ -5,6 +5,10 @@ import { Link, useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
+import { Pie } from "react-chartjs-2";
+import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
+
+Chart.register(ArcElement, Tooltip, Legend);
 
 function CommunityHealthWorkResults() {
   const [resultData, setResultData] = useState([]);
@@ -33,14 +37,12 @@ function CommunityHealthWorkResults() {
   const handleFetch = useCallback(async () => {
     try {
       const res = await axios.get("http://127.0.0.1:8000/result/candidate/", axiosConfig);
-      setResultData(Array.isArray(res.data) ? res.data : []); // Ensure that we set resultData correctly
-      console.log("Fetched Results:", res.data); // Log fetched data
+      setResultData(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       if (err.response && err.response.status === 401) {
         alert("Session expired. Please log in again.");
         navigate("/login");
       }
-      console.error("Error fetching results:", err); // Log any errors
     }
   }, [axiosConfig, navigate]);
 
@@ -81,10 +83,30 @@ function CommunityHealthWorkResults() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Prepare data for the pie chart
+  const resultStatusCounts = useMemo(() => {
+    const statusCounts = resultData.reduce((acc, result) => {
+      acc[result.status] = (acc[result.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    return {
+      labels: Object.keys(statusCounts),
+      datasets: [
+        {
+          label: "Results by Status",
+          data: Object.values(statusCounts),
+          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50", "#FF9F40"],
+        },
+      ],
+    };
+  }, [resultData]);
+
   return (
     <div className="container mx-auto px-4">
       <h1 className="text-center text-black font-bold text-xl capitalize mb-4">Your Awards</h1>
-      <div className="flex flex-col md:flex-row justify-between mb-4">
+
+      {/* <div className="flex flex-col md:flex-row justify-between mb-4">
         <input
           type="text"
           placeholder="Search..."
@@ -100,58 +122,72 @@ function CommunityHealthWorkResults() {
             Download Excel
           </button>
         </div>
-      </div>
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table id="result-table" className="w-full text-sm text-left text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3">Training</th>
-              <th scope="col" className="px-6 py-3">Score</th>
-              <th scope="col" className="px-6 py-3">Status</th>
-              <th scope="col" className="px-6 py-3">Date</th>
-              <th scope="col" className="px-6 py-3">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentResults.length > 0 ? (
-              currentResults.map((result) => (
-                <tr key={result.id} className="bg-white border-b">
-                  <td className="px-6 py-4 font-medium">{result.exam.training.name|| "N/A"}</td>
-                  <td className="px-6 py-4">{result.total_marks}</td>
-                  <td className="px-6 py-4">{result.status}</td>
-                  <td className="px-6 py-4">
-                    {result.created_at ? new Date(result.created_at).toLocaleDateString() : "N/A"}
-                  </td>
-                  <td className="px-6 py-4">
-                    <Link to={`/chw/viewCertificate/${result.id}`} className="text-blue-600">View certificate</Link>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="px-6 py-4 text-center">No results found</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-4">
-          <nav className="relative z-0 inline-flex shadow-sm rounded-md">
-            {[...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => paginate(i + 1)}
-                className={`px-4 py-2 border text-sm font-medium ${
-                  currentPage === i + 1 ? "bg-indigo-600 text-white" : "bg-white text-gray-500 hover:bg-gray-100"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </nav>
+      </div> */}
+
+      <div className="flex flex-col md:flex-row">
+        {/* Pie Chart */}
+        <div className="w-full md:w-1/3 p-4">
+          <h2 className="text-center font-bold mb-4 text-black">Results by Status</h2>
+          <Pie data={resultStatusCounts} />
         </div>
-      )}
+
+        {/* Table */}
+        <div className="w-full md:w-2/3 p-4">
+          <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table id="result-table" className="w-full text-sm text-left text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3">Training</th>
+                  <th scope="col" className="px-6 py-3">Score</th>
+                  <th scope="col" className="px-6 py-3">Status</th>
+                  <th scope="col" className="px-6 py-3">Date</th>
+                  <th scope="col" className="px-6 py-3">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentResults.length > 0 ? (
+                  currentResults.map((result) => (
+                    <tr key={result.id} className="bg-white border-b">
+                      <td className="px-6 py-4 font-medium">{result.exam.training.name || "N/A"}</td>
+                      <td className="px-6 py-4">{result.total_marks}</td>
+                      <td className="px-6 py-4">{result.status}</td>
+                      <td className="px-6 py-4">
+                        {result.created_at ? new Date(result.created_at).toLocaleDateString() : "N/A"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <Link to={`/chw/viewCertificate/${result.id}`} className="text-blue-600">View certificate</Link>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-4 text-center">No results found</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4">
+              <nav className="relative z-0 inline-flex shadow-sm rounded-md">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => paginate(i + 1)}
+                    className={`px-4 py-2 border text-sm font-medium ${
+                      currentPage === i + 1 ? "bg-indigo-600 text-white" : "bg-white text-gray-500 hover:bg-gray-100"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </nav>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

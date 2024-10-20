@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 
@@ -63,12 +64,10 @@ const Footer = () => {
           {/* company Details */}
           <div className=" py-8 px-4 ">
             <h1 className="sm:text-3xl text-xl font-bold sm:text-left text-justify mb-3 flex items-center gap-3">
-              Policy Management System
+              CHW Emporing Management System
             </h1>
             <p className="text-sm">
-              Lorem ipsum dolor sit amet consectetur. Lorem ipsum dolor sit amet
-              consectetur adipisicing elit consectetur adipisicing elit ipsum
-              dolor sit amet consectetur. adipisicing{" "}
+            he Ministry is led by the Minister, Minister of State, the Permanent Secretary and other members of the senior management. You can find the Ministry organisational chart here{" "}
             </p>
             <br />
             {/* Social Handle */}

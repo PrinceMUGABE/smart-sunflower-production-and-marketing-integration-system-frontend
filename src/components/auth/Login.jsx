@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LockClosedIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/20/solid';
 import axios from 'axios';
-import loginImage from '../../assets/pictures/login.jpeg'; // Assuming the path to the image
+import loginImage from '../../assets/pictures/abanyabuzima.jpg'; // Assuming the path to the image
 
 const Login = () => {
   const navigate = useNavigate();
@@ -45,70 +45,90 @@ const Login = () => {
     setError('');
 
     if (!validatePhone(phone)) {
-      setError('Phone number must be 10 digits and start with 078, 072, 079, or 073.');
-      return;
+        setError('Phone number must be 10 digits and start with 078, 072, 079, or 073.');
+        return;
     }
 
     if (!validatePassword(password)) {
-      setError('Password must be at least 8 characters long, and include at least one uppercase letter, one lowercase letter, one digit, and one special character.');
-      return;
+        setError('Password must be at least 8 characters long, and include at least one uppercase letter, one lowercase letter, one digit, and one special character.');
+        return;
     }
 
     setIsLoading(true); // Set loading state
 
     axios.post(
-      'http://127.0.0.1:8000/login/',
-      {
-        phone: phone,
-        password: password,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',  // Ensure the content type is set
+        'http://127.0.0.1:8000/login/',
+        {
+            phone: phone,
+            password: password,
         },
-      }
+        {
+            headers: {
+                'Content-Type': 'application/json',  // Ensure the content type is set
+            },
+        }
     )
     .then((res) => {
-      setIsLoading(false); // Stop loading
-    
-      if (res.data) {
-        console.log('User data returned from API:', res.data);
-    
-        const user = {
-          id: res.data.id,
-          role: res.data.role,
-          created_at: res.data.created_at,
-          phone: res.data.phone,
-          refresh_token: res.data.refresh_token,
-          access_token: res.data.access_token,
-        };
-    
-        localStorage.setItem('userData', JSON.stringify(user));
-        localStorage.setItem('token', res.data.access_token);
-    
-        console.log('User role:', user.role);
-        console.log('Trimmed and lowercased role:', user.role.trim().toLowerCase());
-    
-        // Role-based redirection logic
-        if (user.role.trim().toLowerCase() === 'ceho') {
-          navigate('/admin');
-        } else if (user.role.trim().toLowerCase() === 'chw') {
-          navigate('/chw');
-        } else if (user.role.trim().toLowerCase() === 'citizen') {
-          navigate('/citizen');
+        setIsLoading(false); // Stop loading
+
+        if (res.data) {
+            console.log('User data returned from API:', res.data);
+
+            const user = {
+                id: res.data.id,
+                role: res.data.role,
+                created_at: res.data.created_at,
+                phone: res.data.phone,
+                refresh_token: res.data.refresh_token,
+                access_token: res.data.access_token,
+            };
+
+            localStorage.setItem('userData', JSON.stringify(user));
+            localStorage.setItem('token', res.data.access_token);
+
+            console.log('User role:', user.role);
+            console.log('Trimmed and lowercased role:', user.role.trim().toLowerCase());
+
+            // Role-based redirection logic
+            if (user.role.trim().toLowerCase() === 'ceho') {
+                navigate('/admin');
+            } else if (user.role.trim().toLowerCase() === 'chw') {
+                // Check if the user is a worker
+                axios.get('http://127.0.0.1:8000/worker/me/', {
+                    headers: {
+                        'Authorization': `Bearer ${res.data.access_token}`, // Use the access token to authorize the request
+                    },
+                })
+                .then((workerRes) => {
+                    if (workerRes.data) {
+                        // User is a worker, navigate to /chw
+                        navigate('/chw');
+                    } else {
+                        // User is not a worker, navigate to /register
+                        navigate('/register');
+                    }
+                })
+                .catch((workerError) => {
+                    console.error('Error fetching worker information:', workerError);
+                    // Handle the error, e.g., navigate to register
+                    navigate('/register');
+                });
+            } else if (user.role.trim().toLowerCase() === 'citizen') {
+                navigate('/citizen');
+            } else {
+                console.log('Unknown user role. Please contact support.');
+            }
         } else {
-          console.log('Unknown user role. Please contact support.');
+            console.log("No data");
         }
-      } else {
-        console.log("No data");
-      }
     })
     .catch((error) => {
-      setIsLoading(false);  // Stop loading
-      console.error('Error during login:', error.response || error.message || error);
-      setError('Invalid phone or password.');
+        setIsLoading(false);  // Stop loading
+        console.error('Error during login:', error.response || error.message || error);
+        setError('Invalid phone or password.');
     });
-  };
+};
+
 
   return (
     <div className="flex justify-center items-center min-h-screen h-full bg-gray-50">

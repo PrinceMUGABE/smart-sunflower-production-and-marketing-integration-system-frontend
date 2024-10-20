@@ -91,6 +91,11 @@ function CommunityHealthWorkTrainings() {
         Your Registered Trainings
       </h1>
 
+      {/* Display total number of trainings */}
+      <p className="text-center text-blue-700 font-bold mb-4">
+        Number of Registered Trainings: <span className="text-orange-600 font-bold">{filteredData.length}</span>
+      </p>
+
       <div className="flex flex-col md:flex-row justify-between mb-4">
       <Link
           to="/chw"

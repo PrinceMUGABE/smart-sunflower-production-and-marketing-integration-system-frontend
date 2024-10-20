@@ -6,6 +6,11 @@ import { BiSolidInstitution } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
 import Logo from '../../assets/pictures/logo_lil.jpeg';
 import { FcDepartment } from 'react-icons/fc';
+import { HiMiniClipboardDocument } from "react-icons/hi2";
+import { SiGoogleclassroom } from "react-icons/si";
+import { PiStudentFill } from "react-icons/pi";
+import { GiNotebook } from "react-icons/gi";
+import { LiaUserNurseSolid } from "react-icons/lia";
 
 function Sidebar() {
   const [activeLink, setActiveLink] = useState(null);
@@ -17,12 +22,12 @@ function Sidebar() {
   const Sidebar_Links = [
     { id: 1, name: 'Dashboard', path: '/admin', icon: <MdDashboard /> },
     { id: 2, name: 'Users', path: '/admin/users', icon: <FaUsers /> },
-    { id: 3, name: 'Training', path: '/admin/training', icon: <FaUsers /> },
-    { id: 4, name: 'CHW', path: '/admin/worker', icon: <FaUsers /> },
-    { id: 5, name: 'Training Candidates', path: '/admin/learner', icon: <FaUsers /> },
+    { id: 3, name: 'Training', path: '/admin/training', icon: <GiNotebook /> },
+    { id: 4, name: 'CHW', path: '/admin/worker', icon: <LiaUserNurseSolid /> },
+    { id: 5, name: 'Training Candidates', path: '/admin/learner', icon: <PiStudentFill /> },
     { id: 6, name: 'Exam', path: '/admin/exams', icon: <BiSolidInstitution /> },
     
-    { id: 7, name: 'Exam Results', path: '/admin/results', icon: <FcDepartment /> },
+    { id: 7, name: 'Exam Results', path: '/admin/results', icon: <HiMiniClipboardDocument /> },
     { id: 8, name: 'Reports', path: '/admin/reports', icon: <FcDepartment /> },
     // { id: 9, name: 'Activities', path: '/admin/activities', icon: <FcDepartment /> },
     // { id: 10, name: 'Appointments', path: '/admin/appointments', icon: <FcDepartment /> },

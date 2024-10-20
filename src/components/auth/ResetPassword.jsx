@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -5,7 +6,7 @@ import axios from 'axios';
 const ResetPassword = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
+    phone: '',
     new_password: '',
   });
   const [message, setMessage] = useState('');
@@ -23,6 +24,13 @@ const ResetPassword = () => {
     return csrfToken;
   };
 
+  // Updated phone validation to check for length and format
+  const validatePhone = (phone) => {
+    // Phone number must be exactly 10 digits and start with 078, 079, 072, or 073
+    const phoneRegex = /^(078|079|072|073)\d{7}$/;
+    return phoneRegex.test(phone) && phone.length === 10;
+  };
+
   const validatePassword = (password) => {
     const minLength = 5;
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
@@ -36,35 +44,49 @@ const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate phone number before proceeding
+    if (!validatePhone(formData.phone)) {
+        setError('Phone number must be exactly 10 digits and start with 078, 079, 072, or 073.');
+        setMessage('');
+        return;
+    }
+
+    // Validate password
     if (!validatePassword(formData.new_password)) {
-      setError('Password must be at least 5 characters long, contain a special character, an uppercase letter, a lowercase letter, and a number.');
-      setMessage('');
-      return;
+        setError('Password must be at least 5 characters long, contain a special character, an uppercase letter, a lowercase letter, and a number.');
+        setMessage('');
+        return;
     }
 
     const csrfToken = getCsrfToken();
     try {
-      const response = await axios.post('http://127.0.0.1:8000/account/reset_password/', formData, {
-        headers: {
-          'X-CSRFToken': csrfToken,
-        },
-      });
-      if (response.data.message === "Password reset successfully. Please check your email for confirmation.") {
-        setFormData({ email: '', new_password: '' }); // Clear the form fields
-        setMessage('Password reset successfully. Please check your email for confirmation.');
-        setError(''); // Clear any previous error
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000); // Navigate after 2 seconds to show success message
-      } else {
-        setError(response.data.error || 'Password reset failed. Please try again.');
-        setMessage(''); // Clear any previous message
-      }
+        const response = await axios.post('http://127.0.0.1:8000/forget_password/', formData, {
+            headers: {
+                'X-CSRFToken': csrfToken,
+            },
+        });
+
+        if (response.data.message === "Password reset successfully.") {
+            setFormData({ phone: '', new_password: '' }); // Clear the form fields
+            setMessage('Password reset successfully. Please check your phone for confirmation.');
+            setError(''); // Clear any previous error
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000); // Navigate after 2 seconds to show success message
+        } else {
+            setError(response.data.error || 'Password reset failed. Please try again.');
+            setMessage(''); // Clear any previous message
+        }
     } catch (error) {
-      setError(error.response?.data?.error || 'An error occurred. Please try again.');
-      setMessage(''); // Clear any previous message
+        // Handle specific error for phone number not found
+        if (error.response?.status === 404) {
+            setError('Phone number not found.');
+        } else {
+            setError(error.response?.data?.error || 'An error occurred. Please try again.');
+        }
+        setMessage(''); // Clear any previous message
     }
-  };
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -84,17 +106,17 @@ const ResetPassword = () => {
         {message && <p className="text-green-500 text-sm">{message}</p>}
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-              Email address
+            <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
+              Phone
             </label>
             <div className="mt-2">
               <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="phone"
+                name="phone"
+                type="text" // Changed to text to prevent unwanted behaviors with leading zeros
+                autoComplete="phone"
                 required
-                value={formData.email}
+                value={formData.phone}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />

@@ -8,6 +8,10 @@ import Logo from '../../assets/pictures/logo_lil.jpeg';
 import { MdOutlinePolicy } from "react-icons/md";
 import { FcDepartment } from "react-icons/fc";
 import { FaCommentDots } from "react-icons/fa";
+import { HiMiniDocumentDuplicate } from "react-icons/hi2";
+import { MdReport } from "react-icons/md";
+import { GiFarmer } from "react-icons/gi";
+import { RiHome2Fill } from "react-icons/ri";
 
 function Sidebar({ isOpen }) {
   const [activeLink, setActiveLink] = useState(null);
@@ -26,12 +30,12 @@ function Sidebar({ isOpen }) {
   };
 
   const Sidebar_Links = [
-    { id: 3, name: 'Home', path: "/chw", icon: <BiSolidInstitution /> },
+    { id: 3, name: 'Home', path: "/chw", icon: <RiHome2Fill /> },
     { id: 4, name: 'My Trainigs', path: '/chw/trainings', icon: <FcDepartment /> },
     { id: 5, name: 'My appointments', path: '/chw/appointments', icon: <MdOutlinePolicy /> },
-    { id: 6, name: 'Activities', path: '/chw/activities', icon: <FaCommentDots /> },
-    { id: 7, name: 'Reports', path: `/chw/myReports`, icon: <FaCommentDots /> },
-    { id: 8, name: 'My Certificates', path: `/chw/myCertificates`, icon: <FaCommentDots /> },
+    { id: 6, name: 'Activities', path: '/chw/activities', icon: <GiFarmer /> },
+    { id: 7, name: 'Reports', path: `/chw/myReports`, icon: <MdReport /> },
+    { id: 8, name: 'My Certificates', path: `/chw/myCertificates`, icon: <HiMiniDocumentDuplicate /> },
   ];
 
   return (

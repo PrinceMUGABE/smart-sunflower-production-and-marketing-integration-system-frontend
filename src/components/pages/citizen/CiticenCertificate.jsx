@@ -69,92 +69,105 @@ const CitizenCertificateView = () => {
     return <div>Loading certificate...</div>;
   }
 
+  // Check the result status
+  const isSucceeded = resultData.status === "succeed";
+
   return (
     <div className="certificate-container" style={{ textAlign: "center" }}>
-      <div
-        ref={certificateRef}
-        style={{
-          position: "relative",
-          width: "800px",
-          height: "600px",
-          backgroundColor: "#fff", // Background color (white)
-          color: "black",
-          padding: "20px",
-          borderRadius: "15px",
-          fontFamily: "Arial, sans-serif",
-          border: "5px solid gray", // Added gray border
-        }}
-      >
-        {/* Top Left Badge (Logo) */}
-        <div style={{ position: "absolute", top: "20px", left: "20px" }}>
-          <img src={logo} alt="Logo" style={{ width: "80px" }} />
+      {isSucceeded ? (
+        <div
+          ref={certificateRef}
+          style={{
+            position: "relative",
+            width: "800px",
+            height: "600px",
+            backgroundColor: "#fff", // Background color (white)
+            color: "black",
+            padding: "20px",
+            borderRadius: "15px",
+            fontFamily: "Arial, sans-serif",
+            border: "5px solid gray", // Added gray border
+          }}
+        >
+          {/* Top Left Badge (Logo) */}
+          <div style={{ position: "absolute", top: "20px", left: "20px" }}>
+            <img src={logo} alt="Logo" style={{ width: "80px" }} />
+          </div>
+
+          {/* Top Right Corner (Flag) */}
+          <div style={{ position: "absolute", top: "20px", right: "20px" }}>
+            <img src={flag} alt="Flag" style={{ width: "100px", height: "60px" }} />
+          </div>
+
+          {/* Certificate Title */}
+          <h2 className="text-blue-700 py-5" style={{ marginTop: "50px", fontSize: "28px" }}>
+            Ministry of Healthy
+          </h2>
+
+          {/* Awarded to */}
+          <p className="text-gray-700" style={{ fontSize: "18px", marginTop: "20px" }}>
+            This certificate is awarded to:
+          </p>
+          <h1 className="text-black font-bold" style={{ fontSize: "36px", margin: "10px 0" }}>
+            {resultData.candidate.first_name} {resultData.candidate.last_name}
+          </h1>
+
+          {/* Course */}
+          <p className="text-gray-700" style={{ fontSize: "18px", margin: "20px 0" }}>
+            for successfully completing the course:
+          </p>
+          <h3 className="text-red-900" style={{ fontSize: "24px" }}>
+            {resultData.exam.training.name} Training
+          </h3>
+
+          {/* Issued Date */}
+          <p className="text-black font-bold" style={{ fontSize: "14px", marginTop: "30px" }}>
+            Issued on: {new Date(resultData.created_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </p>
+
+          {/* QR Code (using the imported image) */}
+          <div style={{ position: "absolute", bottom: "20px", right: "20px" }}>
+            <img src={qr} alt="QR Code" style={{ width: "100px" }} />
+          </div>
+
+          {/* Signed By Section */}
+          <div style={{ position: "absolute", bottom: "20px", left: "20px", textAlign: "left" }}>
+            <p style={{ fontSize: "18px", margin: "0" }}>Signed by:</p>
+            <h3 style={{ fontSize: "24px", margin: "5px 0" }}>Dr. Sabin NSANZIMANA</h3>
+            <img src={signature} alt="Signature" style={{ width: "150px", marginTop: "5px" }} />
+            <p style={{ fontSize: "18px", margin: "0" }}>Minister of Healthy</p>
+          </div>
         </div>
-
-        {/* Top Right Corner (Flag) */}
-        <div style={{ position: "absolute", top: "20px", right: "20px" }}>
-          <img src={flag} alt="Flag" style={{ width: "100px", height: "60px" }} />
+      ) : (
+        <div style={{ fontSize: "18px", color: "red", marginTop: "50px" }}>
+          The certificate is not available because you did not pass the training on the expected marks.
         </div>
+      )}
 
-        {/* Certificate Title */}
-        <h2 className="text-blue-700 py-5" style={{ marginTop: "50px", fontSize: "28px" }}>
-          Ministry of Healthy
-        </h2>
-
-        {/* Awarded to */}
-        <p className="text-gray-700" style={{ fontSize: "18px", marginTop: "20px" }}>
-          This certificate is awarded to:
-        </p>
-        <h1 className="text-black font-bold" style={{ fontSize: "36px", margin: "10px 0" }}>
-          {resultData.candidate.first_name} {resultData.candidate.last_name}
-        </h1>
-
-        {/* Course */}
-        <p className="text-gray-700" style={{ fontSize: "18px", margin: "20px 0" }}>
-          for successfully completing the course:
-        </p>
-        <h3 className="text-red-900" style={{ fontSize: "24px" }}>
-          {resultData.exam.training.name} Training
-        </h3>
-
-        {/* Issued Date */}
-        <p className="text-black font-bold" style={{ fontSize: "14px", marginTop: "30px" }}>
-          Issued on: {new Date(resultData.created_at).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-        </p>
-
-        {/* QR Code (using the imported image) */}
-        <div style={{ position: "absolute", bottom: "20px", right: "20px" }}>
-          <img src={qr} alt="QR Code" style={{ width: "100px" }} />
-        </div>
-
-        {/* Signed By Section */}
-        <div style={{ position: "absolute", bottom: "20px", left: "20px", textAlign: "left" }}>
-          <p style={{ fontSize: "18px", margin: "0" }}>Signed by:</p>
-          <h3 style={{ fontSize: "24px", margin: "5px 0" }}>Dr. Sabin NSANZIMANA</h3>
-          <img src={signature} alt="Signature" style={{ width: "150px", marginTop: "5px" }} />
-          <p style={{ fontSize: "18px", margin: "0" }}>Minister of Healthy</p>
-        </div>
-      </div>
-
-      <button
-        onClick={downloadCertificate}
-        style={{
-          marginTop: "20px",
-          padding: "10px 20px",
-          backgroundColor: "#007bff",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        Download Certificate
-      </button>
+      {isSucceeded && (
+        <button
+          onClick={downloadCertificate}
+          style={{
+            marginTop: "20px",
+            padding: "10px 20px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Download Certificate
+        </button>
+      )}
     </div>
   );
 };
+
+
 
 export default CitizenCertificateView;

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { FaUserCircle } from "react-icons/fa";
 
@@ -35,7 +36,7 @@ const ResponsiveMenu = ({ showMenu }) => {
       </div>
       <div className="footer">
         <h1>
-          Made with ❤ by <a href="https://dilshad-ahmed.github.io/">Dilshad</a>{" "}
+          Made with ❤ by <a href="www.linkedin.com/in/mugabe-prince-2b377621b">Clement</a>{" "}
         </h1>
       </div>
     </div>

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
-import AboutImg from '../../assets/pictures/about_lil.jpeg';
+import AboutImg from '../../assets/pictures/abanyabuzuma2.jpg';
 
 function About() {
     return (
@@ -25,25 +25,27 @@ function About() {
                         <div className="p-4 border-l-4 border-primary">
                             <h3 className="text-2xl font-semibold mb-2">Us</h3>
                             <p className="text-sm dark:text-slate-400">
-                            Policy Link Rwanda is a centralized system designed to collect and organize
-                            policies from various institutions across Rwanda, ensuring easy access, 
-                            consistency, and streamlined policy management for all stakeholders.
+                            The overall objective of the health sector in the recently updated Health Sector
+                             Strategic Plan IV (2018 to 2024) is to ensure universal accessibility
+                              (geographical and financial) of equitable and affordable quality health services 
+                              (preventative, curative, rehabilitative and promotional services) for all Rwandans. 
                             </p>
                         </div>
                         <div className="p-4 border-l-4 border-primary">
                             <h3 className="text-2xl font-semibold mb-2">Vision</h3>
                             <p className="text-sm dark:text-slate-400">
-                                To create a unified platform that enhances transparency,
-                                 accessibility, and efficiency in policy management across 
-                                 Rwanda, fostering informed decision-making and collaborative governance.
+                            The Health Sector Policy (2015) states the overall vision of the health sector
+                             as follows: To pursue an integrated and community-driven development process
+                              through the provision of equitable, accessible and quality health care services.
                             </p>
                         </div>
                         <div className="p-4 border-l-4 border-primary">
                             <h3 className="text-2xl font-semibold mb-2">Mission</h3>
                             <p className="text-sm dark:text-slate-400">
-                                To streamline the collection, organization, and dissemination of policies 
-                                from diverse institutions, providing a reliable resource for policymakers, 
-                                researchers, and the public, and promoting informed civic engagement.
+                            The mission of the Ministry of Health is to provide and continually improve affordable
+                             promotive, preventive, curative and rehabilitative health care services of the highest
+                              quality, thereby contributing to the reduction of poverty and enhancing the general 
+                              well-being of the population.
                             </p>
                         </div>
                     </div>

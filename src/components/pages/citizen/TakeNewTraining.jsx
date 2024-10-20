@@ -5,6 +5,7 @@ import axios from "axios";
 import { ArrowPathIcon } from "@heroicons/react/20/solid";
 
 const Citizen_ApplyNewTraining = () => {
+  const token = localStorage.getItem("token");
   const [data, setData] = useState({
     first_name: "",
     last_name: "",
@@ -12,6 +13,7 @@ const Citizen_ApplyNewTraining = () => {
   });
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [trainingName, setTrainingName] = useState(""); // State for training name
   const navigate = useNavigate();
   const { trainingId } = useParams(); // Get training ID from URL
 
@@ -27,6 +29,20 @@ const Citizen_ApplyNewTraining = () => {
     } else {
       setErrorMessage(""); // Clear error message if valid
       console.log("Training ID from URL:", trainingId);
+      
+      // Fetch training information based on trainingId
+      axios
+      .get(`http://127.0.0.1:8000/training/${trainingId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in the headers
+        },
+      })
+        .then(response => {
+          setTrainingName(response.data.name); // Adjust based on actual response structure
+        })
+        .catch(err => {
+          setErrorMessage("Failed to fetch training information.");
+        });
     }
   }, [trainingId]);
 
@@ -62,7 +78,7 @@ const Citizen_ApplyNewTraining = () => {
     })
     .then(() => {
       alert("Training Candidate created successfully");
-      navigate("/chw/trainings");
+      navigate("/citizen/trainings");
     })
     .catch((err) => {
       // Updated to display the actual error message from the response
@@ -133,7 +149,7 @@ const Citizen_ApplyNewTraining = () => {
             </div>
           </div>
 
-          {/* Training (display selected training) */}
+          {/* Training (display training name instead of ID) */}
           <div>
             <label
               htmlFor="training"
@@ -146,7 +162,7 @@ const Citizen_ApplyNewTraining = () => {
                 id="training"
                 name="training"
                 type="text"
-                value={trainingId} // Prepopulate the training id
+                value={trainingName} // Display the training name
                 readOnly
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 bg-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6"
               />
@@ -175,5 +191,6 @@ const Citizen_ApplyNewTraining = () => {
     </div>
   );
 };
+
 
 export default Citizen_ApplyNewTraining;

@@ -112,12 +112,12 @@ function ManagetrainingCandidates() {
       </h1>
 
       <div className="flex flex-col md:flex-row justify-between mb-4">
-        <Link
+        {/* <Link
           to="/admin/createTrainingCandidate"
           className="px-4 py-2 bg-blue-500 text-white rounded mb-4 md:mb-0"
         >
           Create New trainingCandidate
-        </Link>
+        </Link> */}
 
         <div className="flex items-center space-x-2 mb-4 md:mb-0">
           <button

@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import React from "react";
-import hero from "../../assets/pictures/hand-thumb-up-rwanda.png";
+import hero from "../../assets/pictures/ministry_of_healthy_image.jpg";
 
 const Hero = () => {
   return (
@@ -26,16 +26,15 @@ const Hero = () => {
           <div className="space-y-5 order-2 sm:order-1 xl:pr-40 ">
             <h1
               data-aos="fade-up"
-              className="text-4xl sm:text-5xl font-semibold"
+              className="text-4xl sm:text-4xl font-semibold"
               style={{ lineHeight: 1.2 }}
             >
-              Get in tourch with updated Policy{" "}
-              <span className="text-primary">Rwanda Single portal Policy Access</span>
+              Get in tourch with updated{" "}
+              <span className="text-primary ">Community Health Work Emporing Management System</span>
             </h1>
             <p data-aos="fade-up" data-aos-delay="300">
-              Policy Link Rwanda is a centralized system designed to collect and organize
-               policies from various institutions across Rwanda, ensuring easy access, 
-               consistency, and streamlined policy management for all stakeholders.
+            Created in January 2011, Job in Rwanda is a private held company providing services 
+            in the area of online recruitment and advertisement.
             </p>
             {/* <button
               data-aos="fade-up"

@@ -61,6 +61,8 @@ import Citizen_TakeTrainingExam from "./components/pages/citizen/TakeExam.jsx";
 import CitizenResults from "./components/pages/citizen/MyCertificates.jsx";
 import CitizenCertificateView from "./components/pages/citizen/CiticenCertificate.jsx";
 import CommunityHealthWork_CertificateView from "./components/pages/chw/Certificate.jsx";
+import Register_as_CommunityHealthWork from "./components/pages/chw/RegisterWorker.jsx";
+import CreateUser from "./components/pages/ceho/CreateNewUser.jsx";
 
 
 
@@ -89,6 +91,7 @@ const App = () => {
           <Route path="/verifypassword" element={<VerifyPassword />} />
           <Route path="/passwordreset"  element={<ResetPassword />} />
           <Route path="/changePassword" element={<ChangePassword />} />
+          <Route path="/register" element={<Register_as_CommunityHealthWork />} />
 
            {/* End Home view */}
 
@@ -98,6 +101,7 @@ const App = () => {
             <Route index element={<AdminHome />} />
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/edituser/:id" element={<EditUsers />} />
+            <Route path="/admin/createUser/" element={<CreateUser />} />
 
             <Route path="/admin/training" element={<ManageTrainings />} />
             <Route path="/admin/viewtraining/:id" element={<AdminViewTraining />} />
@@ -134,6 +138,7 @@ const App = () => {
           <Route path="/chw" element={<Communit_Health_Work_Layout />}>
             <Route index element={<CommunityHealthWorkHome />} />
             <Route path="/chw/trainings" element={<CommunityHealthWorkTrainings />} />
+            
             <Route path="/chw/myTrainingDetails/:id" element={<CommunityHealthWork_ViewTrainingDetails />} />
             <Route path="/chw/apply-training/:trainingId" element={<CommunityHealthWork_ApplyNewTraining />} />
 

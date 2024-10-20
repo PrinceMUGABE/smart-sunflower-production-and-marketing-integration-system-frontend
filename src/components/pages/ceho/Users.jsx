@@ -159,12 +159,12 @@ function Users() {
         Manage Users
       </h1>
       <div className="flex justify-between mb-4">
-        {/* <Link
+        <Link
           to="/admin/createUser"
           className="px-4 py-2 bg-blue-500 text-white rounded"
         >
           Create New User
-        </Link> */}
+        </Link>
 
         <div>
           <button

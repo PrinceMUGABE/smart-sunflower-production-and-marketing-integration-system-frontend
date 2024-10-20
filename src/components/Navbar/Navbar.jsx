@@ -36,7 +36,7 @@ const Navbar = () => {
   };
   return (
     <div
-      className="relative z-10 w-full dark:bg-black dark:text-white duration-300
+      className="relative z-10 w-full dark:bg-white dark:text-white duration-300
     "
     >
       <div className="container py-3 md:py-2">
@@ -47,9 +47,9 @@ const Navbar = () => {
             href="#home"
             className="flex items-center gap-3"
           >
-            <img src={Logo} alt="" className="w-5" />
+            <img src={Logo} alt="" className="w-5" /> <br /> <br /><br />
             <span className="text-2xl sm:text-3xl font-semibold">
-              Policy
+              CHW
             </span>
           </a>
           {/* Desktop view Navigation */}
@@ -71,7 +71,7 @@ const Navbar = () => {
           </nav>
           {/* Mobile view Drawer  */}
           <div className="flex items-center gap-4 md:hidden ">
-            <DarkMode />
+            {/* <DarkMode /> */}
             {/* Mobile Hamburger icon */}
             {showMenu ? (
               <HiMenuAlt1
