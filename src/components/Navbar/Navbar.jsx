@@ -71,7 +71,7 @@ const Navbar = () => {
           </nav>
           {/* Mobile view Drawer  */}
           <div className="flex items-center gap-4 md:hidden ">
-            {/* <DarkMode /> */}
+            <DarkMode />
             {/* Mobile Hamburger icon */}
             {showMenu ? (
               <HiMenuAlt1

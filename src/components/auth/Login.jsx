@@ -105,7 +105,7 @@ const Login = () => {
                         navigate('/chw');
                     } else {
                         // User is not a worker, navigate to /register
-                        navigate('/register');
+                        navigate('/chw/register');
                     }
                 })
                 .catch((workerError) => {
