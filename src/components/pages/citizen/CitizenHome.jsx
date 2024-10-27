@@ -2,61 +2,78 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './CitizenHome.css'; // Ensure your CSS is imported properly
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function CitizenHome() {
-  const [trainingsData, setTrainingsData] = useState([]);
+  const [servicesData, setServicesData] = useState([]); // Change to servicesData
   const [currentPage, setCurrentPage] = useState(1);
-  const trainingsPerPage = 9; // Show 9 trainings per page (3x3 grid)
+  const servicesPerPage = 9; // Show 9 services per page (3x3 grid)
   const navigate = useNavigate(); // Use the navigate hook
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const trainingsRes = await axios.get('http://127.0.0.1:8000/training/trainings/');
-        if (trainingsRes.data) {
-          setTrainingsData(trainingsRes.data);
+        // Retrieve the token from local storage or any other method you're using
+        const token = localStorage.getItem('token'); // Adjust this if you're using a different storage method
+  
+        const servicesRes = await axios.get('http://127.0.0.1:8000/service/services/', {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the header
+          },
+        });
+  
+        if (servicesRes.data) {
+          setServicesData(servicesRes.data);
         }
       } catch (error) {
-        console.error('Error fetching trainings:', error);
+        console.error('Error fetching services:', error);
+        // You might want to handle different error statuses here
+        if (error.response && error.response.status === 401) {
+          console.error('Unauthorized access - Redirecting to login');
+          // Redirect to login or show an appropriate message
+          // navigate('/login'); // Uncomment if you want to redirect
+        }
       }
     };
     fetchData();
   }, []);
+  
 
   // Pagination logic
-  const indexOfLastTraining = currentPage * trainingsPerPage;
-  const indexOfFirstTraining = indexOfLastTraining - trainingsPerPage;
-  const currentTrainings = trainingsData.slice(indexOfFirstTraining, indexOfLastTraining);
+  const indexOfLastService = currentPage * servicesPerPage;
+  const indexOfFirstService = indexOfLastService - servicesPerPage;
+  const currentServices = servicesData.slice(indexOfFirstService, indexOfLastService);
 
   // Handling page change
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  const totalPages = Math.ceil(trainingsData.length / trainingsPerPage);
-  // Function to navigate to the apply form with the selected training id
-  const handleEnrollClick = (trainingId) => {
-    navigate(`/citizen/apply-training/${trainingId}`); // Pass the training ID in the URL
+  const totalPages = Math.ceil(servicesData.length / servicesPerPage);
+
+  // Function to navigate to the apply form with the selected service id
+  const handleEnrollClick = (serviceId) => {
+    navigate(`/citizen/apply-service/${serviceId}`); // Pass the service ID in the URL
   };
 
   return (
     <div className="mt-20">
-      <h2 className="text-lg font-semibold mb-4 text-center text-black">Trainings</h2>
+      <h2 className="text-lg font-semibold mb-4 text-center text-black">Available Services</h2>
+      <p className='text-sm text-gray-400 text-center'>Choose a service and create an appointment with the community healthworkers to help you</p>
 
       {/* Display cards in a 3x3 grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-        {currentTrainings.map((training, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md p-6 text-center">
-            <h3 className="text-md font-semibold text-black mb-2">{training.name}</h3>
-            <p className="text-sm text-gray-600">Assistant: {training.created_by?.phone || 'Unknown'}</p>
-            <p className="text-sm text-gray-600">Created on: {new Date(training.created_at).toLocaleDateString()}</p>
-            <button
-              className="mt-4 bg-indigo-500 text-white rounded-md px-4 py-2"
-              onClick={() => handleEnrollClick(training.id)} // Pass training ID to the form
+        {currentServices.map((service) => (
+          <div key={service.id} className="bg-white rounded-lg shadow-md p-6 text-center">
+            <h3 className="text-md font-semibold text-black mb-2">{service.name}</h3>
+            <p className="text-sm text-gray-600">Assistant: {service.created_by?.phone || 'Unknown'}</p>
+            <p className="text-sm text-gray-600 mb-20">Created on: {new Date(service.created_at).toLocaleDateString()}</p>
+            <Link
+              className="mt-32 bg-indigo-500 text-white rounded-md px-4 py-2 "
+              to={"/citizen/createAppointment"}
             >
-              Enroll
-            </button>
+              Order appointmenr
+            </Link>
           </div>
         ))}
       </div>

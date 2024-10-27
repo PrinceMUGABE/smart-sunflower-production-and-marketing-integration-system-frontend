@@ -1,23 +1,25 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { ArrowPathIcon } from "@heroicons/react/20/solid";
+import Webcam from "react-webcam"; // Import Webcam
 
 const CommunityHealthWork_ApplyNewTraining = () => {
   const token = localStorage.getItem("token");
   const [data, setData] = useState({
-    first_name: "",
-    last_name: "",
-    user: "", // Assuming this is required; adjust based on your needs
+    user: "",
   });
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [trainingName, setTrainingName] = useState(""); // State for training name
+  const [imageSrc, setImageSrc] = useState(null); // State for captured image
+  const [imageCaptured, setImageCaptured] = useState(false); // State to track if an image has been captured
   const navigate = useNavigate();
   const { trainingId } = useParams(); // Get training ID from URL
+  const webcamRef = useRef(null); // Reference for the webcam
 
-  // New: Function to check if trainingId is a valid number
+  // Function to check if trainingId is a valid number
   const isTrainingIdValid = (id) => {
     return id && !isNaN(id); // Ensures id exists and is a number
   };
@@ -29,14 +31,14 @@ const CommunityHealthWork_ApplyNewTraining = () => {
     } else {
       setErrorMessage(""); // Clear error message if valid
       console.log("Training ID from URL:", trainingId);
-      
+
       // Fetch training information based on trainingId
       axios
-      .get(`http://127.0.0.1:8000/training/${trainingId}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include the token in the headers
-        },
-      })
+        .get(`http://127.0.0.1:8000/training/${trainingId}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the headers
+          },
+        })
         .then(response => {
           setTrainingName(response.data.name); // Adjust based on actual response structure
         })
@@ -47,7 +49,7 @@ const CommunityHealthWork_ApplyNewTraining = () => {
   }, [trainingId]);
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
@@ -65,15 +67,28 @@ const CommunityHealthWork_ApplyNewTraining = () => {
     setErrorMessage("");
 
     const formData = new FormData();
-    formData.append("first_name", data.first_name);
-    formData.append("last_name", data.last_name);
     formData.append("user", data.user); // Assuming this is required
     formData.append("training_id", trainingId); // Use the valid trainingId
 
+    // Submit the captured image as a base64 string
+    if (imageSrc) {
+      // Extract base64 string from the data URL
+      const base64Image = imageSrc.split(',')[1]; // Gets the base64 string
+      formData.append("image", base64Image); // Append the base64 string to FormData
+    }
+
+    // Log the submitted data for debugging
+    console.log("Submitting data:", {
+      user: data.user,
+      training_id: trainingId,
+      image: imageSrc ? imageSrc : null, // Log base64 image for debugging
+    });
+
+    // Make the API request
     axios.post('http://127.0.0.1:8000/trainingCandidate/create/', formData, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "multipart/form-data", // This header will be set automatically by axios when using FormData
       },
     })
     .then(() => {
@@ -81,7 +96,7 @@ const CommunityHealthWork_ApplyNewTraining = () => {
       navigate("/chw/trainings");
     })
     .catch((err) => {
-      // Updated to display the actual error message from the response
+      console.error(err); // Log the error for debugging
       setErrorMessage(
         err.response?.data?.detail || "An unexpected error occurred."
       );
@@ -89,6 +104,19 @@ const CommunityHealthWork_ApplyNewTraining = () => {
     .finally(() => {
       setLoading(false);
     });
+  };
+
+  // Capture image function
+  const capture = () => {
+    const capturedImageSrc = webcamRef.current.getScreenshot();
+    setImageSrc(capturedImageSrc); // Set the captured image src
+    setImageCaptured(true); // Update state to indicate that the image has been captured
+  };
+
+  // Retake image function
+  const retakeImage = () => {
+    setImageSrc(null); // Reset the image source
+    setImageCaptured(false); // Reset the captured state
   };
 
   return (
@@ -107,47 +135,6 @@ const CommunityHealthWork_ApplyNewTraining = () => {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" onSubmit={handleSubmit}>
-          {/* First Name */}
-          <div>
-            <label
-              htmlFor="first_name"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              First Name
-            </label>
-            <div className="mt-2">
-              <input
-                id="first_name"
-                name="first_name"
-                type="text"
-                value={data.first_name}
-                onChange={(e) => setData({ ...data, first_name: e.target.value })}
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-          </div>
-
-          {/* Last Name */}
-          <div>
-            <label
-              htmlFor="last_name"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Last Name
-            </label>
-            <div className="mt-2">
-              <input
-                id="last_name"
-                name="last_name"
-                type="text"
-                value={data.last_name}
-                onChange={(e) => setData({ ...data, last_name: e.target.value })}
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-          </div>
 
           {/* Training (display training name instead of ID) */}
           <div>
@@ -169,6 +156,42 @@ const CommunityHealthWork_ApplyNewTraining = () => {
             </div>
           </div>
 
+          {/* Webcam section */}
+          <div className="flex flex-col items-center">
+            <label className="block text-sm font-medium leading-6 text-gray-900">
+              Capture your image
+            </label>
+            {!imageCaptured ? (
+              <>
+                <Webcam
+                  audio={false}
+                  ref={webcamRef}
+                  screenshotFormat="image/png"
+                  className="w-full max-w-xs rounded-md border-2 border-gray-300"
+                />
+                <button
+                  type="button"
+                  onClick={capture}
+                  className="mt-2 flex w-full justify-center rounded-md bg-indigo-600 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  Capture Image
+                </button>
+              </>
+            ) : (
+              <div className="mt-4">
+                <p className="text-sm text-gray-700">Captured Image:</p>
+                <img src={imageSrc} alt="Captured" className="w-full max-w-xs rounded-md" />
+                <button
+                  type="button"
+                  onClick={retakeImage}
+                  className="mt-2 flex w-full justify-center rounded-md bg-red-600 py-2 px-4 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                >
+                  Retake Picture
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* Submit Button */}
           <div>
             <button
@@ -182,7 +205,7 @@ const CommunityHealthWork_ApplyNewTraining = () => {
                   Submitting...
                 </>
               ) : (
-                "Submit"
+                "Confirm"
               )}
             </button>
           </div>

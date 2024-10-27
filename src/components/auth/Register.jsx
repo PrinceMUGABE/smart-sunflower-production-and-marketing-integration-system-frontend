@@ -14,7 +14,6 @@ const Register = () => {
     role: 'Choose Role', // Set default role text
     password: '',
     confirmPassword: '',
-    capturedImage: null,
   });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
@@ -41,9 +40,6 @@ const Register = () => {
       newErrors.confirmPassword = 'Passwords do not match.';
     }
 
-    if (!formData.capturedImage) {
-      newErrors.capturedImage = 'You must capture a picture before submitting the form.';
-    }
 
     return newErrors;
   };
@@ -61,7 +57,7 @@ const Register = () => {
       phone: formData.phone,
       password: formData.password,
       role: formData.role,
-      image: formData.capturedImage.split(',')[1],
+
     };
 
     setLoading(true);
@@ -83,9 +79,7 @@ const Register = () => {
         if (backendErrors.password) {
           errorMessages.password = backendErrors.password;
         }
-        if (backendErrors.image) {
-          errorMessages.capturedImage = backendErrors.image;
-        }
+
 
         setErrors((prev) => ({
           ...prev,
@@ -121,39 +115,15 @@ const Register = () => {
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setFormData({ ...formData, capturedImage: imageSrc });
-    setErrors((prev) => ({ ...prev, capturedImage: '' }));
-  }, [webcamRef, formData]);
 
-  const handleRecapture = () => {
-    setFormData({ ...formData, capturedImage: null });
-  };
+  }, [formData]);
+
+
 
   return (
     <div className="flex justify-center items-center min-h-screen h-full bg-gray-50">
       <div className="grid lg:grid-cols-2 rounded-lg shadow-xl w-full max-w-4xl overflow-hidden">
-        <div className="flex flex-col items-center justify-center p-4">
-          {!formData.capturedImage ? (
-            <>
-              <Webcam
-                audio={false}
-                ref={webcamRef}
-                screenshotFormat="image/jpeg"
-                className="w-full h-auto"
-              />
-              <button onClick={capture} className="mt-2 bg-indigo-600 text-white py-2 px-4 rounded">
-                Capture Photo
-              </button>
-            </>
-          ) : (
-            <>
-              <img src={formData.capturedImage} alt="Captured" className="w-full h-auto" />
-              <button onClick={handleRecapture} className="mt-2 bg-red-600 text-white py-2 px-4 rounded">
-                Retake Photo
-              </button>
-            </>
-          )}
-          {errors.capturedImage && <p className="text-red-500 text-sm">{errors.capturedImage}</p>}
-        </div>
+
         <div className="flex items-center justify-center bg-white py-6 px-6 lg:px-8 w-full">
           <div className="sm:max-w-md w-full">
             <h2 className="mt-3 text-center text-2xl font-bold text-gray-900">Create Account</h2>

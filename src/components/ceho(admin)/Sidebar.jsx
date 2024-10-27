@@ -22,13 +22,14 @@ function Sidebar() {
   const Sidebar_Links = [
     { id: 1, name: 'Dashboard', path: '/admin', icon: <MdDashboard /> },
     { id: 2, name: 'Users', path: '/admin/users', icon: <FaUsers /> },
-    { id: 3, name: 'Training', path: '/admin/training', icon: <GiNotebook /> },
-    { id: 4, name: 'CHW', path: '/admin/worker', icon: <LiaUserNurseSolid /> },
-    { id: 5, name: 'Training Candidates', path: '/admin/learner', icon: <PiStudentFill /> },
-    { id: 6, name: 'Exam', path: '/admin/exams', icon: <BiSolidInstitution /> },
+    { id: 3, name: 'Services', path: '/admin/services', icon: <GiNotebook /> },
+    { id: 4, name: 'Training', path: '/admin/training', icon: <GiNotebook /> },
+    { id: 5, name: 'CHW', path: '/admin/worker', icon: <LiaUserNurseSolid /> },
+    { id: 6, name: 'Training Candidates', path: '/admin/learner', icon: <PiStudentFill /> },
+    { id: 7, name: 'Exam', path: '/admin/exams', icon: <BiSolidInstitution /> },
     
-    { id: 7, name: 'Exam Results', path: '/admin/results', icon: <HiMiniClipboardDocument /> },
-    { id: 8, name: 'Reports', path: '/admin/reports', icon: <FcDepartment /> },
+    { id: 8, name: 'Exam Results', path: '/admin/results', icon: <HiMiniClipboardDocument /> },
+    { id: 9, name: 'Reports', path: '/admin/reports', icon: <FcDepartment /> },
     // { id: 9, name: 'Activities', path: '/admin/activities', icon: <FcDepartment /> },
     // { id: 10, name: 'Appointments', path: '/admin/appointments', icon: <FcDepartment /> },
   ];

@@ -1,167 +1,246 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
-import axios from "axios";
-import { ArrowPathIcon } from "@heroicons/react/20/solid";
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
 
 const CommunityHealthWork_ViewTrainingDetails = () => {
-  const { id } = useParams();
-  const [data, setData] = useState({});
+  const { id: trainingId } = useParams(); // Use useParams to get the training ID from the URL
+  const navigate = useNavigate(); // useNavigate hook for handling navigation
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const [currentModulePage, setCurrentModulePage] = useState(0);
+  const [allModulesCompleted, setAllModulesCompleted] = useState(false); // New state to track completion status
+
+  const candidateId = 1; // Or receive as a prop
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const fetchTraining = async () => {
+      if (!trainingId) {
+        setErrorMessage("Training ID is required");
+        return;
+      }
 
-    if (!token) {
-      setErrorMessage("No token found. Please login first.");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrorMessage("No token found. Please login first.");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:8000/trainingCandidate/${trainingId}/?candidate_id=${candidateId}`,
+          { 
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch training data: ${response.status}`);
+        }
+
+        const jsonData = await response.json();
+        setData(jsonData);
+        // Check if all modules are completed on initial fetch
+        setAllModulesCompleted(jsonData.training.modules.every(module => module.is_completed));
+      } catch (error) {
+        setErrorMessage(`Error fetching training data: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTraining();
+  }, [trainingId, candidateId]);
+
+  const markModuleAsStudied = async (moduleId) => {
+    if (!trainingId || !moduleId) {
+      console.error("Training ID and Module ID are required");
       return;
     }
 
-    setLoading(true);
-    axios
-      .get(`http://127.0.0.1:8000/trainingCandidate/${id}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        if (res.data) {
-          setData(res.data);
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/trainingCandidate/candidate/${candidateId}/modules/${moduleId}/mark-as-studied/`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      })
-      .catch((err) => {
-        setErrorMessage(
-          err.response?.data?.message || "Error fetching training data."
-        );
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [id]);
+      );
 
-  const renderRole = (role) => {
-    switch (role) {
-      case "citizen":
-        return "Citizen";
-      case "ceho":
-        return "Community Environment Chief Officer";
-      case "chw":
-        return "Community Health Worker";
-      default:
-        return "Unknown Role";
+      if (!response.ok) {
+        throw new Error('Failed to mark module as studied');
+      }
+
+      // Update state to reflect the change
+      setData(prevData => {
+        const updatedModules = prevData.training.modules.map(module =>
+          module.id === moduleId ? { ...module, is_completed: true } : module
+        );
+
+        // Check if all modules are now completed
+        const allCompleted = updatedModules.every(module => module.is_completed);
+        setAllModulesCompleted(allCompleted); // Update completion state
+
+        return {
+          ...prevData,
+          training: {
+            ...prevData.training,
+            modules: updatedModules
+          }
+        };
+      });
+
+    } catch (error) {
+      console.error("Error marking module as studied:", error);
     }
   };
 
-  // Function to format date and time in English format
-  const formatDateTime = (date) => {
-    return new Date(date).toLocaleString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-    });
+  const handleTakeExam = () => {
+    if (!allModulesCompleted) {
+      setErrorMessage("You must complete all modules before taking the exam.");
+      return;
+    }
+    
+    if (data?.training?.id) {
+      navigate(`/chw/takeExam/${data.training.id}`);
+    }
   };
 
-  // Handle redirection to the exam page when the "Take Exam" button is clicked
-  // Handle redirection to the exam page when the "Take Exam" button is clicked
-const handleTakeExam = () => {
-  if (data.training && data.training.id) {
-    navigate(`/chw/takeExam/${data.training.id}`);
-  } else {
-    console.error("Training data is not available.");
+  // Handle loading and error states
+  if (loading) {
+    return <div className="flex justify-center"><Loader2 className="animate-spin" /></div>;
   }
-};
 
+  if (errorMessage) {
+    return (
+      <div className="text-red-600 text-center mt-4">
+        <p>{errorMessage}</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return null; // Or a loading state
+  }
+
+  const currentModule = data?.training?.modules?.[currentModulePage];
+
+  const nextPage = () => {
+    if (data?.training?.modules && currentModulePage < data.training.modules.length - 1) {
+      setCurrentModulePage(currentModulePage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentModulePage > 0) {
+      setCurrentModulePage(currentModulePage - 1);
+    }
+  };
+
+  // Early return for missing training ID
+  if (!trainingId) {
+    return (
+      <div className="text-red-600 text-center mt-4">
+        <p>Training ID is required</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-2xl">
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Name of Training:{" "}
-          <span className="text-yellow-900 font-bold">
-            {data.training?.name || "N/A"}
-          </span>
+          {data?.training?.name || "Training Details"}
         </h2>
       </div>
 
-      {loading && (
-        <div className="flex justify-center">
-          <ArrowPathIcon className="h-8 w-8 text-indigo-600 animate-spin" />
-        </div>
-      )}
-
-      {errorMessage && (
-        <div className="text-red-600 text-center">
+      {errorMessage ? (
+        <div className="text-red-600 text-center mt-4">
           <p>{errorMessage}</p>
         </div>
-      )}
-
-      {!loading && !errorMessage && (
+      ) : (
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-4xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Training Information */}
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <div className="block">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Assistant
-                  </label>
-                  <span className="text-gray-900">
-                    {data.training?.created_by?.phone || "N/A"}
-                  </span>
-                </div>
-                <div className="block">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Status
-                  </label>
-                  <span className="text-gray-900">{data.status || "N/A"}</span>
-                </div>
-                <div className="block">
-                  <span className="text-gray-900">
-                    {data.training?.materials ? (
+          {currentModule ? (
+            <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+                Module {currentModulePage + 1}: <span className="text-red-700">{currentModule.name}</span> 
+              </h3>
+              
+              <div className="prose max-w-none">
+                <p className="text-black mb-6 text-center font-semibold py-4">Description:<br /><br /> </p>
+                 <span className="text-gray-700">{currentModule.description}</span>
+              </div>
+
+              {currentModule.materials?.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="font-semibold text-black text-center mb-2">Materials</h4>
+                  <div className="space-y-2">
+                    {currentModule.materials.map((material, index) => (
                       <a
-                        href={`http://127.0.0.1:8000${data.training.materials}`}
-                        className="text-indigo-600 hover:text-indigo-800"
+                        key={index}
+                        href={`http://127.0.0.1:8000${material.file}`}
                         target="_blank"
                         rel="noopener noreferrer"
+                        className="block text-blue-600 hover:text-blue-800 hover:underline"
                       >
-                        View Materials
+                        {material.file.split("/").pop()}
                       </a>
-                    ) : (
-                      <span className="text-gray-500">
-                        No materials uploaded
-                      </span>
-                    )}
-                  </span>
+                    ))}
+                  </div>
                 </div>
-                <div className="block">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Created At
-                  </label>
-                  <span className="text-red-600">
-                    {data.created_at
-                      ? formatDateTime(data.created_at)
-                      : "N/A"}
-                  </span>
-                </div>
+              )}
+
+              <div className="mt-8 flex items-center justify-between gap-4">
+                <button
+                  onClick={prevPage}
+                  disabled={currentModulePage === 0}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </button>
+
+                <button
+                  onClick={() => markModuleAsStudied(currentModule.id)}
+                  disabled={currentModule.is_completed}
+                  className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {currentModule.is_completed ? "Completed" : "Mark as Completed"}
+                </button>
+
+                <button
+                  onClick={nextPage}
+                  disabled={currentModulePage >= (data?.training?.modules?.length || 0) - 1}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-gray-600 text-center">No module data available.</div>
+          )}
 
-          {/* Take Exam Button */}
-          <div className="flex justify-center mt-6">
-            <button
-              onClick={handleTakeExam}
-              className="px-6 py-2 bg-blue-500 text-white font-bold rounded hover:bg-blue-600 transition"
-            >
-              Take Exam
-            </button>
-          </div>
+          {currentModulePage === (data?.training?.modules?.length - 1) && (
+            <div className="mt-8 text-center">
+              <button
+                onClick={handleTakeExam}
+                className="px-6 py-2 bg-green-500 text-white font-bold rounded-md hover:bg-green-600 transition-colors"
+              >
+                Take Exam
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

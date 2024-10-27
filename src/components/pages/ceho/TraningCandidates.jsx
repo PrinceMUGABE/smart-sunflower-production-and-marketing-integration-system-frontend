@@ -93,7 +93,7 @@ function ManagetrainingCandidates() {
 
   const filteredData = trainingCandidateData.filter(
     (trainingCandidate) =>
-      trainingCandidate.user.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      trainingCandidate.worker?.created_by?.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       trainingCandidate.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       trainingCandidate.created_at?.includes(searchQuery)
   );
@@ -169,7 +169,7 @@ function ManagetrainingCandidates() {
             {currenttrainingCandidates.length > 0 ? (
               currenttrainingCandidates.map((trainingCandidate) => (
                 <tr key={trainingCandidate.id} className="bg-white border-b">
-                  <td className="px-6 py-4 font-medium">{trainingCandidate.user.phone}</td>
+                  <td className="px-6 py-4 font-medium">{trainingCandidate.worker?.created_by?.phone}</td>
                   <td className="px-6 py-4">{trainingCandidate.training.name}</td>
                   <td className="px-6 py-4">
                     {trainingCandidate.created_at

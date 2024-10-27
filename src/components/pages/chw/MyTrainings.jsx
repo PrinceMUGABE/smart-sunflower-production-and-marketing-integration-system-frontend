@@ -16,7 +16,9 @@ function CommunityHealthWorkTrainings() {
   const navigate = useNavigate();
 
   const storedUserData = localStorage.getItem("userData");
-  const accessToken = storedUserData ? JSON.parse(storedUserData).access_token : null;
+  const accessToken = storedUserData
+    ? JSON.parse(storedUserData).access_token
+    : null;
 
   useEffect(() => {
     if (!accessToken) {
@@ -34,7 +36,10 @@ function CommunityHealthWorkTrainings() {
 
   const handleFetch = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/trainingCandidate/my_trainings/", axiosConfig);
+      const res = await axios.get(
+        "http://127.0.0.1:8000/trainingCandidate/my_trainings/",
+        axiosConfig
+      );
       if (Array.isArray(res.data)) {
         setTrainingData(res.data);
       } else {
@@ -80,7 +85,10 @@ function CommunityHealthWorkTrainings() {
 
   const indexOfLastTraining = currentPage * trainingsPerPage;
   const indexOfFirstTraining = indexOfLastTraining - trainingsPerPage;
-  const currentTrainings = filteredData.slice(indexOfFirstTraining, indexOfLastTraining);
+  const currentTrainings = filteredData.slice(
+    indexOfFirstTraining,
+    indexOfLastTraining
+  );
   const totalPages = Math.ceil(filteredData.length / trainingsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -93,11 +101,12 @@ function CommunityHealthWorkTrainings() {
 
       {/* Display total number of trainings */}
       <p className="text-center text-blue-700 font-bold mb-4">
-        Number of Registered Trainings: <span className="text-orange-600 font-bold">{filteredData.length}</span>
+        Number of Registered Trainings:{" "}
+        <span className="text-orange-600 font-bold">{filteredData.length}</span>
       </p>
 
       <div className="flex flex-col md:flex-row justify-between mb-4">
-      <Link
+        <Link
           to="/chw"
           className="px-4 py-2 bg-blue-500 text-white rounded mb-4 md:mb-0"
         >
@@ -156,7 +165,10 @@ function CommunityHealthWorkTrainings() {
             {currentTrainings.length > 0 ? (
               currentTrainings.map((training) => (
                 <tr key={training.id} className="bg-white border-b">
-                  <td className="px-6 py-4 font-medium">{training.user?.phone || "N/A"}</td> {/* Handle undefined user */}
+                  <td className="px-6 py-4 font-medium">
+                    {training.training?.created_by?.phone || "N/A"}
+                  </td>{" "}
+                  {/* Handle undefined user */}
                   <td className="px-6 py-4">{training.training.name}</td>
                   <td className="px-6 py-4">{training.status}</td>
                   {/* <td className="px-6 py-4">
@@ -165,7 +177,9 @@ function CommunityHealthWorkTrainings() {
                       : "N/A"}
                   </td> */}
                   <td className="px-6 py-4 flex items-center space-x-2">
-                    <Link to={`/chw/myTrainingDetails/${training.id}`}>
+                    <Link
+                      to={`/chw/myTrainingDetails/${training.training?.id}`}
+                    >
                       <FontAwesomeIcon icon={faEye} className="text-blue-500" />
                     </Link>
                   </td>

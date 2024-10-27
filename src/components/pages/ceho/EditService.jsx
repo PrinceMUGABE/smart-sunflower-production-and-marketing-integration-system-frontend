@@ -4,47 +4,45 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { LockClosedIcon, ArrowPathIcon } from "@heroicons/react/20/solid"; // Using ArrowPathIcon for spinner
 
-const EditTraining = () => {
+const EditService = () => {
   const { id } = useParams();
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false); // Loading state for spinner
   const [errorMessage, setErrorMessage] = useState(""); // Error message to show on the page
-  const [newMaterials, setNewMaterials] = useState([]); // State for new materials
-  const [existingMaterials, setExistingMaterials] = useState([]); // State for existing materials
+  const [materials, setMaterials] = useState(null); // State to handle file upload
   const navigate = useNavigate();
 
-  // Fetch the training data by ID
+  // Fetch the service data by ID
   useEffect(() => {
     const token = localStorage.getItem("token"); // Retrieve the token from local storage
 
     if (!token) {
-      console.error("No token found. Training is not authenticated.");
+      console.error("No token found. service is not authenticated.");
       setErrorMessage("No token found. Please login first.");
       return; // Stop the request if there's no token
     }
 
     setLoading(true); // Start loading before making the request
     axios
-      .get(`http://127.0.0.1:8000/training/${id}/`, {
+      .get(`http://127.0.0.1:8000/service/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in the headers
         },
       })
       .then((res) => {
         if (res.data) {
-          setData(res.data); // Set the fetched training data
-          setExistingMaterials(res.data.materials || []); // Set the existing materials
+          setData(res.data); // Set the fetched service data
         }
       })
       .catch((err) => {
-        setErrorMessage(err.response?.data?.message || "Error fetching training data.");
+        setErrorMessage(err.response?.data?.message || "Error fetching service data.");
       })
       .finally(() => {
         setLoading(false); // Stop loading after the request finishes
       });
   }, [id]);
 
-  // Update the training data
+  // Update the service data
   const handleSubmit = (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token"); // Retrieve the token from local storage
@@ -60,14 +58,12 @@ const EditTraining = () => {
     // Create a FormData object to send data including files
     const formData = new FormData();
     formData.append("name", data.name);
-    
-    // Append new materials
-    newMaterials.forEach((file) => {
-      formData.append("materials", file); // Attach new files if they exist
-    });
+    if (materials) {
+      formData.append("materials", materials); // Attach file if it exists
+    }
 
     axios
-      .put(`http://127.0.0.1:8000/training/update/${id}/`, formData, {
+      .put(`http://127.0.0.1:8000/service/update/${id}/`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data", // Important for file uploads
@@ -75,30 +71,21 @@ const EditTraining = () => {
       })
       .then((res) => {
         alert("Data updated successfully");
-        navigate("/admin/training"); // Navigate back to the trainings list page
+        navigate("/admin/services"); // Navigate back to the services list page
       })
       .catch((err) => {
-        setErrorMessage(err.response?.data?.message || "Error updating training.");
+        setErrorMessage(err.response?.data?.message || "Error updating service.");
       })
       .finally(() => {
         setLoading(false); // Stop loading after the request finishes
       });
   };
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files); // Convert FileList to Array
-    setNewMaterials(files); // Update new materials state with the selected files
-  };
-
-  const handleRemoveMaterial = (index) => {
-    setExistingMaterials((prev) => prev.filter((_, i) => i !== index)); // Remove material by index
-  };
-
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Update Training
+          Update service
         </h2>
       </div>
 
@@ -110,6 +97,27 @@ const EditTraining = () => {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" onSubmit={handleSubmit}>
+          {/* <div>
+            <label
+              htmlFor="phone"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
+              Created By
+            </label>
+            <div className="mt-2">
+              <input
+                id="phone"
+                name="phone"
+                type="text"
+                value={data.created_by?.phone || ""} // Use optional chaining here
+                onChange={(e) => setData({ ...data, phone: e.target.value })}
+                required
+                readOnly
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div> */}
+
           <div>
             <label
               htmlFor="name"
@@ -130,61 +138,7 @@ const EditTraining = () => {
             </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="existing-materials"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Existing Materials
-            </label>
-            <ul className="mt-2">
-              {existingMaterials.length === 0 ? (
-                <li>No materials uploaded yet.</li>
-              ) : (
-                existingMaterials.map((material, index) => (
-                  <li key={index} className="flex justify-between items-center">
-                    {/* Display link for the material */}
-                    <a 
-                      href={material.file} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-blue-500 hover:underline"
-                    >
-                      {material.name}
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveMaterial(index)}
-                      className="ml-2 text-red-500 hover:text-red-700"
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-
-          <div>
-            <label
-              htmlFor="materials"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Upload New Materials
-            </label>
-            <div className="mt-2">
-              <input
-                id="materials"
-                name="materials"
-                type="file"
-                onChange={handleFileChange} // Handle file upload
-                accept=".pdf,.mp4,.avi,.mkv" // Accept only specific formats
-                className="block w-full text-gray-900"
-                multiple // Allow multiple uploads
-              />
-            </div>
-          </div>
-
+          
           <div>
             <button
               type="submit"
@@ -212,4 +166,4 @@ const EditTraining = () => {
   );
 };
 
-export default EditTraining;
+export default EditService;

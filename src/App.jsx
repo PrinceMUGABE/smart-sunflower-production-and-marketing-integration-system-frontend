@@ -63,6 +63,10 @@ import CitizenCertificateView from "./components/pages/citizen/CiticenCertificat
 import CommunityHealthWork_CertificateView from "./components/pages/chw/Certificate.jsx";
 import Register_as_CommunityHealthWork from "./components/pages/chw/RegisterWorker.jsx";
 import CreateUser from "./components/pages/ceho/CreateNewUser.jsx";
+import ManageServices from "./components/pages/ceho/Services.jsx";
+import AdminViewService from "./components/pages/ceho/ViewService.jsx";
+import EditService from "./components/pages/ceho/EditService.jsx";
+import CreateService from "./components/pages/ceho/CreateService.jsx";
 
 
 
@@ -108,6 +112,7 @@ const App = () => {
             <Route path="/admin/edittraining/:id" element={<EditTraining />} />
             <Route path="/admin/createtraining/" element={<CreateTraining />} />
 
+
             <Route path="/admin/learner" element={<ManagetrainingCandidates />} />
             <Route path="/admin/viewTrainingCandidate/:id" element={<AdminViewTrainingCandidateDetails />} />
             <Route path="/admin/createTrainingCandidate/" element={<AdminCreateTrainingCandidate />} />
@@ -128,6 +133,11 @@ const App = () => {
 
             <Route path="/admin/results" element={<AdminManageExamResults />} />
             <Route path="/admin/reports" element={<AdminManageReports />} />
+
+            <Route path="/admin/services" element={<ManageServices />} />
+            <Route path="/admin/viewService/:id" element={<AdminViewService />} />
+            <Route path="/admin/editService/:id" element={<EditService />} />
+            <Route path="/admin/createService/" element={<CreateService />} />
 
           </Route>
 

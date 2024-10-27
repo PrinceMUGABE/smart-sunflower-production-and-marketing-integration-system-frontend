@@ -29,15 +29,22 @@ const AdminEditTrainingCandidate = () => {
 
     const fetchCandidate = async () => {
       try {
-        const candidateResponse = await axios.get(`http://127.0.0.1:8000/trainingCandidate/${id}/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const candidateResponse = await axios.get(
+          `http://127.0.0.1:8000/trainingCandidate/${id}/`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        // Ensure to check if the response has the expected structure
+        const workerData = candidateResponse.data.worker; // Get the worker object
+        const trainingData = candidateResponse.data.training; // Get the training object if available
 
         setData({
-          first_name: candidateResponse.data.first_name,
-          last_name: candidateResponse.data.last_name,
-          user: candidateResponse.data.user, // Make sure to get user data here if needed
-          training: candidateResponse.data.training, // Assuming you get training details here
+          first_name: workerData.first_name || "", // Set default value
+          last_name: workerData.last_name || "", // Set default value
+          user: workerData.created_by || {}, // Assuming 'created_by' holds the user details
+          training: trainingData || {}, // Set default value
         });
       } catch (error) {
         setErrorMessage("Error fetching candidate data. Please try again.");
@@ -63,13 +70,17 @@ const AdminEditTrainingCandidate = () => {
       return;
     }
 
-    if (!validateName(data.first_name)) {
-      setErrorMessage("First name must start with a capital letter and contain only letters.");
+    if (!validateName(data.first_name)) { // Access first_name directly from data
+      setErrorMessage(
+        "First name must start with a capital letter and contain only letters."
+      );
       return;
     }
 
-    if (!validateName(data.last_name)) {
-      setErrorMessage("Last name must start with a capital letter and contain only letters.");
+    if (!validateName(data.last_name)) { // Access last_name directly from data
+      setErrorMessage(
+        "Last name must start with a capital letter and contain only letters."
+      );
       return;
     }
 
@@ -77,9 +88,9 @@ const AdminEditTrainingCandidate = () => {
     setErrorMessage(""); // Clear any previous errors
 
     const formData = new FormData();
-    formData.append("first_name", data.first_name);
-    formData.append("last_name", data.last_name);
-    formData.append("user", data.user);
+    formData.append("first_name", data.first_name); // Correctly use first_name
+    formData.append("last_name", data.last_name); // Correctly use last_name
+    formData.append("user", data.user?.id); // Assuming you want to update using user ID
 
     axios
       .put(`http://127.0.0.1:8000/trainingCandidate/update/${id}/`, formData, {
@@ -120,7 +131,10 @@ const AdminEditTrainingCandidate = () => {
         <form className="space-y-6" onSubmit={handleSubmit}>
           {/* First Name */}
           <div>
-            <label htmlFor="first_name" className="block text-sm font-medium leading-6 text-gray-900">
+            <label
+              htmlFor="first_name"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
               First Name
             </label>
             <div className="mt-2">
@@ -128,8 +142,10 @@ const AdminEditTrainingCandidate = () => {
                 id="first_name"
                 name="first_name"
                 type="text"
-                value={data.first_name}
-                onChange={(e) => setData({ ...data, first_name: e.target.value })}
+                value={data.first_name} // Use data.first_name
+                onChange={(e) =>
+                  setData({ ...data, first_name: e.target.value })
+                }
                 required
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
@@ -138,7 +154,10 @@ const AdminEditTrainingCandidate = () => {
 
           {/* Last Name */}
           <div>
-            <label htmlFor="last_name" className="block text-sm font-medium leading-6 text-gray-900">
+            <label
+              htmlFor="last_name"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
               Last Name
             </label>
             <div className="mt-2">
@@ -146,8 +165,10 @@ const AdminEditTrainingCandidate = () => {
                 id="last_name"
                 name="last_name"
                 type="text"
-                value={data.last_name}
-                onChange={(e) => setData({ ...data, last_name: e.target.value })}
+                value={data.last_name} // Use data.last_name
+                onChange={(e) =>
+                  setData({ ...data, last_name: e.target.value })
+                }
                 required
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
@@ -156,16 +177,17 @@ const AdminEditTrainingCandidate = () => {
 
           {/* User */}
           <div>
-            <label htmlFor="user" className="block text-sm font-medium leading-6 text-gray-900">
+            <label
+              htmlFor="user"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
               User
             </label>
             <div className="mt-2">
               <input
                 id="user"
                 name="user"
-                value={data.user.phone || ""}
-                onChange={(e) => setData({ ...data, user: e.target.value })}
-                required
+                value={data.user?.phone || ""} // Correctly reference user's phone
                 readOnly
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
@@ -174,7 +196,10 @@ const AdminEditTrainingCandidate = () => {
 
           {/* Training Dropdown */}
           <div>
-            <label htmlFor="training" className="block text-sm font-medium leading-6 text-gray-900">
+            <label
+              htmlFor="training"
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
               Select Training
             </label>
             <div className="mt-2">
@@ -195,13 +220,9 @@ const AdminEditTrainingCandidate = () => {
               className="group relative flex w-full justify-center rounded-md bg-purple-500 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                {loading ? (
-                  <ArrowPathIcon className="h-5 w-5 text-white animate-spin" aria-hidden="true" />
-                ) : (
-                  <LockClosedIcon className="h-5 w-5 text-white group-hover:text-purple-400" aria-hidden="true" />
-                )}
+                <LockClosedIcon className="h-5 w-5" aria-hidden="true" />
               </span>
-              {loading ? "Submitting..." : "Update Training Candidate"}
+              {loading ? <ArrowPathIcon className="animate-spin h-5 w-5" /> : "Update"}
             </button>
           </div>
         </form>

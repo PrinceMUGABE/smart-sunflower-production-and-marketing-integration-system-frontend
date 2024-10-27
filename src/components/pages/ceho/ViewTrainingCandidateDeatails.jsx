@@ -99,26 +99,26 @@ const AdminViewTrainingCandidateDetails = () => {
                   <label className="block text-sm font-medium text-gray-700">
                     Firstname
                   </label>
-                  <span className="text-gray-900">{data.first_name || "N/A"}</span>
+                  <span className="text-gray-900">{data.worker?.first_name || "N/A"}</span>
                 </div>
                 <div className="block">
                   <label className="block text-sm font-medium text-gray-700">
                     Lastname
                   </label>
-                  <span className="text-gray-900">{data.last_name || "N/A"}</span>
+                  <span className="text-gray-900">{data.worker?.last_name || "N/A"}</span>
                 </div>
                 <div className="block">
                   <label className="block text-sm font-medium text-gray-700">
                     Phone
                   </label>
-                  <span className="text-gray-900">{data.user?.phone || "N/A"}</span>
+                  <span className="text-gray-900">{data.worker?.created_by?.phone || "N/A"}</span>
                 </div>
                 <div className="block">
                   <label className="block text-sm font-medium text-gray-700">
                     Role
                   </label>
                   <span className="text-gray-900">
-                    {data.user?.role ? renderRole(data.user.role) : "N/A"}
+                    {data.worker?.created_by?.role ? renderRole(data.worker.created_by.role) : "N/A"}
                   </span>
                 </div>
                 <div className="block">
@@ -126,8 +126,8 @@ const AdminViewTrainingCandidateDetails = () => {
                     Registerd on
                   </label>
                   <span className="text-red-600">
-                    {data.user?.created_at
-                      ? formatDateTime(data.user.created_at)
+                    {data.created_at
+                      ? formatDateTime(data.created_at)
                       : "N/A"}
                   </span>
                 </div>

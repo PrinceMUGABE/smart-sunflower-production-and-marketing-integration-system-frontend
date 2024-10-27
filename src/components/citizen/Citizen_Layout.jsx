@@ -26,7 +26,7 @@ function Citizen_Layout() {
               >
                 My Appointments
               </Link>
-              <Link
+              {/* <Link
                 to="/citizen/trainings"
                 className="px-4 py-2 bg-purple-500 text-white rounded w-full md:w-auto text-center"
               >
@@ -37,7 +37,7 @@ function Citizen_Layout() {
                 className="px-4 py-2 bg-red-500 text-white rounded w-full md:w-auto text-center"
               >
                 My Certificates
-              </Link>
+              </Link> */}
             </div>
             <Outlet />
           </main>

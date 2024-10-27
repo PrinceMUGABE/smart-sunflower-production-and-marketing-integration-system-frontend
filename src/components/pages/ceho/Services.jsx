@@ -5,13 +5,14 @@ import { Link, useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
+// Import FontAwesome icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-function AdminManageExamResults() {
-  const [resultData, setresultData] = useState([]);
+function ManageServices() {
+  const [serviceData, setserviceData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [resultsPerPage] = useState(5);
+  const [servicesPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
@@ -34,11 +35,11 @@ function AdminManageExamResults() {
 
   const handleFetch = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/result/results/", axiosConfig);
+      const res = await axios.get("http://127.0.0.1:8000/service/services/", axiosConfig);
       if (Array.isArray(res.data)) {
-        setresultData(res.data);
+        setserviceData(res.data);
       } else {
-        setresultData([]);
+        setserviceData([]);
       }
     } catch (err) {
       if (err.response && err.response.status === 401) {
@@ -55,20 +56,20 @@ function AdminManageExamResults() {
   }, [accessToken]);
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Do you want to delete this result?");
+    const confirmDelete = window.confirm("Do you want to delete this service?");
     if (confirmDelete) {
       try {
         const res = await axios.delete(
-          `http://127.0.0.1:8000/result/delete/${id}/`,
+          `http://127.0.0.1:8000/service/delete/${id}/`,
           axiosConfig
         );
         if (res.status === 204) {
-          setresultData((prevData) => prevData.filter((result) => result.id !== id));
+          setserviceData((prevData) => prevData.filter((service) => service.id !== id));
         } else {
-          alert("Failed to delete result");
+          alert("Failed to delete service");
         }
       } catch (err) {
-        alert("An error occurred while deleting the result");
+        alert("An error occurred while deleting the service");
       }
     }
   };
@@ -79,41 +80,45 @@ function AdminManageExamResults() {
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
-    doc.autoTable({ html: "#result-table" });
-    doc.save("results.pdf");
+    doc.autoTable({ html: "#service-table" });
+    doc.save("services.pdf");
   };
 
   const handleDownloadExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(resultData);
+    const worksheet = XLSX.utils.json_to_sheet(serviceData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "results");
-    XLSX.writeFile(workbook, "results.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "services");
+    XLSX.writeFile(workbook, "services.xlsx");
   };
 
-  const filteredData = resultData.filter(
-    (result) =>
-      result.created_by?.user?.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.created_by?.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.status?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.created_by?.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.exam?.training?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.created_at?.includes(searchQuery)
+  const filteredData = serviceData.filter(
+    (service) =>
+      service.created_by.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.created_at?.includes(searchQuery)
   );
 
-  const indexOfLastresult = currentPage * resultsPerPage;
-  const indexOfFirstresult = indexOfLastresult - resultsPerPage;
-  const currentresults = filteredData.slice(indexOfFirstresult, indexOfLastresult);
-  const totalPages = Math.ceil(filteredData.length / resultsPerPage);
+  const indexOfLastservice = currentPage * servicesPerPage;
+  const indexOfFirstservice = indexOfLastservice - servicesPerPage;
+  const currentservices = filteredData.slice(indexOfFirstservice, indexOfLastservice);
+  const totalPages = Math.ceil(filteredData.length / servicesPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <>
       <h1 className="text-center text-black font-bold text-xl capitalize mb-4">
-        Manage results
+        Manage services
       </h1>
 
       <div className="flex flex-col md:flex-row justify-between mb-4">
+        <Link
+          to="/admin/createService"
+          className="px-4 py-2 bg-blue-500 text-white rounded mb-4 md:mb-0"
+        >
+          Create New service
+        </Link>
+
         <div className="flex items-center space-x-2 mb-4 md:mb-0">
           <button
             onClick={handleDownloadPDF}
@@ -140,31 +145,16 @@ function AdminManageExamResults() {
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table
-          id="result-table"
+          id="service-table"
           className="min-w-full text-sm text-left text-gray-500"
         >
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
               <th scope="col" className="px-6 py-3">
-                Firstname
+                Created by
               </th>
               <th scope="col" className="px-6 py-3">
-                Lastname
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Phone
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Training Name
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Service Name
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Total Marks
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Status
+                Name of service
               </th>
               <th scope="col" className="px-6 py-3">
                 Created Date
@@ -176,42 +166,37 @@ function AdminManageExamResults() {
           </thead>
 
           <tbody>
-  {currentresults.length > 0 ? (
-    currentresults.map((result) => (
-      <tr key={result.id} className="bg-white border-b">
-        <td className="px-6 py-4 font-medium">{result.candidate?.worker?.first_name || "N/A"}</td>
-        <td className="px-6 py-4">{result.candidate?.worker?.last_name || "N/A"}</td>
-        <td className="px-6 py-4">{result.candidate?.worker.created_by?.phone || "N/A"}</td>
-        <td className="px-6 py-4">{result.exam?.training?.name || "N/A"}</td>
-        <td className="px-6 py-4">{result.exam?.training?.service?.name || "N/A"}</td>
-        <td className="px-6 py-4">{result.total_marks}</td>
-        <td className="px-6 py-4">{result.status}</td>
-        <td className="px-6 py-4">
-          {result.created_at
-            ? new Date(result.created_at).toLocaleDateString()
-            : "N/A"}
-        </td>
-        <td className="px-6 py-4 flex items-center space-x-2">
-          {/* <Link to={`/admin/viewresult/${result.id}`}>
-            <FontAwesomeIcon icon={faEye} className="text-blue-500" />
-          </Link>
-          <Link to={`/admin/editresult/${result.id}`}>
-            <FontAwesomeIcon icon={faEdit} className="text-green-500" />
-          </Link> */}
-          <span onClick={() => handleDelete(result.id)} className="cursor-pointer">
-            <FontAwesomeIcon icon={faTrash} className="text-red-500" />
-          </span>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="8" className="px-6 py-4 text-center">
-        No results found
-      </td>
-    </tr>
-  )}
-</tbody>
+            {currentservices.length > 0 ? (
+              currentservices.map((service) => (
+                <tr key={service.id} className="bg-white border-b">
+                  <td className="px-6 py-4 font-medium">{service.created_by.phone}</td>
+                  <td className="px-6 py-4">{service.name}</td>
+                  <td className="px-6 py-4">
+                    {service.created_at
+                      ? new Date(service.created_at).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                  <td className="px-6 py-4 flex items-center space-x-2">
+                    <Link to={`/admin/viewService/${service.id}`}>
+                      <FontAwesomeIcon icon={faEye} className="text-blue-500" />
+                    </Link>
+                    <Link to={`/admin/editService/${service.id}`}>
+                      <FontAwesomeIcon icon={faEdit} className="text-green-500" />
+                    </Link>
+                    <span onClick={() => handleDelete(service.id)} className="cursor-pointer">
+                      <FontAwesomeIcon icon={faTrash} className="text-red-500" />
+                    </span>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="px-6 py-4 text-center">
+                  No services found
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
 
         <div className="flex justify-center mt-4">
@@ -236,4 +221,4 @@ function AdminManageExamResults() {
   );
 }
 
-export default AdminManageExamResults;
+export default ManageServices;

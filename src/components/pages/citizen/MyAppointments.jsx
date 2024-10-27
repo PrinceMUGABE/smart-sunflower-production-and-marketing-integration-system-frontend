@@ -88,9 +88,9 @@ function Citizen_ManageAppointments() {
   // Filter appointments based on search query
   const filteredData = appointmentData.filter(
     appointment =>
-      appointment.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      appointment.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      appointment.created_date?.includes(searchQuery)
+      appointment.appointed_to.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      appointment.appointed_to.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      new Date(appointment.created_date).toLocaleDateString().includes(searchQuery)
   );
 
   // Pagination logic
@@ -131,10 +131,9 @@ function Citizen_ManageAppointments() {
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
               <th className="px-6 py-3">Worker Firstname</th>
-              <th className="px-6 py-3">Worker lastname</th>
-              <th className="px-6 py-3">Worker phone</th>
+              <th className="px-6 py-3">Worker Lastname</th>
+              <th className="px-6 py-3">Worker Phone</th>
               <th className="px-6 py-3">Worker Address</th>
-              
               <th className="px-6 py-3">Details</th>
               <th className="px-6 py-3">Created Date</th>
               <th className="px-6 py-3">Action</th>
@@ -144,8 +143,8 @@ function Citizen_ManageAppointments() {
             {currentAppointments.length > 0 ? (
               currentAppointments.map(appointment => (
                 <tr key={appointment.id} className="bg-white border-b">
-                  <th className="px-6 py-4 font-medium">{appointment.appointed_to.first_name}</th>
-                  <th className="px-6 py-4 font-medium">{appointment.appointed_to.last_name}</th>
+                  <td className="px-6 py-4 font-medium">{appointment.appointed_to.first_name}</td>
+                  <td className="px-6 py-4 font-medium">{appointment.appointed_to.last_name}</td>
                   <td className="px-6 py-4">{appointment.appointed_to.created_by.phone}</td>
                   <td className="px-6 py-4">{appointment.appointed_to.address}</td>
                   <td className="px-6 py-4">{appointment.details}</td>
@@ -153,11 +152,8 @@ function Citizen_ManageAppointments() {
                     {new Date(appointment.created_date).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4">
-                    {/* <Link to={`/citizen/viewAppointmentDetails/${appointment.id}`}>
-                      <FontAwesomeIcon icon={faEye} className="text-blue-500" />
-                    </Link> */}
                     <Link to={`/citizen/editAppointment/${appointment.id}`}>
-                      <FontAwesomeIcon icon={faEdit} className= " px-2 text-green-500" />
+                      <FontAwesomeIcon icon={faEdit} className="px-2 text-green-500" />
                     </Link>
                     <span onClick={() => handleDelete(appointment.id)} className="px-2 text-red-500 cursor-pointer">
                       <FontAwesomeIcon icon={faTrash} />
@@ -167,7 +163,7 @@ function Citizen_ManageAppointments() {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-6 py-4 text-center">No appointments found</td>
+                <td colSpan="7" className="px-6 py-4 text-center">No appointments found</td>
               </tr>
             )}
           </tbody>
