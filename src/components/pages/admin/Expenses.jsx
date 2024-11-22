@@ -13,8 +13,6 @@ import {
   faDownload,
   faAdd,
   faCancel,
-  
-
 } from "@fortawesome/free-solid-svg-icons";
 
 function AdminManageExpenses() {
@@ -71,7 +69,7 @@ function AdminManageExpenses() {
         });
 
         setexpenseData(res.data.expenses);
-        
+
         // Optional: Set a success message
         // setMessage(`${res.data.expenses.length} expenses retrieved successfully`);
         // setMessageType("success");
@@ -83,15 +81,16 @@ function AdminManageExpenses() {
       }
     } catch (err) {
       console.error("Error fetching expenses:", err.response || err);
-      
+
       // More detailed error handling
-      const errorMessage = err.response?.data?.message || 
-                           err.response?.statusText || 
-                           "An error occurred while fetching expenses";
-      
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.statusText ||
+        "An error occurred while fetching expenses";
+
       setMessage(errorMessage);
       setMessageType("error");
-      
+
       // Optional: Handle specific error scenarios
       if (err.response?.status === 401) {
         navigate("/login");
@@ -109,12 +108,15 @@ function AdminManageExpenses() {
     const conf = window.confirm("Do you want to delete this expense?");
     if (conf) {
       try {
-        const res = await axios.delete(`http://127.0.0.1:8000/expense/delete/${id}/`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await axios.delete(
+          `http://127.0.0.1:8000/expense/delete/${id}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         // Refresh the expense list after successful deletion
         await handleFetch();
@@ -177,7 +179,9 @@ function AdminManageExpenses() {
 
   const filteredData = expenseData?.filter(
     (expense) =>
-      expense.user?.phone_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      expense.user?.phone_number
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       expense.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expense.amount?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expense.status?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -199,11 +203,13 @@ function AdminManageExpenses() {
 
   const indexOfLastexpense = currentPage * expensesPerPage;
   const indexOfFirstexpense = indexOfLastexpense - expensesPerPage;
-  const currentexpenses = filteredData.slice(indexOfFirstexpense, indexOfLastexpense);
+  const currentexpenses = filteredData.slice(
+    indexOfFirstexpense,
+    indexOfLastexpense
+  );
   const totalPages = Math.ceil(filteredData.length / expensesPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
 
   const handleViewExpense = async (id) => {
     try {
@@ -212,6 +218,7 @@ function AdminManageExpenses() {
       });
       setSelectedExpense(res.data);
       setIsModalOpen(true); // Open modal
+      console.log("Retrieved Data: ", res);
     } catch (err) {
       console.error("Error fetching expense details", err.response || err);
       const errorMessage =
@@ -324,7 +331,7 @@ function AdminManageExpenses() {
               <th scope="col" className="px-6 py-3">
                 Driver
               </th>
-   
+
               <th scope="col" className="px-6 py-3">
                 Category
               </th>
@@ -363,7 +370,7 @@ function AdminManageExpenses() {
                       : "N/A"}
                   </td>
                   <td className="px-6 py-4">
-                  <button
+                    <button
                       onClick={() => handleViewExpense(expense.id)}
                       className="text-black mr-2"
                     >
@@ -421,80 +428,101 @@ function AdminManageExpenses() {
         </div>
       </div>
 
-
-
       {isModalOpen && selectedExpense && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-lg p-4 w-1/2">
-      <h2 className="text-lg font-bold mb-4 text-center text-blue-700">
-        Expense Details
-      </h2>
-      <p className="text-black">
-        <strong>Driver:</strong> {selectedExpense.user.phone_number}
-      </p>
-      <p className="text-black">
-        <strong>Category:</strong> {selectedExpense.category}
-      </p>
-      <p className="text-black">
-        <strong>Amount:</strong> {selectedExpense.amount}
-      </p>
-      <p className="text-black">
-        <strong>Status:</strong> {selectedExpense.status}
-      </p>
-      <p className="text-black">
-        <strong>Date:</strong> {selectedExpense.date}
-      </p>
-      <p className="text-black">
-        <strong>Created Date:</strong>{" "}
-        {selectedExpense.created_at
-          ? new Date(selectedExpense.created_at).toLocaleDateString()
-          : "N/A"}
-      </p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 h-3/4 scroll-m-2">
+          <div className="bg-white rounded-lg p-4 w-1/2 overflow-auto">
+            <h2 className="text-lg font-bold mb-4 text-center text-blue-700">
+              Expense Details
+            </h2>
+            <p className="text-black">
+              <strong>Driver:</strong> {selectedExpense.user.phone_number}
+            </p>
+            <p className="text-black">
+              <strong>Category:</strong> {selectedExpense.category}
+            </p>
+            <p className="text-black">
+              <strong>Amount:</strong> {selectedExpense.amount}
+            </p>
+            <p className="text-black">
+              <strong>Status:</strong> {selectedExpense.status}
+            </p>
+            <p className="text-black">
+              <strong>Date:</strong> {selectedExpense.date}
+            </p>
+            <p className="text-black">
+              <strong>Created Date:</strong>{" "}
+              {selectedExpense.created_at
+                ? new Date(selectedExpense.created_at).toLocaleDateString()
+                : "N/A"}
+            </p>
 
-      {/* Video playback */}
-      {selectedExpense.video_base64 ? (
-        <div className="mt-4">
-          <h3 className="text-black font-bold">Video Evidence:</h3>
-          <video
-            controls
-            className="w-full h-auto border border-gray-300 rounded"
-          >
-            <source
-              src={`data:video/mp4;base64,${selectedExpense.video_base64}`}
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
+            {/* Video playback */}
+            {selectedExpense.video_base64 ? (
+              <div className="mt-4">
+                <h3 className="text-black font-bold">Video Evidence:</h3>
+                <video
+                  controls
+                  className="w-1/2l h-1/2 border border-gray-300 rounded"
+                >
+                  <source
+                    src={`data:video/mp4;base64,${selectedExpense.video_base64}`}
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            ) : selectedExpense.video ? (
+              <div className="mt-4">
+                <h3 className="text-black font-bold">Video Evidence:</h3>
+                <video
+                  controls
+                  className="w-full h-auto border border-gray-300 rounded"
+                >
+                  <source src={selectedExpense.video} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            ) : (
+              <p className="text-black mt-4">
+                No video available for this expense.
+              </p>
+            )}
+
+            {/* Receipt display */}
+            <div className="mt-4">
+              <h3 className="text-black font-bold">Receipt:</h3>
+              {selectedExpense.receipt ? (
+                selectedExpense.receipt.toLowerCase().endsWith(".pdf") ? (
+                  <iframe
+                    src={`http://127.0.0.1:8000${selectedExpense.receipt}`}
+                    title="Receipt PDF"
+                    className="w-full h-auto border border-gray-300 rounded"
+                  ></iframe>
+                ) : (
+                  <img
+                    src={`http://127.0.0.1:8000${selectedExpense.receipt}`}
+                    alt="Receipt"
+                    className="w-full h-auto border border-gray-300 rounded"
+                  />
+                )
+              ) : (
+                <p className="text-black">
+                  No receipt available for this expense.
+                </p>
+              )}
+            </div>
+
+            <button
+              onClick={handleCloseModal}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+            >
+              Close
+            </button>
+          </div>
         </div>
-      ) : selectedExpense.video ? (
-        <div className="mt-4">
-          <h3 className="text-black font-bold">Video Evidence:</h3>
-          <video
-            controls
-            className="w-full h-auto border border-gray-300 rounded"
-          >
-            <source src={selectedExpense.video} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      ) : (
-        <p className="text-black mt-4">No video available for this expense.</p>
       )}
-
-      <button
-        onClick={handleCloseModal}
-        className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
-
     </>
   );
 }
-
-
 
 export default AdminManageExpenses;
