@@ -5,6 +5,7 @@ import axios from 'axios';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import Webcam from 'react-webcam';
+import loginImage from '../../assets/pictures/abanyabuzuma2.jpg'; // Assuming the path to the image
 
 const Register = () => {
   const navigate = useNavigate();
@@ -62,7 +63,7 @@ const Register = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post('http://127.0.0.1:8000/signup/', dataToSubmit);
+      const response = await axios.post('http://127.0.0.1:8000/register/', dataToSubmit);
 
       if (response.status === 201) {
         setMessage('Registration successful!');
@@ -123,6 +124,10 @@ const Register = () => {
   return (
     <div className="flex justify-center items-center min-h-screen h-full bg-gray-50">
       <div className="grid lg:grid-cols-2 rounded-lg shadow-xl w-full max-w-4xl overflow-hidden">
+
+      <div className="hidden lg:block">
+          <img src={loginImage} alt="Login" className="object-cover w-full h-full" />
+        </div>
 
         <div className="flex items-center justify-center bg-white py-6 px-6 lg:px-8 w-full">
           <div className="sm:max-w-md w-full">

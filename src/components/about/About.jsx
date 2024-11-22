@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
-import AboutImg from '../../assets/pictures/abanyabuzuma2.jpg';
+import AboutImg from '../../assets/pictures/img3.jpg';
 
 function About() {
     return (
@@ -25,27 +25,20 @@ function About() {
                         <div className="p-4 border-l-4 border-primary">
                             <h3 className="text-2xl font-semibold mb-2">Us</h3>
                             <p className="text-sm dark:text-slate-400">
-                            The overall objective of the health sector in the recently updated Health Sector
-                             Strategic Plan IV (2018 to 2024) is to ensure universal accessibility
-                              (geographical and financial) of equitable and affordable quality health services 
-                              (preventative, curative, rehabilitative and promotional services) for all Rwandans. 
+                            A professional transport company operating in major cities in Rwanda & East Africa. 
+                            Provide a more comfortable and we drive our customers to their destination on time.
                             </p>
                         </div>
                         <div className="p-4 border-l-4 border-primary">
                             <h3 className="text-2xl font-semibold mb-2">Vision</h3>
                             <p className="text-sm dark:text-slate-400">
-                            The Health Sector Policy (2015) states the overall vision of the health sector
-                             as follows: To pursue an integrated and community-driven development process
-                              through the provision of equitable, accessible and quality health care services.
+                            Our vision is to become the leading regional transport provider in East Africa, expanding services to more countries, or being recognized for innovation in passenger transport and logistics.
                             </p>
                         </div>
                         <div className="p-4 border-l-4 border-primary">
                             <h3 className="text-2xl font-semibold mb-2">Mission</h3>
                             <p className="text-sm dark:text-slate-400">
-                            The mission of the Ministry of Health is to provide and continually improve affordable
-                             promotive, preventive, curative and rehabilitative health care services of the highest
-                              quality, thereby contributing to the reduction of poverty and enhancing the general 
-                              well-being of the population.
+                            Our mission is to focus on providing affordable, reliable transportation services in East Africa, ensuring customer satisfaction through efficient and timely travel.
                             </p>
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
+import MapComponent from "./MapComponent"; // Import the MapComponent you created
 
 const FooterLinks = [
   {
@@ -20,125 +21,62 @@ const FooterLinks = [
     link: "/#contact",
   },
 ];
-const HelpLinks = [
-  {
-    title: "Home",
-    link: "/#home",
-  },
-  {
-    title: "About",
-    link: "/#about",
-  },
-  {
-    title: "Services",
-    link: "/#service",
-  },
-  {
-    title: "Contact",
-    link: "/#contact",
-  },
-];
-const ResourcesLinks = [
-  {
-    title: "Home",
-    link: "/#home",
-  },
-  {
-    title: "About",
-    link: "/#about",
-  },
-  {
-    title: "Services",
-    link: "/#service",
-  },
-  {
-    title: "Contact",
-    link: "/#contact",
-  },
-];
+
 const Footer = () => {
   return (
-    <div className="bg-dark text-white">
-      <section className="container py-10">
-        <div className=" grid md:grid-cols-3 py-5">
-          {/* company Details */}
-          <div className=" py-8 px-4 ">
+    <div className="bg-green-950 text-white">
+      <section className="container py-8">
+        <div className="flex flex-wrap justify-between items-start gap-8 py-5">
+          {/* Company Details */}
+          <div className="flex-1 min-w-[250px] py-8 px-4">
             <h1 className="sm:text-3xl text-xl font-bold sm:text-left text-justify mb-3 flex items-center gap-3">
-              CHW Emporing Management System
+              Volcano Expense Pro
             </h1>
-            <p className="text-sm">
-            he Ministry is led by the Minister, Minister of State, the Permanent Secretary and other members of the senior management. You can find the Ministry organisational chart here{" "}
+            <p className="mt-4 text-gray-400">
+              <strong>Phone:</strong> +250 788 457 408
             </p>
-            <br />
+            <p className="mt-2 text-gray-400">
+              <strong>Email:</strong> info@volcanoexpensepro.com
+            </p>
+            <p className="mt-2 text-gray-400">
+              <strong>Location:</strong> Kigali, Rwanda
+            </p>
+            
+          </div>
+
+          {/* Links */}
+          <div className="flex-1 min-w-[250px] py-8 px-4">
+            <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-3">
+              Social Media
+            </h1>
             {/* Social Handle */}
             <div className="flex items-center gap-4 mt-6">
               <a href="#">
-                <FaInstagram className="text-2xl hover:text-primary duration-300" />
+                <FaInstagram className="text-2xl text-red-600 hover:text-gray-600 duration-300" />
               </a>
               <a href="#">
-                <FaFacebook className="text-2xl hover:text-primary duration-300" />
+                <FaFacebook className="text-2xl text-blue-700 hover:text-green-700 duration-300" />
               </a>
               <a href="#">
-                <FaLinkedin className="text-2xl hover:text-primary duration-300" />
+                <FaLinkedin className="text-2xl text-blue-700 hover:text-primary duration-300" />
               </a>
             </div>
           </div>
-          {/* Links */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 col-span-2 md:pl-10 ">
-            <div className="">
-              <div className="py-8 px-4 ">
-                <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-3">
-                  Company
-                </h1>
-                <ul className={`flex flex-col gap-3`}>
-                  {FooterLinks.map((link) => (
-                    <li
-                      key={link.title}
-                      className="cursor-pointer hover:translate-x-1 duration-300 hover:!text-primary space-x-1 text-gray-400 "
-                    >
-                      <span>{link.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="">
-              <div className="py-8 px-4 ">
-                <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-3">
-                  Help
-                </h1>
-                <ul className="flex flex-col gap-3">
-                  {HelpLinks.map((link) => (
-                    <li
-                      key={link.title}
-                      className="cursor-pointer hover:translate-x-1 duration-300 hover:!text-primary space-x-1 text-gray-400 "
-                    >
-                      <span>{link.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="">
-              <div className="py-8 px-4 ">
-                <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-3">
-                  Resources
-                </h1>
-                <ul className="flex flex-col gap-3">
-                  {ResourcesLinks.map((link) => (
-                    <li
-                      key={link.title}
-                      className="cursor-pointer hover:translate-x-1 duration-300 hover:!text-primary space-x-1 text-gray-400 "
-                    >
-                      <span>{link.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+
+          {/* Map Section */}
+          <div className="flex-1 min-w-[250px] py-8 px-4">
+            <h1 className="text-xl font-bold mb-4">Our Location in Rwanda</h1>
+            <div className="overflow-hidden rounded-lg shadow-lg">
+              <MapComponent />
             </div>
           </div>
         </div>
       </section>
+
+      {/* Copyright Section */}
+      <div className="bg-green-800 py-4 text-center text-gray-400">
+        <p>&copy; {new Date().getFullYear()} Volcano Expense Pro. All Rights Reserved.</p>
+      </div>
     </div>
   );
 };

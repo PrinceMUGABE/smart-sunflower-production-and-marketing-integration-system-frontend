@@ -83,7 +83,7 @@ const Contact = () => {
                 <div className='md:flex justify-center items-center'>
                     <div
                         data-aos="fade-left"
-                        className='w-full mt-8 md:mt-0 md:w-1/2 sm:h-[450px] lg:flex items-center bg-indigo-100 px-4 lg:px-8 py-8'>
+                        className='w-full mt-8 md:mt-0 md:w-1/2 sm:h-[450px] lg:flex items-center bg-indigo-100 px-4 lg:px-8 py-8 rounded-lg'>
                         <form className='w-full' onSubmit={handleSubmit}>
                             {message && <div className="mb-5 text-red-500">{message}</div>}
                             <div className="mb-5">
@@ -103,7 +103,7 @@ const Contact = () => {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    placeholder='Enter your Email'
+                                    placeholder='your email @gmail.com'
                                     className='w-full p-3 focus:outline-none rounded-[5px]'
                                 />
                                 {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}

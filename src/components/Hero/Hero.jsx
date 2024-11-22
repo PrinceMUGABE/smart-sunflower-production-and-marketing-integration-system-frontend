@@ -1,10 +1,9 @@
 // eslint-disable-next-line no-unused-vars
 import React from "react";
-import hero from "../../assets/pictures/ministry_of_healthy_image.jpg";
+import hero from "../../assets/pictures/bus.png";
 
 const Hero = () => {
   return (
-
     <div className="dark:bg-gray-950 dark:text-white duration-300 " id="home">
       <div className="container min-h-[620px] flex mt-10 sm:mt-0">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 place-items-center">
@@ -30,11 +29,15 @@ const Hero = () => {
               style={{ lineHeight: 1.2 }}
             >
               Get in tourch with updated{" "}
-              <span className="text-primary ">Community Health Work Emporing Management System</span>
+              <span className="text-blue-800 ">
+                Volcano Express Trip Expense Management System
+              </span>
             </h1>
             <p data-aos="fade-up" data-aos-delay="300">
-            Created in January 2011, Job in Rwanda is a private held company providing services 
-            in the area of online recruitment and advertisement.
+              The accuracy of the company profile for Volcano Express - Head
+              Office is validated by the company owner, representative, or
+              directory administrator. Last update on 8 Mar, 2023 Registered
+              with us on 17 Feb, 2012
             </p>
             {/* <button
               data-aos="fade-up"
