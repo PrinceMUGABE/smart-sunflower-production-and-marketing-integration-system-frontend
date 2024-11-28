@@ -234,7 +234,7 @@ const AdminCreateNewExpense = () => {
                 <input
                   type="file"
                   className="text-black"
-                  accept=".pdf,.png,.jpeg,.jpg"
+                  accept=".png,.jpeg,.jpg"
                   onChange={handleFileChange}
                 />
               </label>

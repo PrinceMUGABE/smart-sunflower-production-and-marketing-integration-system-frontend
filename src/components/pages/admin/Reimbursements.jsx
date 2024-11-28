@@ -17,12 +17,12 @@ import {
   faCancel,
 } from "@fortawesome/free-solid-svg-icons";
 
-function AdminManageExpenses() {
-  const [expenseData, setexpenseData] = useState([]);
+function AdminManage_Reimbursement() {
+  const [reimbursementData, setreimbursementData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedExpense, setSelectedExpense] = useState(null); // For the modal
+  const [selectedreimbursement, setSelectedreimbursement] = useState(null); // For the modal
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [expensesPerPage, setexpensesPerPage] = useState(5); // Default rows per page
+  const [reimbursementsPerPage, setreimbursementsPerPage] = useState(5); // Default rows per page
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
@@ -53,47 +53,38 @@ function AdminManageExpenses() {
 
   const handleFetch = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/expense/expenses/", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await axios.get(
+        "http://127.0.0.1:8000/reimbursement/reimbursements/",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      // Log the entire response to console
-      console.log("Full Expense Response:", res.data);
-
-      // Check if expenses exist in the response
-      if (res.data.expenses && Array.isArray(res.data.expenses)) {
-        // Log individual expenses
-        res.data.expenses.forEach((expense, index) => {
-          console.log(`Expense ${index + 1}:`, expense);
-        });
-
-        setexpenseData(res.data.expenses);
-
-        // Optional: Set a success message
-        // setMessage(`${res.data.expenses.length} expenses retrieved successfully`);
-        // setMessageType("success");
+      // Directly check if the response is an array
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        setreimbursementData(res.data); // Directly set the array
+        setMessage(`${res.data.length} reimbursements retrieved successfully`);
+        setMessageType("success");
       } else {
-        console.warn("No expenses found in the response");
-        setexpenseData([]);
-        setMessage("No expenses found");
+        console.warn("No reimbursements found in the response");
+        setreimbursementData([]); // Set empty array if no data
+        setMessage("No reimbursements found");
         setMessageType("warning");
       }
     } catch (err) {
-      console.error("Error fetching expenses:", err.response || err);
+      console.error("Error fetching reimbursements:", err.response || err);
 
-      // More detailed error handling
       const errorMessage =
         err.response?.data?.message ||
         err.response?.statusText ||
-        "An error occurred while fetching expenses";
+        "An error occurred while fetching reimbursements";
 
       setMessage(errorMessage);
       setMessageType("error");
 
-      // Optional: Handle specific error scenarios
       if (err.response?.status === 401) {
         navigate("/login");
       }
@@ -107,11 +98,11 @@ function AdminManageExpenses() {
   }, [accessToken]);
 
   const handleDelete = async (id) => {
-    const conf = window.confirm("Do you want to delete this expense?");
+    const conf = window.confirm("Do you want to delete this reimbursement?");
     if (conf) {
       try {
         const res = await axios.delete(
-          `http://127.0.0.1:8000/expense/delete/${id}/`,
+          `http://127.0.0.1:8000/reimbursement/delete/${id}/`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -120,16 +111,16 @@ function AdminManageExpenses() {
           }
         );
 
-        // Refresh the expense list after successful deletion
+        // Refresh the reimbursement list after successful deletion
         await handleFetch();
 
-        setMessage("expense deleted successfully.");
+        setMessage("Reimbursement deleted successfully.");
         setMessageType("success");
 
         // Reset current page if needed
         setCurrentPage(1);
       } catch (err) {
-        console.error("Error deleting expense", err);
+        console.error("Error deleting reimbursement", err);
         setMessage(
           err.response
             ? err.response.data.message || err.response.statusText
@@ -146,24 +137,24 @@ function AdminManageExpenses() {
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
-    doc.autoTable({ html: "#expense-table" });
-    doc.save("expenses.pdf");
+    doc.autoTable({ html: "#reimbursement-table" });
+    doc.save("reimbursements.pdf");
   };
 
   const handleDownloadExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(expenseData);
+    const worksheet = XLSX.utils.json_to_sheet(reimbursementData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "expenses");
-    XLSX.writeFile(workbook, "expenses.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "reimbursements");
+    XLSX.writeFile(workbook, "reimbursements.xlsx");
   };
 
   const handleDownloadCSV = () => {
-    const csvData = expenseData.map((expense) => ({
-      Phone: expense.phone_number,
-      Email: expense.email,
-      Role: expense.role,
-      Created_by: expense.created_by__phone_number,
-      Created_Date: expense.created_at,
+    const csvData = reimbursementData.map((reimbursement) => ({
+      Expense: reimbursement.expense?.category,
+      Driver: reimbursement.expense?.user?.phone,
+      Status: reimbursement.is_paid,
+      Issued_date: reimbursement.expense?.date,
+      Created_Date: reimbursement.created_at,
     }));
     const csvContent =
       "data:text/csv;charset=utf-8," +
@@ -174,20 +165,23 @@ function AdminManageExpenses() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "expenses.csv");
+    link.setAttribute("download", "reimbursements.csv");
     document.body.appendChild(link);
     link.click();
   };
 
-  const filteredData = expenseData?.filter(
-    (expense) =>
-      expense.user?.phone_number
-        .toLowerCase()
+  const filteredData = reimbursementData?.filter(
+    (reimbursement) =>
+      reimbursement.expense?.category
+        ?.toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
-      expense.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      expense.amount?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      expense.status?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      expense.created_at?.includes(searchQuery)
+      reimbursement.expense?.user?.phone_number
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      reimbursement.is_paid
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      reimbursement.created_at?.includes(searchQuery)
   );
 
   const getRoleDisplayName = (role) => {
@@ -203,30 +197,37 @@ function AdminManageExpenses() {
     }
   };
 
-  const indexOfLastexpense = currentPage * expensesPerPage;
-  const indexOfFirstexpense = indexOfLastexpense - expensesPerPage;
-  const currentexpenses = filteredData.slice(
-    indexOfFirstexpense,
-    indexOfLastexpense
+  const indexOfLastreimbursement = currentPage * reimbursementsPerPage;
+  const indexOfFirstreimbursement =
+    indexOfLastreimbursement - reimbursementsPerPage;
+  const currentreimbursements = filteredData.slice(
+    indexOfFirstreimbursement,
+    indexOfLastreimbursement
   );
-  const totalPages = Math.ceil(filteredData.length / expensesPerPage);
+  const totalPages = Math.ceil(filteredData.length / reimbursementsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handleViewExpense = async (id) => {
+  const handleViewreimbursement = async (id) => {
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/expense/${id}/`, {
-        headers: axiosConfig.headers,
-      });
-      setSelectedExpense(res.data);
+      const res = await axios.get(
+        `http://127.0.0.1:8000/reimbursement/${id}/`,
+        {
+          headers: axiosConfig.headers,
+        }
+      );
+      setSelectedreimbursement(res.data);
       setIsModalOpen(true); // Open modal
       console.log("Retrieved Data: ", res);
     } catch (err) {
-      console.error("Error fetching expense details", err.response || err);
+      console.error(
+        "Error fetching reimbursement details",
+        err.response || err
+      );
       const errorMessage =
         err.response?.data?.message ||
         err.response?.statusText ||
-        "An error occurred while fetching expense details";
+        "An error occurred while fetching reimbursement details";
       setMessage(errorMessage);
       setMessageType("error");
     }
@@ -234,13 +235,13 @@ function AdminManageExpenses() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedExpense(null);
+    setSelectedreimbursement(null);
   };
 
-  const handleAcceptExpense = async (id) => {
+  const handleAcceptreimbursement = async (id) => {
     try {
       const res = await axios.put(
-        `http://127.0.0.1:8000/expense/accept/${id}/`,
+        `http://127.0.0.1:8000/reimbursement/paid/${id}/`,
         {}, // Send an empty body for the accept endpoint, adjust if needed
         {
           headers: {
@@ -249,25 +250,28 @@ function AdminManageExpenses() {
           },
         }
       );
-      setMessage("Expense accepted successfully.");
+      setMessage("reimbursement Marked as Paid successfully.");
       setMessageType("success");
       await handleFetch(); // Refresh the data
       handleCloseModal();
     } catch (err) {
-      console.error("Error accepting expense", err.response || err);
+      console.error(
+        "Error accepting reimbursement Payment",
+        err.response || err
+      );
       const errorMessage =
         err.response?.data?.message ||
         err.response?.statusText ||
-        "An error occurred while accepting the expense";
+        "An error occurred while accepting the reimbursement payment";
       setMessage(errorMessage);
       setMessageType("error");
     }
   };
 
-  const handleRejectExpense = async (id) => {
+  const handleRejectreimbursement = async (id) => {
     try {
       const res = await axios.put(
-        `http://127.0.0.1:8000/expense/reject/${id}/`,
+        `http://127.0.0.1:8000/reimbursement/reject/${id}/`,
         {}, // Send an empty body for the reject endpoint, adjust if needed
         {
           headers: {
@@ -276,16 +280,16 @@ function AdminManageExpenses() {
           },
         }
       );
-      setMessage("Expense rejected successfully.");
+      setMessage("reimbursement rejected successfully.");
       setMessageType("success");
       await handleFetch(); // Refresh the data
       handleCloseModal();
     } catch (err) {
-      console.error("Error rejecting expense", err.response || err);
+      console.error("Error rejecting reimbursement", err.response || err);
       const errorMessage =
         err.response?.data?.message ||
         err.response?.statusText ||
-        "An error occurred while rejecting the expense";
+        "An error occurred while rejecting the reimbursement";
       setMessage(errorMessage);
       setMessageType("error");
     }
@@ -294,7 +298,7 @@ function AdminManageExpenses() {
   return (
     <>
       <h1 className="text-center text-black font-bold text-xl capitalize mb-4">
-        Manage expenses
+        Manage reimbursements
       </h1>
       {message && (
         <div
@@ -307,7 +311,7 @@ function AdminManageExpenses() {
       )}
       <div className="flex justify-end mb-4">
         <Link
-          to="/admin/createExpense"
+          to="/admin/expenses"
           className=" py-2 text-black bg-blue-700 px-2 mr-4 rounded"
         >
           <FontAwesomeIcon icon={faAdd} className="mr-2 " />
@@ -345,8 +349,8 @@ function AdminManageExpenses() {
         </div>
 
         {/* <select
-          onChange={(e) => setexpensesPerPage(Number(e.target.value))}
-          value={expensesPerPage}
+          onChange={(e) => setreimbursementsPerPage(Number(e.target.value))}
+          value={reimbursementsPerPage}
           className=" py-2 border rounded-full"
         >
           {[5, 10, 30, 50, 100].map((option) => (
@@ -369,14 +373,14 @@ function AdminManageExpenses() {
 
       <div className="text-right mb-4">
         <p className="text-blue-700">
-          Total expenses:{" "}
+          Total reimbursements:{" "}
           <span className="font-bold text-black">{filteredData.length}</span>
         </p>
       </div>
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table
-          id="expense-table"
+          id="reimbursement-table"
           className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
         >
           <thead className="text-xs text-black uppercase bg-blue-700 dark:bg-blue-700 dark:text-black">
@@ -385,68 +389,79 @@ function AdminManageExpenses() {
                 #
               </th>
               <th scope="col" className="px-6 py-3">
+                Expense
+              </th>
+              <th scope="col" className="px-6 py-3">
                 Driver
               </th>
 
-              <th scope="col" className="px-6 py-3">
-                Category
-              </th>
               <th scope="col" className="px-6 py-3">
                 Amount (FRW)
               </th>
               <th scope="col" className="px-6 py-3">
                 Status
               </th>
+
               <th scope="col" className="px-6 py-3">
-                Reimbursement
+                Date
               </th>
+
               <th scope="col" className="px-6 py-3">
                 Created Date
               </th>
+
               <th scope="col" className="px-6 py-3">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody>
-            {currentexpenses.length === 0 ? (
+            {currentreimbursements.length === 0 ? (
               <tr>
                 <td colSpan="7" className="text-center py-4">
                   No data found
                 </td>
               </tr>
             ) : (
-              currentexpenses.map((expense, index) => (
-                <tr key={expense.id} className="bg-white">
+              currentreimbursements.map((reimbursement, index) => (
+                <tr key={reimbursement.id} className="bg-white">
                   <td className="px-6 py-4">{index + 1}</td>
-                  <td className="px-6 py-4">{expense.user?.phone_number}</td>
-                  <td className="px-6 py-4">{expense.category}</td>
-                  <td className="px-6 py-4">{expense.amount}</td>
-                  <td className="px-6 py-4">{expense.status}</td>
-                  <td className="px-6 py-4">{expense.reimbursement_status}</td>
                   <td className="px-6 py-4">
-                    {expense.created_at
-                      ? new Date(expense.created_at).toLocaleDateString()
+                    {reimbursement.expense?.category}
+                  </td>
+                  <td className="px-6 py-4">
+                    {reimbursement.expense?.user?.phone_number}
+                  </td>
+                  <td className="px-6 py-4">{reimbursement.expense?.amount}</td>
+                  <td className="px-6 py-4">
+                    {reimbursement.is_paid ? "Paid" : "Pending"}
+                  </td>
+                  <td className="px-6 py-4">{reimbursement.expense?.date}</td>
+                  <td className="px-6 py-4">
+                    {reimbursement.created_at
+                      ? new Date(reimbursement.created_at).toLocaleDateString()
                       : "N/A"}
                   </td>
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => handleViewExpense(expense.id)}
-                      className="text-black mr-2"
+                      onClick={() => handleAcceptreimbursement(reimbursement.id)}
+                      className="text-blue-700 hover:text-red-700 mr-2"
                     >
-                      <FontAwesomeIcon icon={faEye} />
+                      {/* <FontAwesomeIcon icon={faEye} /> */}
+                      Paid?
                     </button>
-                    <Link
-                      to={`/admin/editExpense/${expense.id}`}
+                    {/* <Link
+                      to={`/admin/editreimbursement/${reimbursement.id}`}
                       className="mr-2 text-blue-600 hover:text-blue-900"
                     >
                       <FontAwesomeIcon icon={faEdit} />
-                    </Link>
+                    </Link> */}
                     <button
-                      onClick={() => handleDelete(expense.id)}
-                      className="text-red-600 hover:text-red-900"
+                      onClick={() => handleDelete(reimbursement.id)}
+                      className="text-red-600 hover:text-gray-700"
                     >
-                      <FontAwesomeIcon icon={faTrash} />
+                      {/* <FontAwesomeIcon icon={faTrash} /> */}
+                      Del
                     </button>
                   </td>
                 </tr>
@@ -459,8 +474,8 @@ function AdminManageExpenses() {
       <div className="flex justify-end items-center mt-4">
         <p className="text-black font-bold px-2">Filter By:</p>
         <select
-          onChange={(e) => setexpensesPerPage(Number(e.target.value))}
-          value={expensesPerPage}
+          onChange={(e) => setreimbursementsPerPage(Number(e.target.value))}
+          value={reimbursementsPerPage}
           className=" border rounded-full mr-4"
         >
           {[5, 10, 30, 50, 100].map((option) => (
@@ -487,118 +502,8 @@ function AdminManageExpenses() {
           </button>
         </div>
       </div>
-
-      {isModalOpen && selectedExpense && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-4 w-1/2 max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-bold mb-4 text-center text-blue-700">
-              Expense Details
-            </h2>
-            <p className="text-black">
-              <strong>Driver:</strong> {selectedExpense.user.phone_number}
-            </p>
-            <p className="text-black">
-              <strong>Category:</strong> {selectedExpense.category}
-            </p>
-            <p className="text-black">
-              <strong>Amount:</strong> {selectedExpense.amount}
-            </p>
-            <p className="text-black">
-              <strong>Status:</strong> {selectedExpense.status}
-            </p>
-            <p className="text-black">
-              <strong>Date:</strong> {selectedExpense.date}
-            </p>
-            <p className="text-black">
-              <strong>Created Date:</strong>{" "}
-              {selectedExpense.created_at
-                ? new Date(selectedExpense.created_at).toLocaleDateString()
-                : "N/A"}
-            </p>
-
-            {/* Video playback */}
-            {selectedExpense.video_base64 ? (
-              <div className="mt-4">
-                <h3 className="text-black font-bold">Video Evidence:</h3>
-                <video
-                  controls
-                  className="w-1/2 h-1/2 border border-gray-300 rounded"
-                >
-                  <source
-                    src={`data:video/mp4;base64,${selectedExpense.video_base64}`}
-                    type="video/mp4"
-                  />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            ) : selectedExpense.video ? (
-              <div className="mt-4">
-                <h3 className="text-black font-bold">Video Evidence:</h3>
-                <video
-                  controls
-                  className="w-full h-auto border border-gray-300 rounded"
-                >
-                  <source src={selectedExpense.video} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            ) : (
-              <p className="text-black mt-4">
-                No video available for this expense.
-              </p>
-            )}
-
-            {/* Receipt display */}
-            <div className="mt-4">
-              <h3 className="text-black font-bold">Receipt:</h3>
-              {selectedExpense.receipt ? (
-                selectedExpense.receipt.toLowerCase().endsWith(".pdf") ? (
-                  <iframe
-                    src={`http://127.0.0.1:8000${selectedExpense.receipt}`}
-                    title="Receipt PDF"
-                    className="w-full h-auto border border-gray-300 rounded"
-                  ></iframe>
-                ) : (
-                  <img
-                    src={`http://127.0.0.1:8000${selectedExpense.receipt}`}
-                    alt="Receipt"
-                    className="w-full h-auto border border-gray-300 rounded"
-                  />
-                )
-              ) : (
-                <p className="text-black">
-                  No receipt available for this expense.
-                </p>
-              )}
-            </div>
-
-
-
-            <button
-              onClick={() => handleAcceptExpense(selectedExpense.id)}
-              className="mt-4 bg-blue-500 text-white px-4 py-2 mr-2 rounded"
-            >
-              Accept
-            </button>
-
-            <button
-              onClick={() => handleRejectExpense(selectedExpense.id)}
-              className="mt-4 bg-green-500 text-white px-4 py-2 mr-2 rounded"
-            >
-              Reject
-            </button>
-
-            <button
-              onClick={handleCloseModal}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 }
 
-export default AdminManageExpenses;
+export default AdminManage_Reimbursement;

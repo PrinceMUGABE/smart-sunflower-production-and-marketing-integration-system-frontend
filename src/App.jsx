@@ -22,6 +22,8 @@ import ChangePassword from "./components/auth/ChangePassword.jsx";
 import Layout from "./components/admin/Layout.jsx";
 import AdminManageExpenses from "./components/pages/admin/Expenses.jsx";
 import AdminCreateNewExpense from "./components/pages/admin/CreateNewExpense.jsx";
+import AdminEditExpense from "./components/pages/admin/EditExpense.jsx";
+import AdminManage_Reimbursement from "./components/pages/admin/Reimbursements.jsx";
 
 
 
@@ -66,6 +68,9 @@ const App = () => {
 
             <Route path="/admin/expenses" element={<AdminManageExpenses />} />
             <Route path="/admin/createExpense/" element={<AdminCreateNewExpense />} />
+            <Route path="/admin/editExpense/:id" element={<AdminEditExpense />} />
+
+            <Route path="/admin/reimbursements" element={<AdminManage_Reimbursement />} />
 
 
           </Route>

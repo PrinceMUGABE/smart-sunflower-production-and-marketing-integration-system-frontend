@@ -28,7 +28,7 @@ function Sidebar() {
     { id: 1, name: 'Dashboard', path: '/admin', icon: <MdDashboard /> },
     { id: 2, name: 'Users', path: '/admin/users', icon: <FcBusinessman /> },
     { id: 3, name: 'Expenses', path: '/admin/expenses', icon: <BsEvStationFill /> },
-    { id: 4, name: 'Reimbursements', path: '/admin/drivers', icon: <GrUserPolice /> },
+    { id: 4, name: 'Reimbursements', path: '/admin/reimbursements', icon: <GrUserPolice /> },
     { id: 5, name: 'Integrations', path: '/admin/expenses', icon: <BsBusFrontFill /> },
     { id: 6, name: 'Policies', path: '/admin/learner', icon: <MdPolicy /> },
  
