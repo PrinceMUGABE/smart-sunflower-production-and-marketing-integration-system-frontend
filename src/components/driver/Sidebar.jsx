@@ -38,7 +38,7 @@ function Sidebar() {
   return (
     <div className="w-16 md:w-56 fixed left-0 top-0 z-10 h-screen bg-white shadow-md overflow-y-auto">
       <div className="mb-8 flex justify-center md:block">
-        <img src={Logo} alt="Logo" className=" ml-8 w-10 md:w-20" />
+        <img src={Logo} alt="Logo" className="w-10 md:w-20" />
       </div>
       <ul className="mt-6 space-y-6">
         {Sidebar_Links.map((link, index) => (

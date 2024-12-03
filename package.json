@@ -30,6 +30,8 @@
     "leaflet": "^1.9.4",
     "lucide": "^0.453.0",
     "lucide-react": "^0.453.0",
+    "mammoth": "^1.8.0",
+    "pdf-lib": "^1.17.1",
     "plotly.js": "^2.33.0",
     "policy": "file:",
     "prop-types": "^15.8.1",

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 
-const Header = () => {
+const ManagerHeader = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [phone, setPhone] = useState("");
   const navigate = useNavigate();
@@ -73,4 +73,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default ManagerHeader;

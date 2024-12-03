@@ -25,12 +25,12 @@ function Sidebar() {
   };
 
   const Sidebar_Links = [
-    { id: 1, name: 'Dashboard', path: '/admin', icon: <MdDashboard /> },
-    { id: 2, name: 'Users', path: '/admin/users', icon: <FcBusinessman /> },
-    { id: 3, name: 'Expenses', path: '/admin/expenses', icon: <BsEvStationFill /> },
-    { id: 4, name: 'Reimbursements', path: '/admin/reimbursements', icon: <GrUserPolice /> },
+    { id: 1, name: 'Dashboard', path: '/manager', icon: <MdDashboard /> },
+    { id: 2, name: 'Driver', path: '/manager/users', icon: <FcBusinessman /> },
+    { id: 3, name: 'Expenses', path: '/manager/expenses', icon: <BsEvStationFill /> },
+    { id: 4, name: 'Reimbursements', path: '/manager/reimbursements', icon: <GrUserPolice /> },
     // { id: 5, name: 'Integrations', path: '/admin/expenses', icon: <BsBusFrontFill /> },
-    { id: 5, name: 'Policies', path: '/admin/policies', icon: <MdPolicy /> },
+    { id: 5, name: 'Policies', path: '/manager/policies', icon: <MdPolicy /> },
  
     
   ];
@@ -38,7 +38,7 @@ function Sidebar() {
   return (
     <div className="w-16 md:w-56 fixed left-0 top-0 z-10 h-screen bg-white shadow-md overflow-y-auto">
       <div className="mb-8 flex justify-center md:block">
-        <img src={Logo} alt="Logo" className=" ml-8 w-10 md:w-20" />
+        <img src={Logo} alt="Logo" className="ml-8 w-10 md:w-20" />
       </div>
       <ul className="mt-6 space-y-6">
         {Sidebar_Links.map((link, index) => (

@@ -21,4 +21,24 @@ html {
   .primary-btn {
     @apply bg-primary text-white hover:bg-primary/80  duration-500 rounded-lg py-2 px-4;
   }
+
+
+  /* Add this to your CSS or Tailwind configuration file */
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Apply the animation to the header text */
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 10s linear infinite;
+  white-space: nowrap; /* Prevent text from wrapping */
+}
+
 }

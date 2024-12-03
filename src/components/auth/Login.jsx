@@ -266,9 +266,17 @@ const Login = () => {
                   {isLoading ? "Signing In..." : "Sign In"}
                 </button>
               </div>
+
             </form>
+            <Link
+                    to="/"
+                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                  >
+                    Back home
+                  </Link>
           </div>
         </div>
+        
       </div>
     </div>
   );
