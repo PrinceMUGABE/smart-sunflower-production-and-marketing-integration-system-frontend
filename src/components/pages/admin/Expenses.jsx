@@ -169,6 +169,7 @@ function AdminManageExpenses() {
 
   const handleDownloadCSV = () => {
     const csvData = expenseData.map((expense) => ({
+      Vendor: expense.vendor,
       Phone: expense.phone_number,
       Email: expense.email,
       Role: expense.role,
@@ -197,7 +198,8 @@ function AdminManageExpenses() {
       expense.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expense.amount?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expense.status?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      expense.created_at?.includes(searchQuery)
+      expense.created_at?.includes(searchQuery) ||
+      expense.vendor?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getRoleDisplayName = (role) => {
@@ -413,10 +415,10 @@ function AdminManageExpenses() {
       </div>
 
       <div className="text-right mb-4">
-        <p className="text-blue-700">
+        {/* <p className="text-blue-700">
           Total expenses:{" "}
           <span className="font-bold text-black">{filteredData.length}</span>
-        </p>
+        </p> */}
       </div>
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -429,6 +431,10 @@ function AdminManageExpenses() {
               <th scope="col" className="px-6 py-3">
                 #
               </th>
+              <th scope="col" className="px-6 py-3">
+                Vendor
+              </th>
+
               <th scope="col" className="px-6 py-3">
                 Driver
               </th>
@@ -464,6 +470,7 @@ function AdminManageExpenses() {
               currentexpenses.map((expense, index) => (
                 <tr key={expense.id} className="bg-white">
                   <td className="px-6 py-4">{index + 1}</td>
+                  <td className="px-6 py-4">{expense.vendor}</td>
                   <td className="px-6 py-4">{expense.user?.phone_number}</td>
                   <td className="px-6 py-4">{expense.category}</td>
                   <td className="px-6 py-4">{expense.amount}</td>
@@ -539,6 +546,9 @@ function AdminManageExpenses() {
             <h2 className="text-lg font-bold mb-4 text-center text-blue-700">
               Expense Details
             </h2>
+            <p className="text-black">
+              <strong>Vendor:</strong> {selectedExpense.vendor}
+            </p>
             <p className="text-black">
               <strong>Driver:</strong> {selectedExpense.user.phone_number}
             </p>

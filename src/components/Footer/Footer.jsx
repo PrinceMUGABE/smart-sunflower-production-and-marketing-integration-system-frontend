@@ -51,13 +51,13 @@ const Footer = () => {
             </h1>
             {/* Social Handle */}
             <div className="flex items-center gap-4 mt-6">
-              <a href="#">
+              <a href="https://www.instagram.com/mugabe50/">
                 <FaInstagram className="text-2xl text-red-600 hover:text-gray-600 duration-300" />
               </a>
-              <a href="#">
+              <a href="https://web.facebook.com/?_rdc=1&_rdr#">
                 <FaFacebook className="text-2xl text-blue-700 hover:text-green-700 duration-300" />
               </a>
-              <a href="#">
+              <a href="https://www.linkedin.com/in/mugabe-prince-2b377621b">
                 <FaLinkedin className="text-2xl text-blue-700 hover:text-primary duration-300" />
               </a>
             </div>

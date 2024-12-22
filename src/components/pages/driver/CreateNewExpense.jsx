@@ -148,6 +148,7 @@ const DriverCreateNewExpense = () => {
     formDataToSubmit.append("category", formData.category);
     formDataToSubmit.append("amount", formData.amount);
     formDataToSubmit.append("date", formData.date);
+    formDataToSubmit.append("vendor", formData.vendor);
 
     setLoading(true);
     try {
@@ -190,6 +191,29 @@ const DriverCreateNewExpense = () => {
         {message && <p className="text-green-600 mt-4">{message}</p>}
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
+        <div>
+            <label
+              htmlFor="vendor"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Vendor
+            </label>
+            <input
+              type="text"
+              id="vendor"
+              name="vendor"
+          
+              value={formData.vendor}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, vendor: e.target.value }))
+              }
+              className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-black"
+              placeholder=""
+            />
+            {errors.vendor && (
+              <p className="text-red-500 mt-1 text-sm">{errors.vendor}</p>
+            )}
+          </div>
           {/* Amount Field */}
           <div>
             <label

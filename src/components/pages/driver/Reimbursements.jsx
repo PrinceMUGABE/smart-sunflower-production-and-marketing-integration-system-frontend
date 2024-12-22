@@ -291,6 +291,10 @@ function Driver_Reimbursement() {
               </div>
 
               <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faFileInvoice} className="text-gray-400" />
+                  <span className="text-gray-700">{item.expense?.vendor}</span>
+                </div>
                 <div className="flex items-center gap-2">
                   <FontAwesomeIcon icon={faFileInvoice} className="text-gray-400" />
                   <span className="text-gray-700">{item.expense?.category}</span>

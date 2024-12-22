@@ -99,6 +99,7 @@ function DriverExpenses() {
   const formatExpenseData = (expenses) => {
     return expenses.map((expense, index) => ({
       'No.': index + 1,
+      'vendor': expense.vendor,
       'Category': expense.category,
       'Amount (FRW)': expense.amount,
       'Status': expense.status,
@@ -237,7 +238,8 @@ function DriverExpenses() {
       expense.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expense.amount?.toString().includes(searchQuery) ||
       expense.status?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      expense.created_at?.includes(searchQuery)
+      expense.created_at?.includes(searchQuery) ||
+      expense.vendor?.toLowerCase().includes(searchQuery.toLowerCase()) 
   );
 
   const indexOfLastExpense = currentPage * expensesPerPage;
@@ -364,6 +366,7 @@ function DriverExpenses() {
               </div>
               
               <div className="space-y-2">
+              <p className="text-gray-700"><span className="font-semibold text-gray-700">Vendor:</span> {expense.vendor}</p>
                 <p className="text-gray-700"><span className="font-semibold text-gray-700">Category:</span> {expense.category}</p>
                 <p className="text-gray-700"><span className="font-semibold text-gray-700">Amount:</span> {expense.amount} FRW</p>
                 <p className="text-gray-700"><span className="font-semibold text-gray-700">Date:</span> {
@@ -449,6 +452,9 @@ function DriverExpenses() {
             </div>
 
             <div className="space-y-4">
+            <p className="text-black">
+                <strong>Vendor:</strong> {selectedExpense.vendor}
+              </p>
               <p className="text-black">
                 <strong>Category:</strong> {selectedExpense.category}
               </p>
