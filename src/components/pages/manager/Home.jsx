@@ -38,36 +38,8 @@ function ManagerHome() {
     labels: [],
     datasets: [],
   });
-
-
-
-  const processDriverChartData = (data) => {
-    // Initialize to track drivers over time
-    const driversByDate = data.reduce((acc, driver) => {
-      const date = new Date(driver.created_at).toLocaleDateString();
-      acc[date] = acc[date] ? acc[date] + 1 : 1;
-      return acc;
-    }, {});
-  
-    const labels = Object.keys(driversByDate).sort(); // Get all unique dates and sort them
-  
-    const lineChartDataset = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'Number of Drivers Added',
-          data: labels.map((date) => driversByDate[date] || 0),
-          fill: false,
-          backgroundColor: 'rgba(54,162,235,0.2)',
-          borderColor: 'rgba(54,162,235,1)',
-          tension: 0.4,
-        },
-      ],
-    };
-  
-    setAreaChartData(lineChartDataset);
-  };
-  
+  const [recentExpenses, setRecentExpenses] = useState([]);
+  const [recentReimbursements, setRecentReimbursements] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -79,8 +51,9 @@ function ManagerHome() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data && res.data.users) {
+          setUserData(res.data.users);
           console.log("Fetched Users Data:", res.data.users);
-          processDriverChartData(res.data.users); // Process the driver data accordingly
+          processUserChartData(res.data.users);
         }
       } catch (error) {
         console.error('Error fetching users:', error);
@@ -96,6 +69,7 @@ function ManagerHome() {
         if (res.data && res.data.expenses) {
           console.log("Fetched Expenses Data:", res.data.expenses);
           processExpenseChartData(res.data.expenses);
+          setRecentExpenses(res.data.expenses.slice(0, 5)); // Fetch 5 recent expenses
         }
       } catch (error) {
         console.error('Error fetching Expenses:', error);
@@ -111,6 +85,7 @@ function ManagerHome() {
         if (res.data && res.data) {
           console.log("Fetched Reimbursements Data:", res.data);
           processReimbursementChartData(res.data);
+          setRecentReimbursements(res.data.slice(0, 5)); // Fetch 5 recent reimbursements
         }
       } catch (error) {
         console.error('Error fetching Reimbursements:', error);
@@ -230,8 +205,7 @@ function ManagerHome() {
       Paid: 'rgba(54,162,235,1)',
       Unpaid: 'rgba(255,99,132,1)',
     };
-  
-    // Initialize an object to group data by status and date
+
     const reimbursementsByStatusAndDate = data.reduce((acc, reimbursement) => {
       const status = reimbursement.is_paid ? 'Paid' : 'Unpaid';
       const date = new Date(reimbursement.created_at).toLocaleDateString();
@@ -239,13 +213,11 @@ function ManagerHome() {
       acc[status][date] = acc[status][date] ? acc[status][date] + 1 : 1;
       return acc;
     }, {});
-  
-    // Extract unique, sorted dates
+
     const labels = [...new Set(data.map((reimbursement) =>
       new Date(reimbursement.created_at).toLocaleDateString()
     ))].sort();
-  
-    // Build datasets for each status
+
     const datasets = statuses.map((status) => ({
       label: status,
       data: labels.map((date) => reimbursementsByStatusAndDate[status]?.[date] || 0),
@@ -254,17 +226,16 @@ function ManagerHome() {
       borderColor: borderColors[status],
       tension: 0.4,
     }));
-  
-    // Ensure that labels and datasets are valid before setting state
+
     setReimbursementChartData({
-      labels: labels.map(String), // Convert all labels explicitly to strings
+      labels: labels.map(String),
       datasets: datasets.map(dataset => ({
         ...dataset,
-        data: dataset.data.map(Number), // Ensure all data points are numbers
+        data: dataset.data.map(Number),
       })),
     });
   };
-  
+
   const chartOptions = {
     responsive: true,
     scales: {
@@ -290,7 +261,10 @@ function ManagerHome() {
           <Line data={areaChartData} options={{ ...chartOptions, plugins: { ...chartOptions.plugins, title: { text: 'Users Over Time' } } }} />
         </div>
 
-
+        <div className="flex-1 min-w-[200px] md:max-w-[30%] p-4 bg-white rounded shadow-md">
+          <h2 className="text-lg font-semibold mb-4 text-center text-black">User Distribution by Role</h2>
+          <Pie data={pieChartData} options={chartOptions} />
+        </div>
 
         <div className="flex-1 min-w-[300px] md:max-w-[48%] p-4 bg-white rounded shadow-md">
           <h2 className="text-lg font-semibold mb-4 text-center text-black">Expenses Over Time by Status</h2>
@@ -302,8 +276,73 @@ function ManagerHome() {
           <Bar data={reimbursementChartData} options={{ ...chartOptions, plugins: { ...chartOptions.plugins, title: { text: 'Reimbursements Over Time by Payment Status' } } }} />
         </div>
       </div>
+
+      <div className="w-full flex flex-wrap justify-start gap-8 mt-8">
+        {/* Recent Expenses and Reimbursements */}
+        <div className="flex-1 min-w-[300px] md:max-w-[48%] p-4 bg-white rounded shadow-md">
+          <h2 className="text-lg font-semibold mb-4 text-center text-black">Recent Expenses</h2>
+          <ul className="list-none">
+          {recentExpenses.map((expense, index) => (
+            <li key={index} className="mb-4 p-4 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+              <div className="font-semibold text-gray-700">
+                  
+                  <span className="text-black">
+                    {(expense.user.phone_number)}
+                  </span>
+                </div>
+                <div className="font-semibold text-gray-700">
+                  {/* <span>Amount: </span> */}
+                  <span className="text-black">
+                    {(expense.amount)}
+                  </span>
+                </div>
+                <div className={`font-semibold ${expense.status === 'pending' ? 'text-orange-600' : expense.status === 'approved' ? 'text-green-600' : 'text-red-600'}`}>
+                  {/* <span>Status: </span> */}
+                  <span>{expense.status}</span>
+                </div>
+                <div className="text-green-700">
+                  {/* <span>Date: </span> */}
+                  <span>{new Date(expense.created_at).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        </div>
+
+        <div className="flex-1 min-w-[300px] md:max-w-[48%] p-4 bg-white rounded shadow-md">
+          <h2 className="text-lg font-semibold mb-4 text-center text-black">Recent Reimbursements</h2>
+          <ul>
+  {recentReimbursements.map((reimbursement, index) => (
+    <li key={index} className="mb-4 p-4 border-b border-gray-200 flex justify-between items-center">
+      <div className="font-semibold text-gray-700">
+        <span> {reimbursement.expense.user.phone_number}</span>
+      </div>
+      {/* Amount */}
+      <div className="font-semibold text-gray-700">
+        <span>{reimbursement.expense.amount}</span>
+      </div>
+
+      {/* Status */}
+      <div className={`font-semibold ${reimbursement.is_paid ? 'text-green-600' : 'text-red-600'}`}>
+        <span>{reimbursement.is_paid ? 'Paid' : 'Unpaid'}</span>
+      </div>
+
+      {/* Date */}
+      <div className="text-green-700">
+        <span>{new Date(reimbursement.created_at).toLocaleDateString()}</span>
+      </div>
+    </li>
+  ))}
+</ul>
+
+        </div>
+      </div>
     </div>
   );
 }
+
+
 
 export default ManagerHome;

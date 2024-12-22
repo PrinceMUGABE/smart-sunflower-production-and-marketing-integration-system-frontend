@@ -16,6 +16,7 @@ import {
   faAdd,
   faCancel,
 } from "@fortawesome/free-solid-svg-icons";
+import tripImage from "../../../assets/pictures/tripImage.png";
 
 function ManagerExpenses() {
   const [expenseData, setexpenseData] = useState([]);
@@ -293,7 +294,7 @@ function ManagerExpenses() {
 
   return (
     <>
-      <h1 className="text-center text-black font-bold text-xl capitalize mb-4">
+      <h1 className="text-center text-green-700 font-bold text-xl capitalize mb-4">
         Manage expenses
       </h1>
       {message && (
@@ -316,7 +317,7 @@ function ManagerExpenses() {
         <div className="relative">
           <button
             onClick={() => setDownloadMenuVisible(!downloadMenuVisible)}
-            className=" py-2  text-black bg-red-700 px-4 mr-2 rounded w-auto"
+            className=" py-2  text-black bg-green-700 px-4 mr-2 rounded w-auto"
           >
             <FontAwesomeIcon icon={faDownload} className="mr-2" />
           </button>
@@ -368,10 +369,10 @@ function ManagerExpenses() {
       </div>
 
       <div className="text-right mb-4">
-        <p className="text-blue-700">
+        {/* <p className="text-blue-700">
           Total expenses:{" "}
           <span className="font-bold text-black">{filteredData.length}</span>
-        </p>
+        </p> */}
       </div>
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -379,7 +380,7 @@ function ManagerExpenses() {
           id="expense-table"
           className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
         >
-          <thead className="text-xs text-black uppercase bg-blue-700 dark:bg-blue-700 dark:text-black">
+          <thead className="text-xs text-black uppercase bg-green-700 dark:bg-green-700 dark:text-black">
             <tr>
               <th scope="col" className="px-6 py-3">
                 #
@@ -444,7 +445,7 @@ function ManagerExpenses() {
                     </Link>
                     <button
                       onClick={() => handleDelete(expense.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-green-600 hover:text-red-900"
                     >
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
@@ -473,7 +474,7 @@ function ManagerExpenses() {
           <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
-            className="px-4 py-2 bg-blue-700 text-white rounded"
+            className="px-4 py-2 bg-green-700 text-white rounded"
           >
             Prev
           </button>
@@ -491,7 +492,7 @@ function ManagerExpenses() {
       {isModalOpen && selectedExpense && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-4 w-1/2 max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-bold mb-4 text-center text-blue-700">
+            <h2 className="text-lg font-bold mb-4 text-center text-green-700">
               Expense Details
             </h2>
             <p className="text-black">
@@ -572,7 +573,18 @@ function ManagerExpenses() {
               )}
             </div>
 
-
+            {/* Map Section */}
+            <div className="flex-1 min-w-[250px] py-8 px-4">
+              <h1 className="text-xl font-bold mb-4">Our Location in Rwanda</h1>
+              <div className="overflow-hidden rounded-lg shadow-lg">
+                {/* <MapComponent /> */}
+                <img
+                  src={tripImage}
+                  alt="No image"
+                  className="w-full h-80 object-cover rounded-lg"
+                />
+              </div>
+            </div>
 
             <button
               onClick={() => handleAcceptExpense(selectedExpense.id)}

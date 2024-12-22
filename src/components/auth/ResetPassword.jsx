@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import loginImage from "../../assets/pictures/img3.jpg";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const ResetPassword = () => {
   });
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const getCsrfToken = () => {
     let csrfToken = null;
@@ -24,9 +26,7 @@ const ResetPassword = () => {
     return csrfToken;
   };
 
-  // Updated phone validation to check for length and format
   const validatePhone = (phone) => {
-    // Phone number must be exactly 10 digits and start with 078, 079, 072, or 073
     const phoneRegex = /^(078|079|072|073)\d{7}$/;
     return phoneRegex.test(phone) && phone.length === 10;
   };
@@ -43,50 +43,57 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    setMessage('');
 
-    // Validate phone number before proceeding
     if (!validatePhone(formData.phone)) {
-        setError('Phone number must be exactly 10 digits and start with 078, 079, 072, or 073.');
-        setMessage('');
-        return;
+      setIsLoading(false);
+      setError('Phone number must be exactly 10 digits and start with 078, 079, 072, or 073.');
+      return;
     }
 
-    // Validate password
     if (!validatePassword(formData.new_password)) {
-        setError('Password must be at least 5 characters long, contain a special character, an uppercase letter, a lowercase letter, and a number.');
-        setMessage('');
-        return;
+      setIsLoading(false);
+      setError('Password must be at least 5 characters long, contain a special character, an uppercase letter, a lowercase letter, and a number.');
+      return;
     }
 
     const csrfToken = getCsrfToken();
     try {
-        const response = await axios.post('http://127.0.0.1:8000/forget_password/', formData, {
-            headers: {
-                'X-CSRFToken': csrfToken,
-            },
-        });
+      const response = await axios.post('http://127.0.0.1:8000/forget_password/', formData, {
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+      });
 
-        if (response.data.message === "Password reset successfully.") {
-            setFormData({ phone: '', new_password: '' }); // Clear the form fields
-            setMessage('Password reset successfully. Please check your phone for confirmation.');
-            setError(''); // Clear any previous error
-            setTimeout(() => {
-                navigate('/login');
-            }, 2000); // Navigate after 2 seconds to show success message
-        } else {
-            setError(response.data.error || 'Password reset failed. Please try again.');
-            setMessage(''); // Clear any previous message
-        }
+      setIsLoading(false);
+
+      if (response.data.message === "Password reset successfully. A confirmation has been sent to your email.") {
+        setMessage('Password reset successfully. Redirecting to login...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      } else {
+        setError('An unexpected response was received.');
+      }
     } catch (error) {
-        // Handle specific error for phone number not found
-        if (error.response?.status === 404) {
-            setError('Phone number not found.');
+      setIsLoading(false);
+      if (error.response) {
+        if (error.response.status === 404) {
+          setError('Phone number not found.');
+        } else if (error.response.data && error.response.data.error) {
+          setError(error.response.data.error);
         } else {
-            setError(error.response?.data?.error || 'An error occurred. Please try again.');
+          setError('An error occurred. Please try again.');
         }
-        setMessage(''); // Clear any previous message
+      } else if (error.request) {
+        setError('No response from server. Please check your connection.');
+      } else {
+        setError('Error setting up the request. Please try again.');
+      }
     }
-};
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -94,65 +101,101 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-white">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Reset Password
-        </h2>
-      </div>
-      <small className='mt-1.5 text-center'>Reset password</small>
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        {message && <p className="text-green-500 text-sm">{message}</p>}
-        <form className="space-y-6" onSubmit={handleSubmit}>
+    <div
+      className="flex justify-center items-center min-h-screen bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${loginImage})`,
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <div className="absolute inset-0 bg-black opacity-50"></div> {/* Dark overlay */}
+      <div className="relative z-10 max-w-sm w-full space-y-8 bg-white rounded-lg shadow-lg p-8 mx-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900">
+            Reset Password
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Enter your phone number and new password to reset your account.
+          </p>
+        </div>
+        {error && <div className="text-red-500 text-sm">{error}</div>}
+        {message && <div className="text-green-500 text-sm">{message}</div>}
+        <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
+            <label
+              htmlFor="phone"
+              className="block text-sm font-medium text-gray-700"
+            >
               Phone
             </label>
-            <div className="mt-2">
-              <input
-                id="phone"
-                name="phone"
-                type="text" // Changed to text to prevent unwanted behaviors with leading zeros
-                autoComplete="phone"
-                required
-                value={formData.phone}
-                onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
+            <input
+              id="phone"
+              name="phone"
+              type="text"
+              value={formData.phone}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              required
+            />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               New Password
             </label>
-            <div className="mt-2">
-              <input
-                id="password"
-                name="new_password"
-                type="password"
-                required
-                value={formData.new_password}
-                onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
+            <input
+              id="password"
+              name="new_password"
+              type="password"
+              value={formData.new_password}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              required
+            />
           </div>
           <div>
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={isLoading}
             >
-              Reset Password
+              {isLoading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              ) : (
+                "Reset Password"
+              )}
             </button>
-            <p className="mt-10 text-center text-sm text-gray-500">
-              Already have an account?{' '}
-              <Link to="/login" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                Login
-              </Link>
-            </p>
           </div>
         </form>
+        <div className="text-center">
+          <Link
+            to="/login"
+            className="text-sm text-blue-500 hover:underline"
+          >
+            Back to Login
+          </Link>
+        </div>
       </div>
     </div>
   );

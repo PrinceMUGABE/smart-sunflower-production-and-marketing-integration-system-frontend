@@ -110,7 +110,7 @@ const CreateUser = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="flex justify-center items-center rounded-lg shadow-xl w-full max-w-4xl bg-white p-8">
         <div className="w-full sm:max-w-md">
-          <h2 className="mt-3 text-center text-2xl font-bold text-gray-900">Create New User</h2>
+          <h2 className="mt-3 text-center text-2xl font-bold text-green-900">Create New User</h2>
 
           {errors.form && <p className="text-red-500 text-sm">{errors.form}</p>}
           {message && <p className="text-green-500 text-sm">{message}</p>}
@@ -165,7 +165,7 @@ const CreateUser = () => {
             <div>
               <button
                 type="submit"
-                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full bg-green-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 disabled={loading}
               >
                 {loading ? <AiOutlineLoading3Quarters className="animate-spin h-5 w-5" /> : 'Save'}

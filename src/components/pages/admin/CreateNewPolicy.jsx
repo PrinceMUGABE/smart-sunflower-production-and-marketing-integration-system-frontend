@@ -9,6 +9,7 @@ import { PDFDocument } from 'pdf-lib'; // For PDF parsing (lightweight)
 const CreatePolicy = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    name: '', // New field for policy name
     description: '',
   });
   const [errors, setErrors] = useState({});
@@ -62,7 +63,7 @@ const CreatePolicy = () => {
     try {
       const response = await axios.post(
         'http://127.0.0.1:8000/policy/create/',
-        { description: formData.description },
+        { name: formData.name, description: formData.description }, // Include name in submission
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         }
@@ -92,12 +93,28 @@ const CreatePolicy = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="flex justify-center items-center rounded-lg shadow-xl w-full max-w-4xl bg-white p-8">
         <div className="w-full sm:max-w-md">
-          <h2 className="mt-3 text-center text-2xl font-bold text-gray-900">Create New Policy</h2>
+          <h2 className="mt-3 text-center text-2xl font-bold text-green-900">Create New Policy</h2>
 
           {errors.form && <p className="text-red-500 text-sm">{errors.form}</p>}
           {message && <p className="text-green-500 text-sm">{message}</p>}
 
           <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+            {/* New Name Field */}
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Policy Name</label>
+              <input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                type="text"
+                className="mt-1 block w-full rounded-md border border-gray-300 p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                placeholder="Enter the policy name"
+                required
+              />
+              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+            </div>
+
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
               <textarea
@@ -128,7 +145,7 @@ const CreatePolicy = () => {
             <div>
               <button
                 type="submit"
-                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full bg-green-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 disabled={loading}
               >
                 {loading ? <AiOutlineLoading3Quarters className="animate-spin h-5 w-5" /> : 'Save'}

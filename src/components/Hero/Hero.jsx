@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
 // eslint-disable-next-line no-unused-vars
 import React from "react";
 import hero from "../../assets/pictures/bus.png";
+import bgImage from "../../assets/pictures/branches.jpg";
 
 const Hero = () => {
   return (

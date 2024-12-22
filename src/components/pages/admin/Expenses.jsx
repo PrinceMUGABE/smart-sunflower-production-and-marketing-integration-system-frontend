@@ -8,6 +8,7 @@ import * as XLSX from "xlsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Worker, Viewer } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import {
   faEye,
   faEdit,
@@ -16,6 +17,8 @@ import {
   faAdd,
   faCancel,
 } from "@fortawesome/free-solid-svg-icons";
+import MapComponent from "../../Footer/MapComponent"; // Import the MapComponent you created
+import tripImage from "../../../assets/pictures/tripImage.png";
 
 function AdminManageExpenses() {
   const [expenseData, setexpenseData] = useState([]);
@@ -36,6 +39,13 @@ function AdminManageExpenses() {
 
   const token = localStorage.getItem("token");
   console.log("Retrieved Token:", token);
+
+  const mapOptions = {
+    mapTypeControl: true,
+    streetViewControl: true,
+    fullscreenControl: true,
+    zoomControl: true,
+  };
 
   useEffect(() => {
     if (!accessToken) {
@@ -291,9 +301,44 @@ function AdminManageExpenses() {
     }
   };
 
+  // Add new state for map center
+  const [center, setCenter] = useState({
+    lat: 1.3521, // Default to Singapore coordinates
+    lng: 103.8198,
+  });
+
+  const mapContainerStyle = {
+    width: "100%",
+    height: "400px",
+    marginTop: "2rem",
+  };
+
+  const MapComponent = () => {
+    return (
+      <div className="w-full p-4 bg-white rounded shadow-md mt-8">
+        <h2 className="text-lg font-semibold mb-4 text-center text-green-700">
+          Location
+        </h2>
+        <div style={mapContainerStyle}>
+          <iframe
+            title="Default Map"
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${
+              center.lng - 0.1
+            }%2C${center.lat - 0.1}%2C${center.lng + 0.1}%2C${
+              center.lat + 0.1
+            }&amp;layer=mapnik`}
+          ></iframe>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
-      <h1 className="text-center text-black font-bold text-xl capitalize mb-4">
+      <h1 className="text-center text-green-700 font-bold text-xl capitalize mb-4">
         Manage expenses
       </h1>
       {message && (
@@ -316,7 +361,7 @@ function AdminManageExpenses() {
         <div className="relative">
           <button
             onClick={() => setDownloadMenuVisible(!downloadMenuVisible)}
-            className=" py-2  text-black bg-red-700 px-4 mr-2 rounded w-auto"
+            className=" py-2  text-black bg-green-700 px-4 mr-2 rounded w-auto"
           >
             <FontAwesomeIcon icon={faDownload} className="mr-2" />
           </button>
@@ -379,7 +424,7 @@ function AdminManageExpenses() {
           id="expense-table"
           className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
         >
-          <thead className="text-xs text-black uppercase bg-blue-700 dark:bg-blue-700 dark:text-black">
+          <thead className="text-xs text-black uppercase bg-green-700 dark:bg-green-700 dark:text-black">
             <tr>
               <th scope="col" className="px-6 py-3">
                 #
@@ -444,7 +489,7 @@ function AdminManageExpenses() {
                     </Link>
                     <button
                       onClick={() => handleDelete(expense.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-green-600 hover:text-red-900"
                     >
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
@@ -565,6 +610,7 @@ function AdminManageExpenses() {
                     className="w-full h-auto border border-gray-300 rounded"
                   />
                 )
+                
               ) : (
                 <p className="text-black">
                   No receipt available for this expense.
@@ -572,7 +618,18 @@ function AdminManageExpenses() {
               )}
             </div>
 
-
+            {/* Map Section */}
+            <div className="flex-1 min-w-[250px] py-8 px-4">
+              <h1 className="text-xl font-bold mb-4">Our Location in Rwanda</h1>
+              <div className="overflow-hidden rounded-lg shadow-lg">
+                {/* <MapComponent /> */}
+                <img
+                  src={tripImage}
+                  alt="No image"
+                  className="w-full h-80 object-cover rounded-lg"
+                />
+              </div>
+            </div>
 
             <button
               onClick={() => handleAcceptExpense(selectedExpense.id)}
@@ -588,12 +645,15 @@ function AdminManageExpenses() {
               Reject
             </button>
 
+
             <button
               onClick={handleCloseModal}
               className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
             >
               Close
             </button>
+
+            
           </div>
         </div>
       )}

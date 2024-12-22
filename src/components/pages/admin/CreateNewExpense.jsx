@@ -14,6 +14,8 @@ const AdminCreateNewExpense = () => {
     video: null,
     receipt: null,
     category: "Choose Category",
+    date: "",
+    amount: "",
   });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
@@ -120,11 +122,15 @@ const AdminCreateNewExpense = () => {
     if (formData.category === "Choose Category") {
       newErrors.category = "You must select a category.";
     }
-    if (!formData.video) {
-      newErrors.video = "You must record a video.";
+    if (!formData.date) {
+      newErrors.date = "Please select a date.";
     }
-    if (!formData.receipt) {
-      newErrors.receipt = "You must upload a receipt.";
+    if (!formData.amount || isNaN(formData.amount) || formData.amount <= 0) {
+      newErrors.amount = "Please enter a valid amount greater than 0.";
+    }
+    // Receipt is now optional, no validation for receipt field unless it's uploaded
+    if (formData.receipt && !["application/pdf", "image/png", "image/jpeg", "image/jpg"].includes(formData.receipt.type)) {
+      newErrors.receipt = "Please upload a valid PDF or image file (PNG, JPEG, JPG).";
     }
 
     return newErrors;
@@ -141,9 +147,10 @@ const AdminCreateNewExpense = () => {
     }
 
     const formDataToSubmit = new FormData();
-    formDataToSubmit.append("video", formData.video);
     formDataToSubmit.append("receipt", formData.receipt);
     formDataToSubmit.append("category", formData.category);
+    formDataToSubmit.append("date", formData.date);
+    formDataToSubmit.append("amount", formData.amount);
 
     setLoading(true);
     try {
@@ -178,54 +185,46 @@ const AdminCreateNewExpense = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="w-5/6 max-w-4xl bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-center text-2xl font-bold">Create New Expense</h2>
+        <h2 className="text-center text-2xl font-bold text-black">Create New Expense</h2>
 
         {errors.form && <p className="text-red-600 mt-4">{errors.form}</p>}
         {message && <p className="text-green-600 mt-4">{message}</p>}
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
-          {/* Video Recording Section */}
+          {/* Date Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Record Video
-            </label>
-            <div className="mt-2">
-              {videoPreview ? (
-                <video
-                  src={videoPreview}
-                  className="w-full h-48 bg-black rounded-lg"
-                  controls
-                />
-              ) : (
-                <video
-                  ref={videoRef}
-                  className="w-full h-48 bg-black rounded-lg"
-                  autoPlay
-                  muted
-                />
-              )}
-              <div className="mt-2 flex gap-2">
-                <button
-                  type="button"
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`pointer px-4 py-2 ${
-                    isRecording ? "bg-red-600" : "bg-blue-600"
-                  } text-white rounded-md hover:opacity-90`}
-                  disabled={!streamRef.current}
-                >
-                  {isRecording ? "Stop Recording" : "Start Recording"}
-                </button>
-              </div>
-              {errors.video && (
-                <p className="text-red-500 mt-1">{errors.video}</p>
-              )}
-            </div>
+            <label className="block text-sm font-medium text-gray-700">Date</label>
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, date: e.target.value }))
+              }
+              className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-black"
+            />
+            {errors.date && <p className="text-red-500 mt-1">{errors.date}</p>}
+          </div>
+
+          {/* Amount Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Amount</label>
+            <input
+              type="number"
+              value={formData.amount}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, amount: e.target.value }))
+              }
+              className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-black"
+              min="0.01"
+              step="0.01"
+            />
+            {errors.amount && <p className="text-red-500 mt-1">{errors.amount}</p>}
           </div>
 
           {/* Receipt Upload Section */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Upload Receipt (PDF or Image)
+              Upload Receipt (PDF or Image) (Optional)
             </label>
             <div className="mt-2">
               <label className="block cursor-pointer text-black">
@@ -234,7 +233,7 @@ const AdminCreateNewExpense = () => {
                 <input
                   type="file"
                   className="text-black"
-                  accept=".png,.jpeg,.jpg"
+                  accept=".png,.jpeg,.jpg,.pdf"
                   onChange={handleFileChange}
                 />
               </label>

@@ -172,7 +172,7 @@ const DriverEditExpense = () => {
           </div>
 
           {/* Video */}
-          <div>
+          {/* <div>
             <label htmlFor="video" className="block text-sm font-medium leading-6 text-gray-900">
               Video (Optional)
             </label>
@@ -186,7 +186,7 @@ const DriverEditExpense = () => {
                 className="block w-full text-gray-900"
               />
             </div>
-          </div>
+          </div> */}
 
           <div>
             <button

@@ -297,10 +297,10 @@ function AdminManage_Reimbursement() {
 
   return (
     <>
-      <h1 className="text-center text-black font-bold text-xl capitalize mb-4">
+      <h1 className="text-center text-green-700 font-bold text-xl capitalize mb-4">
         Manage reimbursements
       </h1>
-      {message && (
+      {/* {message && (
         <div
           className={`text-center py-2 px-4 mb-4 rounded ${
             messageType === "success" ? " text-green-500" : " text-red-500"
@@ -308,19 +308,19 @@ function AdminManage_Reimbursement() {
         >
           {message}
         </div>
-      )}
+      )} */}
       <div className="flex justify-end mb-4">
-        <Link
+        {/* <Link
           to="/admin/expenses"
           className=" py-2 text-black bg-blue-700 px-2 mr-4 rounded"
         >
           <FontAwesomeIcon icon={faAdd} className="mr-2 " />
-        </Link>
+        </Link> */}
 
         <div className="relative">
           <button
             onClick={() => setDownloadMenuVisible(!downloadMenuVisible)}
-            className=" py-2  text-black bg-red-700 px-4 mr-2 rounded w-auto"
+            className=" py-2  text-black bg-green-700 px-4 mr-2 rounded w-auto"
           >
             <FontAwesomeIcon icon={faDownload} className="mr-2" />
           </button>
@@ -383,7 +383,7 @@ function AdminManage_Reimbursement() {
           id="reimbursement-table"
           className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
         >
-          <thead className="text-xs text-black uppercase bg-blue-700 dark:bg-blue-700 dark:text-black">
+          <thead className="text-xs text-black uppercase bg-green-700 dark:bg-green-700 dark:text-black">
             <tr>
               <th scope="col" className="px-6 py-3">
                 #
@@ -458,7 +458,7 @@ function AdminManage_Reimbursement() {
                     </Link> */}
                     <button
                       onClick={() => handleDelete(reimbursement.id)}
-                      className="text-red-600 hover:text-gray-700"
+                      className="text-green-600 hover:text-gray-700"
                     >
                       {/* <FontAwesomeIcon icon={faTrash} /> */}
                       Del
@@ -488,7 +488,7 @@ function AdminManage_Reimbursement() {
           <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
-            className="px-4 py-2 bg-blue-700 text-white rounded"
+            className="px-4 py-2 bg-green-700 text-white rounded"
           >
             Prev
           </button>
