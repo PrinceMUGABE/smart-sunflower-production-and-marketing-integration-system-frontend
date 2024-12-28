@@ -123,7 +123,7 @@ const AdminCreateNewExpense = () => {
     if (formData.category === "Choose Category") {
       newErrors.category = "You must select a category.";
     }
-    if (formData.vendor) {
+    if (!formData.vendor) {  // Fixed vendor validation
       newErrors.vendor = "You must enter a vendor.";
     }
     if (!formData.date) {
@@ -196,13 +196,13 @@ const AdminCreateNewExpense = () => {
         {message && <p className="text-green-600 mt-4">{message}</p>}
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
-        <div>
+          <div>
             <label className="block text-sm font-medium text-gray-700">Vendor</label>
             <input
               type="text"
               value={formData.vendor}
               onChange={(e) =>
-                setFormData((prev) => ({ ...prev, date: e.target.value }))
+                setFormData((prev) => ({ ...prev, vendor: e.target.value }))  // Fixed vendor onChange handler
               }
               className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-black"
             />

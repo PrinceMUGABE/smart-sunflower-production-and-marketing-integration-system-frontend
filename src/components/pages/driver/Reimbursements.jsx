@@ -250,22 +250,22 @@ function Driver_Reimbursement() {
               {isDownloading ? 'Downloading...' : 'Download'}
             </button>
             {downloadMenuVisible && (
-              <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-xl z-10">
+              <div className="absolute right-0 mt-2 py-2 w-48 text-gray-700 bg-white rounded-lg shadow-xl z-10">
                 <button
                   onClick={downloadPDF}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
+                  className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   Download as PDF
                 </button>
                 <button
                   onClick={downloadExcel}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
+                  className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   Download as Excel
                 </button>
                 <button
                   onClick={downloadCSV}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
+                  className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   Download as CSV
                 </button>

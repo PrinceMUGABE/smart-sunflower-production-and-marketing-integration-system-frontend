@@ -11,6 +11,7 @@ const DriverCreateNewExpense = () => {
   const streamRef = useRef(null);
 
   const [formData, setFormData] = useState({
+    vendor: "",
     video: null,
     receipt: null,
     category: "Choose Category",
@@ -114,6 +115,10 @@ const DriverCreateNewExpense = () => {
   const validateFields = () => {
     const newErrors = {};
 
+    if (formData.vendor === "") {
+      newErrors.vendor = "You must enter vendor.";
+    }
+
     if (formData.category === "Choose Category") {
       newErrors.category = "You must select a category.";
     }
@@ -135,6 +140,11 @@ const DriverCreateNewExpense = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Add this logging
+  console.log("Submitting vendor:", formData.vendor);
+
+  
     const newErrors = validateFields();
 
     if (Object.keys(newErrors).length > 0) {

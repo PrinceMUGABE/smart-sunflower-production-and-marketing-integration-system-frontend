@@ -197,6 +197,7 @@ function DriverHome() {
   
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
       y: {
         beginAtZero: true,
@@ -209,53 +210,89 @@ function DriverHome() {
       title: {
         display: true,
       },
+      legend: {
+        position: 'top',
+      },
     },
   };
 
   return (
-    <div className="mt-20 flex flex-col items-center">
-      <div className="w-full flex flex-wrap justify-start gap-4 p-4">
+    <div className="mt-20 flex flex-col items-center w-full max-w-[1600px] mx-auto px-4">
+      {/* Cards Container */}
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {/* Total Expenses Card */}
-        <div className="flex flex-1 min-w-[300px] md:max-w-[48%] p-4 bg-blue-100 rounded-lg shadow-md flex-col items-center justify-center text-center">
+        <div className="p-4 bg-blue-100 rounded-lg shadow-md flex flex-col items-center justify-center text-center">
           <FaWallet className="text-blue-600 text-4xl mb-2" />
           <h3 className="text-xl font-semibold text-blue-800">Total Expenses</h3>
           <p className="text-2xl font-bold text-blue-900">{totalExpenses}</p>
         </div>
 
         {/* Total Reimbursements Card */}
-        <div className="flex flex-1 min-w-[300px] md:max-w-[48%] p-4 bg-green-100 rounded-lg shadow-md flex-col items-center justify-center text-center">
+        <div className="p-4 bg-green-100 rounded-lg shadow-md flex flex-col items-center justify-center text-center">
           <FaFileInvoiceDollar className="text-green-600 text-4xl mb-2" />
           <h3 className="text-xl font-semibold text-green-800">Total Reimbursements</h3>
           <p className="text-2xl font-bold text-green-900">{totalReimbursements}</p>
         </div>
 
         {/* Total Policies Card */}
-        <div className="flex flex-1 min-w-[300px] md:max-w-[48%] p-4 bg-purple-100 rounded-lg shadow-md flex-col items-center justify-center text-center">
+        <div className="p-4 bg-purple-100 rounded-lg shadow-md flex flex-col items-center justify-center text-center">
           <FaFileAlt className="text-purple-600 text-4xl mb-2" />
           <h3 className="text-xl font-semibold text-purple-800">Total Policies</h3>
           <p className="text-2xl font-bold text-purple-900">{totalPolicies}</p>
         </div>
       </div>
 
-      <div className="w-full flex flex-wrap justify-start gap-8">
+      {/* Charts Container */}
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Expenses Over Time by Status Area Chart */}
-        <div className="flex-1 min-w-[300px] md:max-w-[48%] p-4 bg-white rounded shadow-md">
+        <div className="w-full bg-white rounded shadow-md p-4">
           <h2 className="text-lg font-semibold mb-4 text-center text-black">Expenses Over Time by Status</h2>
-          <Line data={expenseChartData} options={{ ...chartOptions, plugins: { ...chartOptions.plugins, title: { text: 'Expenses Over Time by Status' } } }} />
+          <div className="h-[400px]">
+            <Line 
+              data={expenseChartData} 
+              options={{ 
+                ...chartOptions, 
+                plugins: { 
+                  ...chartOptions.plugins, 
+                  title: { text: 'Expenses Over Time by Status' } 
+                } 
+              }} 
+            />
+          </div>
         </div>
 
         {/* Reimbursements Over Time by Payment Status Bar Chart */}
-        <div className="flex-1 min-w-[300px] md:max-w-[48%] p-4 bg-white rounded shadow-md">
+        <div className="w-full bg-white rounded shadow-md p-4">
           <h2 className="text-lg font-semibold mb-4 text-center text-black">Reimbursements Over Time by Payment Status</h2>
-          <Bar data={reimbursementChartData} options={{ ...chartOptions, plugins: { ...chartOptions.plugins, title: { text: 'Reimbursements Over Time by Payment Status' } } }} />
+          <div className="h-[400px]">
+            <Bar 
+              data={reimbursementChartData} 
+              options={{ 
+                ...chartOptions, 
+                plugins: { 
+                  ...chartOptions.plugins, 
+                  title: { text: 'Reimbursements Over Time by Payment Status' } 
+                } 
+              }} 
+            />
+          </div>
         </div>
       </div>
 
-      <div className="w-full flex flex-col items-center gap-8 mt-8">
-        {/* Comparison Pie Chart */}
-        <div className="flex-1 min-w-[300px] max-w-[48%] p-4 bg-white rounded shadow-md">
-          <h2 className="text-lg font-semibold mb-4 text-center text-black">Comparison of Expenses, Reimbursements, and Policies</h2>
-          <Pie data={comparisonChartData} options={{ plugins: { legend: { position: 'bottom' } } }} />
+      {/* Pie Chart Container */}
+      <div className="w-full max-w-2xl mx-auto bg-white rounded shadow-md p-4">
+        <h2 className="text-lg font-semibold mb-4 text-center text-black">Comparison of Expenses, Reimbursements, and Policies</h2>
+        <div className="h-[300px]">
+          <Pie 
+            data={comparisonChartData} 
+            options={{ 
+              ...chartOptions,
+              plugins: { 
+                ...chartOptions.plugins,
+                legend: { position: 'bottom' } 
+              } 
+            }} 
+          />
         </div>
       </div>
     </div>

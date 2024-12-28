@@ -71,7 +71,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section>xa
 
       {/* Copyright Section */}
       <div className="bg-green-800 py-4 text-center text-gray-400">
