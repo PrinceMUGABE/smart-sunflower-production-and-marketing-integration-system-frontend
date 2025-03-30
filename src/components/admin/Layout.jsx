@@ -1,27 +1,18 @@
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable no-unused-vars */
 import React from 'react';
-import Sidebar from './Sidebar';
-import Header from './Header';
 import { Outlet } from 'react-router-dom';
+import Sidebar from './Sidebar';
 
 function Layout() {
   return (
-    <div className="bg-gray-100 min-h-screen overflow-auto">
-      <div className="flex flex-col md:flex-row">
-        {/* Sidebar */}
-        <div className="fixed md:relative z-10">
-          <Sidebar />
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 md:ml-56 ml-16 md:overflow-x-auto overflow-auto">
-          <Header />
-
-          {/* Main Section Scrollable */}
-          <main className="p-4">
+    <div className="flex bg-gray-800 min-h-screen overflow-x-hidden">
+      <Sidebar />
+      <div className="flex-1 ml-0 md:ml-56 w-full overflow-x-auto">
+        <main className="max-w-7xl mx-auto p-4 w-full">
+          <div className="min-w-[320px]"> {/* Ensure minimum width for small screens */}
             <Outlet />
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   );

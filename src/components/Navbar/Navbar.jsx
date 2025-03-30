@@ -1,110 +1,89 @@
-/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
+// Navbar.jsx
 import React, { useState } from "react";
 import { HiMenuAlt3, HiMenuAlt1 } from "react-icons/hi";
+import { FaGlobe, FaUser } from "react-icons/fa";
 import ResponsiveMenu from "./ResponsiveMenu";
 import Logo from "../../assets/pictures/logo.png";
-import DarkMode from "./DarkMode";
 import { Link, useNavigate } from "react-router-dom";
 
 export const MenuLinks = [
-  {
-    id: 1,
-    name: "Home",
-    link: "/#home",
-  },
-  {
-    id: 2,
-    name: "About",
-    link: "/#about",
-  },
-  // {
-  //   id: 3,
-  //   name: "Services",
-  //   link: "/#services",
-  // },
-  {
-    id: 4,
-    name: "Contact",
-    link: "/#contact",
-  },
+  { id: 1, name: "Home", link: "/#home" },
+  { id: 2, name: "Choosing AGS", link: "/#choosing-ags" },
+  { id: 3, name: "Our Services", link: "/#services" },
+  { id: 4, name: "Our Network", link: "/#network" },
+  { id: 5, name: "News", link: "/#news" },
+  { id: 6, name: "Contact", link: "/#contact" },
 ];
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const navigate = useNavigate();
 
-  const toggleMenu = () => {
-    setShowMenu(!showMenu);
-  };
-
-  // Function to handle button click and navigate to the login page
-  const handleLoginClick = () => {
-    navigate("/login");
-  };
+  const toggleMenu = () => setShowMenu(!showMenu);
+  const handleLoginClick = () => navigate("/login");
 
   return (
-    <div
-      className="relative z-10 w-full dark:bg-white dark:text-white duration-300
-    "
-    >
-      <div className="container py-3 md:py-2">
+    <header className="fixed top-0 left-0 right-0 z-20 w-full">
+      {/* Top Bar */}
+      <div className="bg-gray-900 text-white py-2 text-sm flex justify-end px-6 md:px-12">
+        <div className="flex items-center gap-4">
+          {/* <a href="#careers" className="text-gray-600 hover:text-red-500">Careers</a>
+          <a href="#payment" className="text-gray-600hover:text-red-500">Payment</a> */}
+          <button onClick={handleLoginClick} className="flex items-center gap-1 hover:text-red-500">
+            <FaUser /> Log in
+          </button>
+          {/* <button className="flex items-center gap-1 hover:text-red-500">
+            <FaGlobe /> English ▼
+          </button> */}
+        </div>
+      </div>
+
+      {/* Main Navigation Bar */}
+      <div className="bg-white shadow-md py-3 px-6 md:px-12">
         <div className="flex justify-between items-center">
-          {/* Logo section */}
-          <a target="_blank" href="#home" className="flex items-center gap-3">
-            <img src={Logo} alt="" className="w-20" /> <br /> <br />
-            <br />
-            <span className="text-2xl sm:text-3xl font-semibold">
-              Volcano Expense Pro
-            </span>
+          {/* Logo */}
+          <a href="#home" className="flex items-center gap-3">
+            <img src={Logo} alt="Logo" className="w-24" />
+            <span className="text-xl font-semibold text-gray-900">AGS Worldwide Movers</span>
           </a>
-          {/* Desktop view Navigation */}
+
+          {/* Desktop Navigation */}
           <nav className="hidden md:block">
-            <ul className="flex items-center gap-8">
+            <ul className="flex items-center gap-6">
               {MenuLinks.map(({ id, name, link }) => (
-                <li key={id} className="py-4">
-                  <a
-                    href={link}
-                    className="text-lg font-medium  hover:text-primary py-2 hover:border-b-2 hover:border-primary transition-colors duration-500"
-                  >
+                <li key={id}>
+                  <a href={link} className="text-lg text-gray-600 font-medium hover:text-red-500 py-2 border-b-2 border-transparent hover:border-red-500 transition-colors">
                     {name}
                   </a>
                 </li>
               ))}
-              {/* Button for Login */}
-              <li>
-                <button
-                  onClick={handleLoginClick}
-                  className="border-2 border-blue-500 text-blue-500 font-bold py-2 px-4 rounded-full hover:bg-blue-500 hover:text-white transition-colors"
-                >
-                  Login
-                </button>
-              </li>
-              <DarkMode />
             </ul>
           </nav>
-          {/* Mobile view Drawer */}
-          <div className="flex items-center gap-4 md:hidden ">
-            <DarkMode />
-            {/* Mobile Hamburger icon */}
+
+          {/* Get a Quote Button */}
+          <button className="hidden md:block bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition">
+            Get a Quote
+          </button>
+
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden flex items-center gap-4">
+            <button className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition">
+              Get a Quote
+            </button>
             {showMenu ? (
-              <HiMenuAlt1
-                onClick={toggleMenu}
-                className="cursor-pointer transition-all"
-                size={30}
-              />
+              <HiMenuAlt1 onClick={toggleMenu} className="cursor-pointer" size={30} />
             ) : (
-              <HiMenuAlt3
-                onClick={toggleMenu}
-                className="cursor-pointer transition-all"
-                size={30}
-              />
+              <HiMenuAlt3 onClick={toggleMenu} className="cursor-pointer" size={30} />
             )}
           </div>
         </div>
       </div>
-      <ResponsiveMenu showMenu={showMenu} />
-    </div>
+
+      {/* Mobile Responsive Menu */}
+      <ResponsiveMenu showMenu={showMenu} setShowMenu={setShowMenu} />
+    </header>
   );
 };
 

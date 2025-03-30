@@ -1,8 +1,9 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { LockClosedIcon, ArrowPathIcon } from "@heroicons/react/20/solid"; // Using ArrowPathIcon for spinner
+import { ArrowLeft } from "lucide-react";
+import { LockClosedIcon } from "@heroicons/react/20/solid";
 
 const EditUser = () => {
   const { id } = useParams();
@@ -47,13 +48,13 @@ const EditUser = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token"); // Retrieve the token from local storage
-
+  
     if (!token) {
       console.error("No token found. User is not authenticated.");
       setErrorMessage("No token found. Please login first.");
       return; // Stop the request if there's no token
     }
-
+  
     setLoading(true); // Start loading when the form is submitted
     setErrorMessage(""); // Clear any previous error message
     axios
@@ -64,44 +65,60 @@ const EditUser = () => {
       })
       .then((res) => {
         if (res.data) {
-          alert("Data updated successfully");
+          // alert("Data updated successfully");
           navigate("/admin/users"); // Navigate back to the users list page
         }
       })
       .catch((err) => {
         console.error("Error updating user:", err); // Log the error
-        setErrorMessage(err.response?.data?.message || "Error updating user.");
+  
+        // Attempt to extract detailed error message from the backend
+        const backendMessage = err.response?.data?.message || err.response?.data?.detail || "Error updating user.";
+  
+        // Set the error message to be displayed
+        setErrorMessage(backendMessage);
       })
       .finally(() => {
         setLoading(false); // Stop loading after the request finishes
       });
   };
+  
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-white">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-green-900">
-          Update User
-        </h2>
-      </div>
+    <section className="bg-gray-800 min-h-screen flex items-center justify-center px-4 py-16">
+      {/* Background overlay with subtle pattern */}
+      <div className="absolute inset-0 bg-gray-900 opacity-50 pattern-grid-lg"></div>
 
-      {errorMessage && (
-        <div className="text-red-600 text-center">
-          <p>{errorMessage}</p>
+      <div className="container mx-auto max-w-md z-10">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">
+            Update User
+          </h2>
+          <p className="text-gray-300 max-w-md mx-auto">
+            Modify user information and assign roles
+          </p>
         </div>
-      )}
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
+          <div className="p-6 bg-red-600 text-white">
+            <h3 className="text-xl font-semibold">Edit User Profile</h3>
+            <p className="text-gray-100 mt-1">Update user account details</p>
+          </div>
 
-          <div>
-            <label
-              htmlFor="phone_number"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Phone Number
-            </label>
-            <div className="mt-2">
+          {errorMessage && (
+            <div className="mx-6 mt-6 p-3 rounded bg-red-900 text-red-100">
+              {errorMessage}
+            </div>
+          )}
+
+          <form className="p-6 space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label
+                htmlFor="phone_number"
+                className="block text-gray-300 mb-2 font-medium"
+              >
+                Phone Number
+              </label>
               <input
                 id="phone_number"
                 name="phone_number"
@@ -109,19 +126,18 @@ const EditUser = () => {
                 value={data.phone_number || ""}
                 onChange={(e) => setData({ ...data, phone_number: e.target.value })}
                 required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                placeholder="e.g., 0781234567"
               />
             </div>
-          </div>
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Email Address
-            </label>
-            <div className="mt-2">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-gray-300 mb-2 font-medium"
+              >
+                Email Address
+              </label>
               <input
                 id="email"
                 name="email"
@@ -129,58 +145,63 @@ const EditUser = () => {
                 value={data.email || ""}
                 onChange={(e) => setData({ ...data, email: e.target.value })}
                 required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                placeholder="e.g., example@gmail.com"
               />
             </div>
-          </div>
 
-          <div>
-            <label
-              htmlFor="role"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Role
-            </label>
-            <div className="mt-2">
+            <div>
+              <label
+                htmlFor="role"
+                className="block text-gray-300 mb-2 font-medium"
+              >
+                Role
+              </label>
               <select
                 id="role"
                 name="role"
                 value={data.role || ""}
                 onChange={(e) => setData({ ...data, role: e.target.value })}
                 required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
               >
                 <option value="admin">Admin</option>
-                <option value="manager">Manager</option>
+                <option value="customer">Customer</option>
                 <option value="driver">Driver</option>
               </select>
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
-              className="group relative flex w-full justify-center rounded-md bg-green-500 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              disabled={loading}
+              className="w-full p-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
             >
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                {loading ? (
-                  <ArrowPathIcon
-                    className="h-5 w-5 text-white animate-spin"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <LockClosedIcon
-                    className="h-5 w-5 text-purple-400 group-hover:text-indigo-400"
-                    aria-hidden="true"
-                  />
-                )}
-              </span>
-              {loading ? "Updating..." : "Update"}
+              {loading ? (
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <>
+                  <LockClosedIcon className="h-5 w-5 text-gray-100 group-hover:text-gray-300" aria-hidden="true" />
+                  Update User
+                </>
+              )}
             </button>
-          </div>
-        </form>
+            
+            <div className="mt-5 text-center">
+              <Link
+                to="/admin/users"
+                className="text-gray-400 hover:text-white flex items-center justify-center gap-1"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to users
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

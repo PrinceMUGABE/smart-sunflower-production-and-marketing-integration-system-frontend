@@ -1,15 +1,16 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { ArrowLeft } from 'lucide-react';
+import { LockClosedIcon } from "@heroicons/react/20/solid";
 
 const CreateUser = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     phone: '',
     email: '',
-    role: 'Choose Role',
+    role: '',
   });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
@@ -29,15 +30,12 @@ const CreateUser = () => {
     }
 
     // Role validation
-    if (formData.role === 'Choose Role') {
+    if (!formData.role) {
       newErrors.role = 'You must select a role.';
     }
 
     return newErrors;
   };
-
-  const token = localStorage.getItem("token"); // Retrieve the token from local storage
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,6 +50,7 @@ const CreateUser = () => {
       phone: formData.phone,
       email: formData.email,
       role: formData.role,
+      is_admin_creating: true,
     };
   
     setLoading(true);
@@ -107,74 +106,133 @@ const CreateUser = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="flex justify-center items-center rounded-lg shadow-xl w-full max-w-4xl bg-white p-8">
-        <div className="w-full sm:max-w-md">
-          <h2 className="mt-3 text-center text-2xl font-bold text-green-900">Create New User</h2>
+    <section className="bg-gray-800 min-h-screen flex items-center justify-center px-4 py-16">
+      {/* Background overlay with subtle pattern */}
+      <div className="absolute inset-0 bg-gray-900 opacity-50 pattern-grid-lg"></div>
 
-          {errors.form && <p className="text-red-500 text-sm">{errors.form}</p>}
-          {message && <p className="text-green-500 text-sm">{message}</p>}
+      <div className="container mx-auto max-w-md z-10">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">
+            Create New User
+          </h2>
+          <p className="text-gray-300 max-w-md mx-auto">
+            Add a new user to the system
+          </p>
+        </div>
 
-          <form className="mt-8 space-y-2" onSubmit={handleSubmit}>
+        <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
+          <div className="p-6 bg-red-600 text-white">
+            <h3 className="text-xl font-semibold">New User Registration</h3>
+            <p className="text-gray-100 mt-1">Enter details for the new user account</p>
+          </div>
+
+          {errors.form && (
+            <div className="mx-6 mt-6 p-3 rounded bg-red-900 text-red-100">
+              {errors.form}
+            </div>
+          )}
+          
+          {message && (
+            <div className="mx-6 mt-6 p-3 rounded bg-green-900 text-green-100">
+              {message}
+            </div>
+          )}
+
+          <form className="p-6 space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+              <label 
+                htmlFor="phone" 
+                className="block text-gray-300 mb-2 font-medium"
+              >
+                Phone Number
+              </label>
               <input
                 id="phone"
                 name="phone"
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                placeholder="e.g., 0781234567"
                 required
               />
-              {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+              {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone}</p>}
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+              <label 
+                htmlFor="email" 
+                className="block text-gray-300 mb-2 font-medium"
+              >
+                Email Address
+              </label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                placeholder="e.g., example@gmail.com"
                 required
               />
-              {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
+              <label 
+                htmlFor="role" 
+                className="block text-gray-300 mb-2 font-medium"
+              >
+                Role
+              </label>
               <select
                 id="role"
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="mt-1 block w-full text-gray-900 rounded-md border border-gray-300 p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
                 required
               >
-                <option value="Choose Role" disabled>Choose Role</option>
+                <option value="" disabled>Select Role</option>
                 <option value="admin">Admin</option>
-                <option value="manager">Manager</option>
-                <option value="driver">Driver</option>
+                <option value="customer">Customer</option>
+                {/* <option value="driver">Driver</option> */}
               </select>
-              {errors.role && <p className="text-red-500 text-sm">{errors.role}</p>}
+              {errors.role && <p className="text-red-400 text-sm mt-1">{errors.role}</p>}
             </div>
 
-            <div>
-              <button
-                type="submit"
-                className="w-full bg-green-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                disabled={loading}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full p-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
+            >
+              {loading ? (
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <>
+                  <LockClosedIcon className="h-5 w-5 text-gray-100 group-hover:text-gray-300" aria-hidden="true" />
+                  Create User
+                </>
+              )}
+            </button>
+            
+            <div className="mt-5 text-center">
+              <Link
+                to="/admin/users"
+                className="text-gray-400 hover:text-white flex items-center justify-center gap-1"
               >
-                {loading ? <AiOutlineLoading3Quarters className="animate-spin h-5 w-5" /> : 'Save'}
-              </button>
+                <ArrowLeft className="h-4 w-4" />
+                Back to users
+              </Link>
             </div>
           </form>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

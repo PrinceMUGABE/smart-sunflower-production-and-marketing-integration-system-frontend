@@ -17,44 +17,40 @@ import ChangePassword from "./components/auth/ChangePassword.jsx";
 
 // Admin imports
 import Layout from "./components/admin/Layout.jsx";
-import AdminManageExpenses from "./components/pages/admin/Expenses.jsx";
-import AdminCreateNewExpense from "./components/pages/admin/CreateNewExpense.jsx";
-import AdminEditExpense from "./components/pages/admin/EditExpense.jsx";
-import AdminManage_Reimbursement from "./components/pages/admin/Reimbursements.jsx";
-import AdminManagePolicies from "./components/pages/admin/Policies.jsx";
-import CreatePolicy from "./components/pages/admin/CreateNewPolicy.jsx";
-import EditPolicy from "./components/pages/admin/EditPolicy.jsx";
 import AdminHome from "./components/pages/admin/Home.jsx";
 import Users from "./components/pages/admin/Users.jsx";
 import CreateUser from "./components/pages/admin/CreateNewUser.jsx";
 import EditUsers from "./components/pages/admin/EditUsers.jsx";
 
-// Manager imports
-import ManagerLayout from "./components/manager/Layout.jsx";
-import ManagerHome from "./components/pages/manager/Home.jsx";
-import ManagerUsers from "./components/pages/manager/Users.jsx";
-import ManagerCreateUser from "./components/pages/manager/CreateNewUser.jsx";
-import ManagerEditUser from "./components/pages/manager/EditUsers.jsx";
-import ManagerExpenses from "./components/pages/manager/Expenses.jsx";
-import ManagerCreateNewExpense from "./components/pages/manager/CreateNewExpense.jsx";
-import ManagerEditExpense from "./components/pages/manager/EditExpense.jsx";
-import Manager_Reimbursement from "./components/pages/manager/Reimbursements.jsx";
-import ManagerPolicies from "./components/pages/manager/Policies.jsx";
 
 
-// Driver imports
-import DriverLayout from "./components/driver/Layout.jsx";
-import DriverHome from "./components/pages/driver/Home.jsx";
-import DriverEditUser from "./components/pages/driver/EditUsers.jsx";
-import DriverCreateNewExpense from "./components/pages/driver/CreateNewExpense.jsx";
-import DriverExpenses from "./components/pages/driver/Expenses.jsx";
-import DriverEditExpense from "./components/pages/driver/EditExpense.jsx";
-import Driver_Reimbursement from "./components/pages/driver/Reimbursements.jsx";
-import DriverPolicies from "./components/pages/driver/Policies.jsx";
-import DriverUsers from "./components/pages/driver/Users.jsx";
-import DriverProfile from "./components/pages/driver/DriverProfile.jsx";
+
 import AdminProfile from "./components/pages/admin/AdminProfile.jsx";
-import ManagerProfile from "./components/pages/manager/ManagerProfile.jsx";
+import UserProfile from "./components/pages/customer/UserProfile.jsx";
+import UserHome from "./components/pages/customer/Home.jsx";
+// import Admin_Manage_Inventory from "./components/pages/admin/manage_inventories.jsx";
+import Admin_DemandForecast from "./components/pages/admin/manage_demandForecast.jsx";
+import Admin_Manage_Vehicles from "./components/pages/admin/manage_vehicles.jsx";
+import Admin_Manage_Drivers from "./components/pages/admin/manage_drivers.jsx";
+import Customer_Layout from "./components/customer/Layout.jsx";
+import Customer_VehiclesDisplay from "./components/pages/customer/vehicles.jsx";
+import Customer_Map from "./components/pages/customer/map.jsx";
+import Admin_Manage_Relocations from "./components/pages/admin/manage_relocations.jsx";
+import Customer_Manage_Relocations from "./components/pages/customer/my_relocations.jsx";
+import Admin_Create_Relocation from "./components/pages/admin/create_relocation.jsx";
+import Admin_Manage_Feedbacks from "./components/pages/admin/manage_feedbacks.jsx";
+import Customer_Manage_Feedbacks from "./components/pages/customer/manage_feedbacks.jsx";
+import Driver_Layout from "./components/driver/Layout.jsx";
+import Driver_Home from "./components/pages/driver/Home.jsx";
+import Driver_VehiclesDisplay from "./components/pages/driver/vehicles.jsx";
+import Driver_Map from "./components/pages/driver/map.jsx";
+import Driver_Manage_Feedbacks from "./components/pages/driver/manage_feedbacks.jsx";
+import DriverProfile from "./components/pages/driver/UserProfile.jsx";
+import Driver_Manage_Relocations from "./components/pages/driver/my_relocations.jsx";
+
+
+
+
 
 const App = () => {
   useEffect(() => {
@@ -88,96 +84,52 @@ const App = () => {
             <Route index element={<AdminHome />} />
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/edituser/:id" element={<EditUsers />} />
-            <Route path="/admin/createUser/" element={<CreateUser />} />
+            <Route path="/admin/createUser" element={<CreateUser />} />
 
-            <Route path="/admin/expenses" element={<AdminManageExpenses />} />
-            <Route
-              path="/admin/createExpense/"
-              element={<AdminCreateNewExpense />}
-            />
-            <Route
-              path="/admin/editExpense/:id"
-              element={<AdminEditExpense />}
-            />
+            <Route path="/admin/vehicles" element={<Admin_Manage_Vehicles />} />
+            <Route path="/admin/relocations" element={<Admin_Manage_Relocations />} />
+            <Route path="/admin/createRelocation" element={<Admin_Create_Relocation />} />
 
-            <Route
-              path="/admin/reimbursements"
-              element={<AdminManage_Reimbursement />}
-            />
-            <Route path="/admin/policies" element={<AdminManagePolicies />} />
-            <Route path="/admin/createPolicy/" element={<CreatePolicy />} />
-            <Route path="/admin/editPolicy/:id" element={<EditPolicy />} />
 
+            <Route path="/admin/drivers" element={<Admin_Manage_Drivers />} />
+            <Route path="/admin/feedbacks" element={<Admin_Manage_Feedbacks />} />
+            <Route path="/admin/forecasts" element={<Admin_DemandForecast />} />
             <Route path="/admin/profile/:id" element={<AdminProfile />} />
+
           </Route>
 
-          {/* End of Admin route*/}
 
-          <Route path="/manager" element={<ManagerLayout />}>
-            <Route index element={<ManagerHome />} />
-            <Route path="/manager/users" element={<ManagerUsers />} />
-            <Route path="/manager/edituser/:id" element={<ManagerEditUser />} />
-            <Route
-              path="/manager/createUser/"
-              element={<ManagerCreateUser />}
-            />
+          {/* user */}
 
-            <Route path="/manager/expenses" element={<ManagerExpenses />} />
-            <Route
-              path="/manager/createExpense/"
-              element={<ManagerCreateNewExpense />}
-            />
-            <Route
-              path="/manager/editExpense/:id"
-              element={<ManagerEditExpense />}
-            />
+          <Route path="/customer" element={<Customer_Layout />}>
+            <Route index element={<UserHome />} />
+            <Route path="/customer/vehicles" element={<Customer_VehiclesDisplay />} />
+            <Route path="/customer/predict" element={<Customer_Map />} />
+            <Route path="/customer/feedbacks" element={<Customer_Manage_Feedbacks />} />
 
-            <Route
-              path="/manager/reimbursements"
-              element={<Manager_Reimbursement />}
-            />
-            <Route path="/manager/policies" element={<ManagerPolicies />} />
-            <Route path="/manager/profile/:id" element={<ManagerProfile />} />
+            <Route path="/customer/profile/:id" element={<UserProfile />} />
+
+            <Route path="/customer/relocations" element={<Customer_Manage_Relocations />} />
+     
+          </Route>
 
 
-            {/* <Route path="/admin/createPolicy/" element={<CreatePolicy />} />
-            <Route path="/admin/editPolicy/:id" element={<EditPolicy />} /> */}
+
+          <Route path="/driver" element={<Driver_Layout />}>
+            <Route index element={<Driver_Home />} />
+            <Route path="/driver/vehicles" element={<Driver_VehiclesDisplay />} />
+            <Route path="/driver/predict" element={<Driver_Map />} />
+            <Route path="/driver/feedbacks" element={<Driver_Manage_Feedbacks />} />
+
+            <Route path="/driver/profile" element={<DriverProfile />} />
+
+            <Route path="/driver/relocations" element={<Driver_Manage_Relocations />} />
+     
           </Route>
 
 
 
 
-          <Route path="/driver" element={<DriverLayout />}>
-            <Route index element={<DriverHome />} />
-            <Route path="/driver/users" element={<DriverUsers />} />
-            <Route path="/driver/edituser/:id" element={<DriverEditUser />} />
-            <Route
-              path="/driver/createUser/"
-              element={<DriverCreateNewExpense />}
-            />
-
-            <Route path="/driver/expenses" element={<DriverExpenses />} />
-            <Route
-              path="/driver/createExpense/"
-              element={<DriverCreateNewExpense />}
-            />
-            <Route
-              path="/driver/editExpense/:id"
-              element={<DriverEditExpense />}
-            />
-
-            <Route
-              path="/driver/reimbursements"
-              element={<Driver_Reimbursement />}
-            />
-            <Route path="/driver/policies" element={<DriverPolicies />} />
-            <Route path="/driver/profile/:id" element={<DriverProfile />} />
-
-
-
-            {/* <Route path="/admin/createPolicy/" element={<CreatePolicy />} />
-            <Route path="/admin/editPolicy/:id" element={<EditPolicy />} /> */}
-          </Route>
         </Routes>
       </BrowserRouter>
     </div>

@@ -1,26 +1,29 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  LockClosedIcon,
-  EyeIcon,
-  EyeSlashIcon,
-} from "@heroicons/react/20/solid";
+import { Phone, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import axios from "axios";
-import loginImage from "../../assets/pictures/coaster2.jpg";
+import loginImage from "../../assets/pictures/driving2.jpg";
 
 const Login = () => {
   const navigate = useNavigate();
 
-  const [phone, setPhone] = useState("");
+  const [identifier, setIdentifier] = useState("");  // Use identifier for both phone and email
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPhoneLogin, setIsPhoneLogin] = useState(true);  // State to toggle between phone or email login
 
   const validatePhone = (phone) => {
     const phoneRegex = /^(078|072|079|073)\d{7}$/;
     return phoneRegex.test(phone);
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    return emailRegex.test(email);
   };
 
   const validatePassword = (password) => {
@@ -39,14 +42,14 @@ const Login = () => {
     );
   };
 
-  const handlePhoneChange = (e) => {
-    const newPhone = e.target.value;
-    setPhone(newPhone);
+  const handleIdentifierChange = (e) => {
+    const newIdentifier = e.target.value;
+    setIdentifier(newIdentifier);
 
-    if (newPhone && !validatePhone(newPhone)) {
-      setError(
-        "Phone number must be 10 digits and start with 078, 072, 079, or 073."
-      );
+    if (isPhoneLogin && newIdentifier && !validatePhone(newIdentifier)) {
+      setError("Phone number must be 10 digits and start with 078, 072, 079, or 073.");
+    } else if (!isPhoneLogin && newIdentifier && !validateEmail(newIdentifier)) {
+      setError("Email must be a valid Gmail address ending with @gmail.com.");
     } else {
       setError("");
     }
@@ -56,17 +59,19 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    if (!validatePhone(phone)) {
-      setError(
-        "Phone number must be 10 digits and start with 078, 072, 079, or 073."
-      );
+    // Validate based on the login method (phone or email)
+    if (isPhoneLogin && !validatePhone(identifier)) {
+      setError("Phone number must be 10 digits and start with 078, 072, 079, or 073.");
+      return;
+    }
+
+    if (!isPhoneLogin && !validateEmail(identifier)) {
+      setError("Email must be a valid Gmail address ending with @gmail.com.");
       return;
     }
 
     if (!validatePassword(password)) {
-      setError(
-        "Password must be at least 8 characters long, and include at least one uppercase letter, one lowercase letter, one digit, and one special character."
-      );
+      setError("Password must be at least 8 characters long, and include at least one uppercase letter, one lowercase letter, one digit, and one special character.");
       return;
     }
 
@@ -75,7 +80,7 @@ const Login = () => {
     axios
       .post(
         "http://127.0.0.1:8000/login/",
-        { phone, password },
+        { identifier, password }, // send identifier (phone/email) and password
         { headers: { "Content-Type": "application/json" } }
       )
       .then((res) => {
@@ -97,11 +102,12 @@ const Login = () => {
 
           if (user.role.trim().toLowerCase() === "admin") {
             navigate("/admin");
-          } else if (user.role.trim().toLowerCase() === "manager") {
-            navigate("/manager");
-          } else if (user.role.trim().toLowerCase() === "driver") {
-            navigate("/driver");
-          } else {
+          } else if (user.role.trim().toLowerCase() === "customer") {
+            navigate("/customer/vehicles");
+          } else if (user.role.trim().toLowerCase() === 'driver'){
+            navigate("/driver/vehicles")
+          }
+          else {
             console.log("Unknown user role. Please contact support.");
           }
         } else {
@@ -110,124 +116,159 @@ const Login = () => {
       })
       .catch((error) => {
         setIsLoading(false);
-        console.error("Error during login:", error.response || error.message || error);
-        setError("Invalid phone number or password.");
+        console.error(
+          "Error during login:",
+          error.response || error.message || error
+        );
+        setError("Invalid phone/email or password.");
       });
   };
 
   return (
-    <div className="relative flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-4 sm:px-6 lg:px-8">
-      {/* Background Image and Overlay */}
-      <div className="absolute inset-0 bg-cover bg-center opacity-50" style={{ backgroundImage: `url(${loginImage})` }}></div>
-      
-      <div className="max-w-md w-full space-y-8 bg-white bg-opacity-90 rounded-lg shadow-lg p-8 z-10">
-        <div className="text-center">
-          <h2 className="mt-2 text-2xl font-bold text-gray-900">
-            Login to Your Account
+    <section className="bg-gray-800 min-h-screen flex items-center justify-center px-4 py-16">
+      {/* Background overlay with image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-20"
+        style={{ backgroundImage: `url(${loginImage})` }}
+      ></div>
+
+      <div className="container mx-auto max-w-md z-10">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">
+            Welcome Back
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Enter your credentials to access the system.
+          <p className="text-gray-300 max-w-md mx-auto">
+            Sign in to access your account and manage your services
           </p>
         </div>
-        {error && <div className="text-red-500 text-sm">{error}</div>}
-        <form className="mt-6 space-y-6" onSubmit={handleLogin}>
-          <div>
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Phone
-            </label>
-            <input
-              id="phone"
-              name="phone"
-              type="text"
-              value={phone}
-              onChange={handlePhoneChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-gray-700"
-              required
-            />
+
+        <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
+          <div className="p-6 bg-red-600 text-white">
+            <h3 className="text-xl font-semibold">Account Login</h3>
+            <p className="text-gray-100 mt-1">Enter your credentials to continue</p>
           </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-            <div className="relative mt-1">
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block text-gray-700 w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              />
-              <span
-                className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeSlashIcon className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <EyeIcon className="h-5 w-5 text-gray-400" />
-                )}
-              </span>
+
+          <form className="p-6" onSubmit={handleLogin}>
+            {error && (
+              <div className="mb-5 p-3 rounded bg-red-900 text-red-100">
+                {error}
+              </div>
+            )}
+
+            {/* Toggle between Phone and Email */}
+            <div className="mb-4 flex justify-between items-center">
+              <label className="block text-gray-300 mb-2 font-medium">Login with</label>
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  className={`px-4 py-2 rounded-md ${isPhoneLogin ? "bg-red-600" : "bg-gray-700"}`}
+                  onClick={() => setIsPhoneLogin(true)}
+                >
+                  Phone
+                </button>
+                <button
+                  type="button"
+                  className={`px-4 py-2 rounded-md ${!isPhoneLogin ? "bg-red-600" : "bg-gray-700"}`}
+                  onClick={() => setIsPhoneLogin(false)}
+                >
+                  Email
+                </button>
+              </div>
             </div>
-          </div>
-          <div>
+
+            <div className="mb-4">
+              <label className="block text-gray-300 mb-2 font-medium">Identifier</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  {isPhoneLogin ? <Phone className="h-5 w-5 text-gray-400" /> : null}
+                </div>
+                <input
+                  type="text"
+                  id="identifier"
+                  name="identifier"
+                  value={identifier}
+                  onChange={handleIdentifierChange}
+                  placeholder={isPhoneLogin ? "e.g., 0781234567" : "e.g., example@gmail.com"}
+                  className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-gray-300 font-medium">Password</label>
+                <Link
+                  to="/passwordreset"
+                  className="text-sm text-red-400 hover:text-red-300"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full p-3 pl-10 pr-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                  required
+                />
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </div>
+              </div>
+            </div>
+
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               disabled={isLoading}
+              className="w-full p-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
             >
               {isLoading ? (
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  ></path>
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               ) : (
                 "Sign In"
               )}
             </button>
-          </div>
-        </form>
-        <div className="text-center">
-          <Link
-            to="/passwordreset"
-            className="text-sm text-blue-500 hover:underline"
-          >
-            Forgot your password?
-          </Link>
-        </div>
-        <div className="text-center">
-          <Link
-            to="/"
-            className="text-sm text-blue-500 hover:underline"
-          >
-            Back to home
-          </Link>
+
+            <div className="mt-5 text-center">
+              <p className="text-gray-400">
+                Don't have an account?{" "}
+                <Link to="/signup" className="text-red-400 hover:text-red-300">
+                  Sign up now
+                </Link>
+              </p>
+            </div>
+
+            <div className="mt-5 text-center">
+              <Link
+                to="/"
+                className="text-gray-400 hover:text-white flex items-center justify-center gap-1"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to home
+              </Link>
+            </div>
+          </form>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

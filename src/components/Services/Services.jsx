@@ -1,101 +1,99 @@
-import React from "react";
-import { FaCameraRetro } from "react-icons/fa";
-import { GiNotebook } from "react-icons/gi";
-import { SlNote } from "react-icons/sl";
+/* eslint-disable no-unused-vars */
+import React, { useState } from "react";
+import { Truck, BarChart2, Clock, Database, Map } from "lucide-react";
 
-const skillsData = [
+const servicesData = [
   {
-    name: "Updated Policy",
-    icon: <FaCameraRetro className="text-4xl text-primary" />,
+    name: "Route Optimization",
+    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
+      <Map color="white" size={36} />
+    </div>,
+    ctaText: "View Routes",
     link: "#",
-    description:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad distinctio dignissimos ea eum, tenetur id ullam ex doloremque enim aspernatur vitae quam modi sequi velit libero nemo maiores in voluptatum.",
-    aosDelay: "0",
   },
   {
-    name: "Updated Policy",
-    icon: <GiNotebook className="text-4xl text-primary" />,
+    name: "Predictive Analytics",
+    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
+      <BarChart2 color="white" size={36} />
+    </div>,
+    ctaText: "View Forecasts",
     link: "#",
-    description:
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad distinctio dignissimos ea eum, tenetur id ullam ex doloremque enim aspernatur vitae quam modi sequi velit libero nemo maiores in voluptatum.",
-    aosDelay: "300",
   },
   {
-    name: "Updated Policy",
-    icon: <SlNote className="text-4xl text-primary" />,
+    name: "Resource Allocation",
+    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
+      <Truck color="white" size={36} />
+    </div>,
+    ctaText: "Manage Resources",
     link: "#",
-    description:
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad distinctio dignissimos ea eum, tenetur id ullam ex doloremque enim aspernatur vitae quam modi sequi velit libero nemo maiores in voluptatum.",
-    aosDelay: "500",
   },
   {
-    name: "Updated Policy",
-    icon: <SlNote className="text-4xl text-primary" />,
+    name: "Customer Analytics",
+    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
+      <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="white" strokeWidth="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    </div>,
+    ctaText: "View Insights",
     link: "#",
-    description:
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad distinctio dignissimos ea eum, tenetur id ullam ex doloremque enim aspernatur vitae quam modi sequi velit libero nemo maiores in voluptatum.",
-    aosDelay: "700",
+  },
+  {
+    name: "Real-Time Tracking",
+    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
+      <Clock color="white" size={36} />
+    </div>,
+    ctaText: "Monitor Fleet",
+    link: "#",
   },
 ];
-const Services = () => {
+
+const RemovalsServices = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const servicesPerPage = 5;
+
+  const indexOfLastService = currentPage * servicesPerPage;
+  const indexOfFirstService = indexOfLastService - servicesPerPage;
+  const currentServices = servicesData.slice(indexOfFirstService, indexOfLastService);
+
   return (
-    <>
-
-      <section id="service">
-
-      <div className="bg-gray-100 dark:bg-black dark:text-white py-12 sm:grid sm:place-items-center">
-        <div className="container">
-          {/* Header */}
-          <div className="pb-12 text-center space-y-3">
-            <h1
-              data-aos="fade-up"
-              className="text-3xl font-semibold sm:text-3xl text-violet-950 dark:text-primary"
-            >
-              Explore Our Services
+    <section id="services">
+      <div className="bg-gray-800 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="pb-8 text-center">
+            <h1 className="text-3xl font-semibold mb-2">
+              Data-Driven Relocation Optimization
             </h1>
-            <p
-              data-aos="fade-up"
-              className="text-gray-600 dark:text-gray-400 text-sm"
-            >
-              We are setting up an updated police
-              visually.
+            <p className="text-gray-300">
+              ROPS offers intelligent analytics and predictive solutions for efficient relocations.
             </p>
           </div>
 
-          {/* services cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {skillsData.map((skill) => (
+          <div className="flex flex-wrap justify-center gap-4">
+            {currentServices.map((service) => (
               <div
-                key={skill.name}
-                data-aos="fade-up"
-                data-aos-delay={skill.aosDelay}
-                className="card space-y-3 sm:space-y-4 p-4"
+                key={service.name}
+                className="flex flex-col items-center w-40 text-center"
               >
-                <div>{skill.icon}</div>
-                <h1 className="text-lg font-semibold">{skill.name}</h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {skill.description}
-                </p>
+                <div className="mb-4 flex justify-center">
+                  {service.icon}
+                </div>
+                <h3 className="text-lg font-medium mb-1">{service.name}</h3>
+                <a 
+                  href={service.link} 
+                  className="text-sm text-gray-300 hover:text-white"
+                >
+                  {service.ctaText}
+                </a>
               </div>
             ))}
           </div>
-
-          {/* button */}
-          {/* <div
-            data-aos="fade-up"
-            data-aos-delay="900"
-            data-aos-offset="0"
-            className="text-center mt-4 sm:mt-8"
-          >
-            <button className="primary-btn">Learn More</button>
-          </div> */}
         </div>
       </div>
-
-      </section>
-     
-    </>
+    </section>
   );
 };
 
-export default Services;
+export default RemovalsServices;
