@@ -87,13 +87,13 @@ const App = () => {
             <Route path="/admin/createUser" element={<CreateUser />} />
 
             <Route path="/admin/vehicles" element={<Admin_Manage_Vehicles />} />
-            <Route path="/admin/relocations" element={<Admin_Manage_Relocations />} />
+            <Route path="/admin/predictions" element={<Admin_Manage_Relocations />} />
             <Route path="/admin/createRelocation" element={<Admin_Create_Relocation />} />
 
 
             <Route path="/admin/drivers" element={<Admin_Manage_Drivers />} />
             <Route path="/admin/feedbacks" element={<Admin_Manage_Feedbacks />} />
-            <Route path="/admin/forecasts" element={<Admin_DemandForecast />} />
+            <Route path="/admin/weather" element={<Admin_DemandForecast />} />
             <Route path="/admin/profile/:id" element={<AdminProfile />} />
 
           </Route>

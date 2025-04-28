@@ -10,7 +10,7 @@ import {
 import { MdDashboard } from "react-icons/md";
 import { X, Menu, LogOut, ChevronDown, Bell } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import Logo from "../../assets/pictures/logo.png";
+import Logo from "../../assets/pictures/minagri.jpg";
 
 const DriverHeader = () => {
   const [isOpen, setIsOpen] = useState(false);

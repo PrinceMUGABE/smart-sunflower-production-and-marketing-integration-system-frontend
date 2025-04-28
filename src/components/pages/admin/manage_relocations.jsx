@@ -47,11 +47,11 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="p-4 text-red-100 bg-red-900 rounded-lg">
+        <div className="p-4 text-green-100 bg-green-900 rounded-lg">
           <h3 className="font-semibold">Something went wrong</h3>
           <button
             onClick={() => window.location.reload()}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
             Refresh Page
           </button>
@@ -563,7 +563,7 @@ function Admin_Manage_Relocations() {
                 </span>
               </div>
               <div className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
                 <span className="text-xs text-gray-300">
                   Canceled: {canceledRelocations}
                 </span>
@@ -766,7 +766,7 @@ function Admin_Manage_Relocations() {
 
     return (
       <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-700 mb-6">
-        <h3 className="text-lg font-semibold mb-4 text-red-400 flex items-center">
+        <h3 className="text-lg font-semibold mb-4 text-green-400 flex items-center">
           <FontAwesomeIcon icon={faRoad} className="mr-2" />
           Recent Activity
         </h3>
@@ -785,7 +785,7 @@ function Admin_Manage_Relocations() {
                 statusColor = "bg-green-500";
                 break;
               case "canceled":
-                statusColor = "bg-red-500";
+                statusColor = "bg-green-500";
                 break;
               default:
                 statusColor = "bg-gray-500";
@@ -817,7 +817,7 @@ function Admin_Manage_Relocations() {
                           ? "bg-yellow-900 text-yellow-200"
                           : relocation.status === "completed"
                           ? "bg-green-900 text-green-200"
-                          : "bg-red-900 text-red-200"
+                          : "bg-green-900 text-green-200"
                       }`}
                     >
                       {relocation.status}
@@ -867,7 +867,7 @@ function Admin_Manage_Relocations() {
       <div className="w-full lg:w-1/3 space-y-6">
         <ErrorBoundary>
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
-            <h3 className="text-sm font-semibold mb-4 text-red-400 flex items-center">
+            <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faRoad} className="mr-2" />
               Relocation Status Distribution
             </h3>
@@ -912,7 +912,7 @@ function Admin_Manage_Relocations() {
 
         <ErrorBoundary>
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
-            <h3 className="text-sm font-semibold mb-4 text-red-400 flex items-center">
+            <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faChartPie} className="mr-2" />
               Relocation Size Distribution
             </h3>
@@ -948,7 +948,7 @@ function Admin_Manage_Relocations() {
 
         <ErrorBoundary>
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72 mt-6">
-            <h3 className="text-sm font-semibold mb-4 text-red-400 flex items-center">
+            <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faChartPie} className="mr-2" />
               Popular Destination Districts
             </h3>
@@ -1075,14 +1075,14 @@ function Admin_Manage_Relocations() {
           onClick={() => setIsModalOpen(false)}
         ></div>
         <div className="bg-gray-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-4xl border border-gray-800 max-h-[90vh] overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4 text-red-500">
+          <h2 className="text-xl font-bold mb-4 text-green-500">
             {currentRelocation ? "Update Relocation" : "Add New Relocation"}
           </h2>
           <form onSubmit={handleAddUpdateRelocation}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Origin (Start) Location Section */}
               <div className="space-y-4">
-                <h3 className="text-red-400 font-medium border-b border-gray-700 pb-2">
+                <h3 className="text-green-400 font-medium border-b border-gray-700 pb-2">
                   Origin Location
                 </h3>
 
@@ -1131,7 +1131,7 @@ function Admin_Manage_Relocations() {
 
               {/* Destination Location Section */}
               <div className="space-y-4">
-                <h3 className="text-red-400 font-medium border-b border-gray-700 pb-2">
+                <h3 className="text-green-400 font-medium border-b border-gray-700 pb-2">
                   Destination Location
                 </h3>
 
@@ -1315,7 +1315,7 @@ function Admin_Manage_Relocations() {
                                     selectedDriver.availability_status ===
                                     "available"
                                       ? "text-green-400"
-                                      : "text-red-400"
+                                      : "text-green-400"
                                   }
                                 >
                                   {selectedDriver.availability_status}
@@ -1382,7 +1382,7 @@ function Admin_Manage_Relocations() {
 
               {/* Cost Section */}
               <div className="space-y-4 col-span-2">
-                <h3 className="text-red-400 font-medium border-b border-gray-700 pb-2">
+                <h3 className="text-green-400 font-medium border-b border-gray-700 pb-2">
                   Cost Information
                 </h3>
 
@@ -1448,7 +1448,7 @@ function Admin_Manage_Relocations() {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
               >
                 {currentRelocation ? "Update" : "Add"}
               </button>
@@ -1467,11 +1467,11 @@ function Admin_Manage_Relocations() {
       <div className="p-4 bg-gray-800 min-h-screen">
         <div className="max-w-7xl mx-auto">
           <div className="mb-6 p-4 bg-gray-900 rounded-lg shadow-lg border border-gray-700">
-            <h1 className="text-center text-red-500 font-bold text-xl mb-2">
-              Manage Relocations
+            <h1 className="text-center text-green-500 font-bold text-xl mb-2">
+              Manage Predictions
             </h1>
             <p className="text-center text-gray-400 text-sm">
-              View, edit and manage relocation details from a central dashboard
+              View, edit and manage prediction details from a central dashboard
             </p>
           </div>
 
@@ -1480,7 +1480,7 @@ function Admin_Manage_Relocations() {
               className={`text-center py-3 px-4 mb-6 rounded-lg shadow-md ${
                 messageType === "success"
                   ? "bg-green-900 text-green-100"
-                  : "bg-red-900 text-red-100"
+                  : "bg-green-900 text-green-100"
               }`}
             >
               {message}
@@ -1495,10 +1495,10 @@ function Admin_Manage_Relocations() {
               <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-700 mb-6">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
                   <div className="flex items-center">
-                    <span className="text-red-400 flex items-center">
+                    <span className="text-green-400 flex items-center">
                       <FontAwesomeIcon icon={faRoad} className="mr-2" />
                       <span className="font-semibold">Total Relocations:</span>
-                      <span className="ml-2 px-3 py-1 bg-red-600 text-white rounded-full">
+                      <span className="ml-2 px-3 py-1 bg-green-600 text-white rounded-full">
                         {filteredData.length}
                       </span>
                     </span>
@@ -1526,7 +1526,7 @@ function Admin_Manage_Relocations() {
                         onClick={() =>
                           setDownloadMenuVisible(!downloadMenuVisible)
                         }
-                        className="py-2 bg-red-600 px-4 rounded-lg text-white flex items-center justify-center hover:bg-red-700 transition duration-200 w-full sm:w-auto"
+                        className="py-2 bg-green-600 px-4 rounded-lg text-white flex items-center justify-center hover:bg-green-700 transition duration-200 w-full sm:w-auto"
                       >
                         <FontAwesomeIcon icon={faDownload} className="mr-2" />
                         Export
@@ -1564,7 +1564,7 @@ function Admin_Manage_Relocations() {
                     id="relocation-table"
                     className="w-full text-sm text-left"
                   >
-                    <thead className="text-xs uppercase bg-red-600 text-white">
+                    <thead className="text-xs uppercase bg-green-600 text-white">
                       <tr>
                         <th className="px-6 py-3 rounded-tl-lg">#</th>
                         <th className="px-6 py-3">Owner</th>
@@ -1606,31 +1606,31 @@ function Admin_Manage_Relocations() {
                             </td>
                             <td className="px-6 py-4 text-gray-300">
                               {relocation.created_by?.phone_number}
-                              <p className="text-red-700">
+                              <p className="text-green-700">
                                 {relocation.created_by?.email}
                               </p>
                             </td>
 
                             <td className="px-6 py-4 text-gray-300">
                               {relocation.origin_sector}
-                              <p className="text-red-700">
+                              <p className="text-green-700">
                                 {relocation.origin_district}
                               </p>
                             </td>
                             <td className="px-6 py-4 text-gray-300">
                               {relocation.destination_sector}
-                              <p className="text-red-700">
+                              <p className="text-green-700">
                                 {relocation.destination_district}
                               </p>
                             </td>
                             <td className="px-6 py-4 text-gray-300 capitalize">
                               {relocation.relocation_size}
-                              <p className="text-red-700">Assigned car:</p>
+                              <p className="text-green-700">Assigned car:</p>
                               <p>{relocation.vehicle.plate_number}</p>
                             </td>
                             <td className="px-6 py-4 text-gray-300 capitalize">
                               {relocation.status}
-                              <p className="text-red-700">Assigned driver:</p>
+                              <p className="text-green-700">Assigned driver:</p>
                               <p>
                                 {relocation.driver?.user?.phone_number ||
                                   relocation.driver.driving_license_number}
@@ -1679,7 +1679,7 @@ function Admin_Manage_Relocations() {
                                 </button>
                                 <button
                                   onClick={() => handleDelete(relocation.id)}
-                                  className="text-red-400 hover:text-red-300 transition"
+                                  className="text-green-400 hover:text-green-300 transition"
                                 >
                                   <FontAwesomeIcon icon={faTrash} />
                                 </button>
@@ -1721,7 +1721,7 @@ function Admin_Manage_Relocations() {
                     >
                       Previous
                     </button>
-                    <span className="px-4 py-2 bg-red-600 text-white rounded-lg">
+                    <span className="px-4 py-2 bg-green-600 text-white rounded-lg">
                       Page {currentPage}
                     </span>
                     <button

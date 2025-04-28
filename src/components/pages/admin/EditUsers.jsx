@@ -100,13 +100,13 @@ const EditUser = () => {
         </div>
 
         <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-6 bg-red-600 text-white">
+          <div className="p-6 bg-green-600 text-white">
             <h3 className="text-xl font-semibold">Edit User Profile</h3>
             <p className="text-gray-100 mt-1">Update user account details</p>
           </div>
 
           {errorMessage && (
-            <div className="mx-6 mt-6 p-3 rounded bg-red-900 text-red-100">
+            <div className="mx-6 mt-6 p-3 rounded bg-green-900 text-red-100">
               {errorMessage}
             </div>
           )}
@@ -163,18 +163,18 @@ const EditUser = () => {
                 value={data.role || ""}
                 onChange={(e) => setData({ ...data, role: e.target.value })}
                 required
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black"
               >
                 <option value="admin">Admin</option>
-                <option value="customer">Customer</option>
-                <option value="driver">Driver</option>
+                <option value="farmer">Farmer</option>
+  
               </select>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full p-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
+              className="w-full p-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
             >
               {loading ? (
                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

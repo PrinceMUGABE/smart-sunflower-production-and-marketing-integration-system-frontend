@@ -3,8 +3,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Send, Mail, User, FileText, MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Contact = () => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         names: '',
@@ -31,15 +33,15 @@ const Contact = () => {
         let error = '';
         if (name === 'names' || name === 'subject') {
             if (/[^a-zA-Z\s]/.test(value)) {
-                error = 'No numbers or special characters allowed';
+                error = t('contact.errors.noSpecialChars');
             } else if (!value.trim()) {
-                error = 'This field is required';
+                error = t('contact.errors.required');
             }
         } else if (name === 'email') {
             if (!value.endsWith('@gmail.com')) {
-                error = 'Email must end with @gmail.com';
+                error = t('contact.errors.gmailOnly');
             } else if (!value.trim()) {
-                error = 'This field is required';
+                error = t('contact.errors.required');
             }
         }
         setErrors(prevErrors => ({
@@ -54,7 +56,7 @@ const Contact = () => {
         const hasEmptyFields = Object.values(formData).some((field) => !field.trim());
         
         if (hasErrors || hasEmptyFields) {
-            setMessage('Please fix the errors and fill in all required fields.');
+            setMessage(t('contact.messages.fixErrors'));
             return;
         }
 
@@ -62,7 +64,7 @@ const Contact = () => {
         try {
             const response = await axios.post('http://127.0.0.1:8000/contact/', formData);
             if (response.status === 200) {
-                setMessage('Message sent successfully');
+                setMessage(t('contact.messages.success'));
                 setFormData({
                     names: '',
                     email: '',
@@ -72,9 +74,9 @@ const Contact = () => {
             }
         } catch (error) {
             if (error.response) {
-                setMessage(error.response.data.error || 'Failed to send message');
+                setMessage(error.response.data.error || t('contact.messages.failed'));
             } else {
-                setMessage('Failed to send message');
+                setMessage(t('contact.messages.failed'));
             }
         } finally {
             setLoading(false);
@@ -82,33 +84,33 @@ const Contact = () => {
     };
 
     return (
-        <section className='bg-gray-800 py-16' id="contact">
+        <section className='bg-white py-16' id="contact">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className='text-3xl font-bold text-white mb-4'>
-                        Contact Us Today
+                    <h2 className='text-3xl font-bold text-green-900 mb-4'>
+                        {t('Contact Us')}
                     </h2>
-                    <p className="text-gray-300 max-w-2xl mx-auto">
-                        We are ready to assist you with your relocation needs. Fill out the form below and our team will get back to you within 24 hours.
-                    </p>
+                    {/* <p className="text-gray-300 max-w-2xl mx-auto">
+                        {t('contact.subtitle')}
+                    </p> */}
                 </div>
                 
                 <div className='max-w-2xl mx-auto'>
-                    <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
-                        <div className="p-6 bg-red-600 text-white">
-                            <h3 className="text-xl font-semibold">Get in touch</h3>
-                            <p className="text-gray-100 mt-1">Send us a message and we'll contact you shortly</p>
+                    <div className="bg-green-950 rounded-lg shadow-xl overflow-hidden">
+                        <div className="p-6 bg-green-700 text-white">
+                            <h3 className="text-xl font-semibold">{t('Get In Touch With Us')}</h3>
+                            <p className="text-gray-100 mt-1">{t('Send us message')}</p>
                         </div>
                         
                         <form className='p-6' onSubmit={handleSubmit}>
                             {message && (
-                                <div className={`mb-5 p-3 rounded ${message.includes('success') ? 'bg-green-900 text-green-100' : 'bg-red-900 text-red-100'}`}>
+                                <div className={`mb-5 p-3 rounded ${message.includes('success') ? 'bg-green-800 text-green-100' : 'bg-yellow-800 text-yellow-100'}`}>
                                     {message}
                                 </div>
                             )}
                             
                             <div className="mb-4">
-                                <label className="block text-gray-300 mb-2 font-medium">Your Name</label>
+                                <label className="block text-gray-300 mb-2 font-medium">{t('contact.labels.name')}</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <User className="h-5 w-5 text-gray-400" />
@@ -118,15 +120,15 @@ const Contact = () => {
                                         name="names"
                                         value={formData.names}
                                         onChange={handleChange}
-                                        placeholder='Enter your full name'
-                                        className='w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600'
+                                        placeholder={t('contact.placeholders.name')}
+                                        className='w-full p-3 pl-10 bg-green-800 border border-green-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600'
                                     />
                                 </div>
-                                {errors.names && <p className="text-red-400 text-sm mt-1">{errors.names}</p>}
+                                {errors.names && <p className="text-yellow-400 text-sm mt-1">{errors.names}</p>}
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-gray-300 mb-2 font-medium">Email Address</label>
+                                <label className="block text-gray-300 mb-2 font-medium">{t('contact.labels.email')}</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <Mail className="h-5 w-5 text-gray-400" />
@@ -136,15 +138,15 @@ const Contact = () => {
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        placeholder='your email @gmail.com'
-                                        className='w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600'
+                                        placeholder={t('contact.placeholders.email')}
+                                        className='w-full p-3 pl-10 bg-green-800 border border-green-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600'
                                     />
                                 </div>
-                                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+                                {errors.email && <p className="text-yellow-400 text-sm mt-1">{errors.email}</p>}
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-gray-300 mb-2 font-medium">Subject</label>
+                                <label className="block text-gray-300 mb-2 font-medium">{t('contact.labels.subject')}</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <FileText className="h-5 w-5 text-gray-400" />
@@ -154,15 +156,15 @@ const Contact = () => {
                                         name="subject"
                                         value={formData.subject}
                                         onChange={handleChange}
-                                        placeholder='Inquiry about your services'
-                                        className='w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600'
+                                        placeholder={t('contact.placeholders.subject')}
+                                        className='w-full p-3 pl-10 bg-green-800 border border-green-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600'
                                     />
                                 </div>
-                                {errors.subject && <p className="text-red-400 text-sm mt-1">{errors.subject}</p>}
+                                {errors.subject && <p className="text-yellow-400 text-sm mt-1">{errors.subject}</p>}
                             </div>
 
                             <div className="mb-5">
-                                <label className="block text-gray-300 mb-2 font-medium">Your Message</label>
+                                <label className="block text-gray-300 mb-2 font-medium">{t('contact.labels.message')}</label>
                                 <div className="relative">
                                     <div className="absolute top-3 left-3 flex items-start pointer-events-none">
                                         <MessageSquare className="h-5 w-5 text-gray-400" />
@@ -172,8 +174,8 @@ const Contact = () => {
                                         name="description"
                                         value={formData.description}
                                         onChange={handleChange}
-                                        placeholder='Tell us about your relocation needs'
-                                        className='w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600'
+                                        placeholder={t('contact.placeholders.message')}
+                                        className='w-full p-3 pl-10 bg-green-800 border border-green-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600'
                                     />
                                 </div>
                             </div>
@@ -181,7 +183,7 @@ const Contact = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className='w-full p-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2'
+                                className='w-full p-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 flex items-center justify-center gap-2'
                             >
                                 {loading ? (
                                     <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -191,7 +193,7 @@ const Contact = () => {
                                 ) : (
                                     <>
                                         <Send className="h-5 w-5" />
-                                        Send Message
+                                        {t('contact.sendButton')}
                                     </>
                                 )}
                             </button>

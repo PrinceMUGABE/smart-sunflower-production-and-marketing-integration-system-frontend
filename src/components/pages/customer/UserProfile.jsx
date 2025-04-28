@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { User, Phone, Mail, Clock, Edit, Save, X, ArrowLeft } from 'lucide-react';
-import profileImage from '../../../assets/pictures/driving2.jpg';
+import profileImage from '../../../assets/pictures/minagri.jpg';
 
 function UserProfile() {
   const { id } = useParams();

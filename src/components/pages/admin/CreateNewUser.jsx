@@ -121,13 +121,13 @@ const CreateUser = () => {
         </div>
 
         <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-6 bg-red-600 text-white">
+          <div className="p-6 bg-green-600 text-white">
             <h3 className="text-xl font-semibold">New User Registration</h3>
             <p className="text-gray-100 mt-1">Enter details for the new user account</p>
           </div>
 
           {errors.form && (
-            <div className="mx-6 mt-6 p-3 rounded bg-red-900 text-red-100">
+            <div className="mx-6 mt-6 p-3 rounded bg-green-900 text-green-100">
               {errors.form}
             </div>
           )}
@@ -156,7 +156,7 @@ const CreateUser = () => {
                 placeholder="e.g., 0781234567"
                 required
               />
-              {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone}</p>}
+              {errors.phone && <p className="text-green-400 text-sm mt-1">{errors.phone}</p>}
             </div>
 
             <div>
@@ -176,7 +176,7 @@ const CreateUser = () => {
                 placeholder="e.g., example@gmail.com"
                 required
               />
-              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-green-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
@@ -191,21 +191,21 @@ const CreateUser = () => {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black"
                 required
               >
                 <option value="" disabled>Select Role</option>
                 <option value="admin">Admin</option>
-                <option value="customer">Customer</option>
+                <option value="farmer">farmer</option>
                 {/* <option value="driver">Driver</option> */}
               </select>
-              {errors.role && <p className="text-red-400 text-sm mt-1">{errors.role}</p>}
+              {errors.role && <p className="text-green-400 text-sm mt-1">{errors.role}</p>}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full p-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
+              className="w-full p-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
             >
               {loading ? (
                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

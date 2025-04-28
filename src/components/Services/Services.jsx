@@ -1,58 +1,55 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-import { Truck, BarChart2, Clock, Database, Map } from "lucide-react";
+import { Cloud, BarChart2, Droplet, Calendar, AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-const servicesData = [
-  {
-    name: "Route Optimization",
-    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
-      <Map color="white" size={36} />
-    </div>,
-    ctaText: "View Routes",
-    link: "#",
-  },
-  {
-    name: "Predictive Analytics",
-    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
-      <BarChart2 color="white" size={36} />
-    </div>,
-    ctaText: "View Forecasts",
-    link: "#",
-  },
-  {
-    name: "Resource Allocation",
-    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
-      <Truck color="white" size={36} />
-    </div>,
-    ctaText: "Manage Resources",
-    link: "#",
-  },
-  {
-    name: "Customer Analytics",
-    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
-      <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="white" strokeWidth="2">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-      </svg>
-    </div>,
-    ctaText: "View Insights",
-    link: "#",
-  },
-  {
-    name: "Real-Time Tracking",
-    icon: <div className="rounded-full bg-red-600 p-6 w-24 h-24 flex items-center justify-center">
-      <Clock color="white" size={36} />
-    </div>,
-    ctaText: "Monitor Fleet",
-    link: "#",
-  },
-];
-
-const RemovalsServices = () => {
+const FarmingServices = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 5;
+  const { t } = useTranslation();
+
+  const servicesData = [
+    {
+      name: t("services.weatherPrediction"),
+      icon: <div className="rounded-full bg-green-700 p-6 w-24 h-24 flex items-center justify-center">
+        <Cloud color="white" size={36} />
+      </div>,
+      ctaText: t("services.viewForecasts"),
+      link: "#",
+    },
+    {
+      name: t("services.cropYieldAnalytics"),
+      icon: <div className="rounded-full bg-green-700 p-6 w-24 h-24 flex items-center justify-center">
+        <BarChart2 color="white" size={36} />
+      </div>,
+      ctaText: t("services.viewPredictions"),
+      link: "#",
+    },
+    {
+      name: t("services.resourceAllocation"),
+      icon: <div className="rounded-full bg-green-700 p-6 w-24 h-24 flex items-center justify-center">
+        <Droplet color="white" size={36} />
+      </div>,
+      ctaText: t("services.manageResources"),
+      link: "#",
+    },
+    {
+      name: t("services.farmPlanning"),
+      icon: <div className="rounded-full bg-green-700 p-6 w-24 h-24 flex items-center justify-center">
+        <Calendar color="white" size={36} />
+      </div>,
+      ctaText: t("services.viewPlanner"),
+      link: "#",
+    },
+    {
+      name: t("services.riskManagement"),
+      icon: <div className="rounded-full bg-green-700 p-6 w-24 h-24 flex items-center justify-center">
+        <AlertTriangle color="white" size={36} />
+      </div>,
+      ctaText: t("services.viewAlerts"),
+      link: "#",
+    },
+  ];
 
   const indexOfLastService = currentPage * servicesPerPage;
   const indexOfFirstService = indexOfLastService - servicesPerPage;
@@ -60,14 +57,14 @@ const RemovalsServices = () => {
 
   return (
     <section id="services">
-      <div className="bg-gray-800 text-white py-12">
+      <div className="bg-green-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="pb-8 text-center">
             <h1 className="text-3xl font-semibold mb-2">
-              Data-Driven Relocation Optimization
+              {t("services.title")}
             </h1>
             <p className="text-gray-300">
-              ROPS offers intelligent analytics and predictive solutions for efficient relocations.
+              {t("services.subtitle")}
             </p>
           </div>
 
@@ -96,4 +93,4 @@ const RemovalsServices = () => {
   );
 };
 
-export default RemovalsServices;
+export default FarmingServices;
