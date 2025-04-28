@@ -30,13 +30,9 @@ import UserProfile from "./components/pages/customer/UserProfile.jsx";
 import UserHome from "./components/pages/customer/Home.jsx";
 // import Admin_Manage_Inventory from "./components/pages/admin/manage_inventories.jsx";
 import Admin_DemandForecast from "./components/pages/admin/manage_demandForecast.jsx";
-import Admin_Manage_Vehicles from "./components/pages/admin/manage_vehicles.jsx";
 import Admin_Manage_Drivers from "./components/pages/admin/manage_drivers.jsx";
 import Customer_Layout from "./components/customer/Layout.jsx";
-import Customer_VehiclesDisplay from "./components/pages/customer/vehicles.jsx";
-import Customer_Map from "./components/pages/customer/map.jsx";
 import Admin_Manage_Relocations from "./components/pages/admin/manage_relocations.jsx";
-import Customer_Manage_Relocations from "./components/pages/customer/my_relocations.jsx";
 import Admin_Create_Relocation from "./components/pages/admin/create_relocation.jsx";
 import Admin_Manage_Feedbacks from "./components/pages/admin/manage_feedbacks.jsx";
 import Customer_Manage_Feedbacks from "./components/pages/customer/manage_feedbacks.jsx";
@@ -47,6 +43,8 @@ import Driver_Map from "./components/pages/driver/map.jsx";
 import Driver_Manage_Feedbacks from "./components/pages/driver/manage_feedbacks.jsx";
 import DriverProfile from "./components/pages/driver/UserProfile.jsx";
 import Driver_Manage_Relocations from "./components/pages/driver/my_relocations.jsx";
+import Datasets from "./components/pages/admin/manage_inventories.jsx";
+import Farmer_Manage_predictions from "./components/pages/customer/create_relocation.jsx";
 
 
 
@@ -86,7 +84,7 @@ const App = () => {
             <Route path="/admin/edituser/:id" element={<EditUsers />} />
             <Route path="/admin/createUser" element={<CreateUser />} />
 
-            <Route path="/admin/vehicles" element={<Admin_Manage_Vehicles />} />
+            <Route path="/admin/datasets" element={<Datasets />} />
             <Route path="/admin/predictions" element={<Admin_Manage_Relocations />} />
             <Route path="/admin/createRelocation" element={<Admin_Create_Relocation />} />
 
@@ -101,15 +99,12 @@ const App = () => {
 
           {/* user */}
 
-          <Route path="/customer" element={<Customer_Layout />}>
+          <Route path="/farmer" element={<Customer_Layout />}>
             <Route index element={<UserHome />} />
-            <Route path="/customer/vehicles" element={<Customer_VehiclesDisplay />} />
-            <Route path="/customer/predict" element={<Customer_Map />} />
-            <Route path="/customer/feedbacks" element={<Customer_Manage_Feedbacks />} />
+            <Route path="/farmer/predictions" element={<Farmer_Manage_predictions />} />
+            <Route path="/farmer/feedbacks" element={<Customer_Manage_Feedbacks />} />
 
-            <Route path="/customer/profile/:id" element={<UserProfile />} />
-
-            <Route path="/customer/relocations" element={<Customer_Manage_Relocations />} />
+            <Route path="/farmer/profile/:id" element={<UserProfile />} />
      
           </Route>
 

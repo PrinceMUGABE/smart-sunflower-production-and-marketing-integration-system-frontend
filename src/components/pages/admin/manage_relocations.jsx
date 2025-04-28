@@ -13,10 +13,13 @@ import {
   faTrash,
   faDownload,
   faSearch,
-  faTruck,
+  faLeaf,
   faChartPie,
   faPlus,
-  faRoad,
+  faEye,
+  faWater,
+  faSeedling,
+  faTemperatureHigh,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   ResponsiveContainer,
@@ -30,6 +33,8 @@ import {
   PieChart,
   Pie,
   Cell,
+  BarChart,
+  Bar,
 } from "recharts";
 
 import mapData from "../customer/mapData.json";
@@ -62,39 +67,89 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-function Admin_Manage_Relocations() {
-  const [relocations, setRelocations] = useState([]);
+const rwandanCrops = [
+  "Maize",
+  "Rice",
+  "Sorghum",
+  "Wheat",
+  "Millet",
+  "Cassava",
+  "Sweet Potatoes",
+  "Irish Potatoes",
+  "Yams",
+  "Taro",
+  "Beans",
+  "Soybeans",
+  "Groundnuts",
+  "Peas",
+  "Green Grams",
+  "Coffee",
+  "Tea",
+  "Pyrethrum",
+  "Sugarcane",
+  "Cotton",
+  "Banana",
+  "Avocado",
+  "Mango",
+  "Pineapple",
+  "Passion Fruit",
+  "Tree Tomato",
+  "Tomatoes",
+  "Cabbage",
+  "Carrots",
+  "Onions",
+  "Green Peppers",
+  "Eggplant",
+  "Sunflower",
+  "Palm Oil",
+  "Macadamia",
+  "Ginger",
+  "Chili Peppers",
+  "Vanilla",
+];
+
+function Admin_Manage_predictions() {
+  const [predictions, setPredictions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [relocationsPerPage, setRelocationsPerPage] = useState(5);
+  const [predictionsPerPage, setPredictionsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [downloadMenuVisible, setDownloadMenuVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentRelocation, setCurrentRelocation] = useState(null);
+  const [currentPrediction, setCurrentPrediction] = useState(null);
+  const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
+  const [detailsPrediction, setDetailsPrediction] = useState(null);
   const navigate = useNavigate();
 
-  // Destination location states
-  // Simplified location states - removed province states
-  const [selectedOriginDistrict, setSelectedOriginDistrict] = useState("");
-  const [selectedOriginSector, setSelectedOriginSector] = useState("");
-  const [selectedDestDistrict, setSelectedDestDistrict] = useState("");
-  const [selectedDestSector, setSelectedDestSector] = useState("");
+  // State for form inputs
+  const [allDistricts, setAllDistricts] = useState([]);
+  const [allSectors, setAllSectors] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedSector, setSelectedSector] = useState("");
 
-  const [startCoordinates, setStartCoordinates] = useState(null);
-  const [endCoordinates, setEndCoordinates] = useState(null);
-  const [vehicles, setVehicles] = useState([]);
-  const [drivers, setDrivers] = useState([]);
-
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [filterStartDate, setFilterStartDate] = useState("");
-  const [filterEndDate, setFilterEndDate] = useState("");
-  const [filterOriginDistrict, setFilterOriginDistrict] = useState("");
-  const [filterDestDistrict, setFilterDestDistrict] = useState("");
+  // Filter states
+  const [filterSeason, setFilterSeason] = useState("all");
+  const [filterCrop, setFilterCrop] = useState("");
+  const [filterDistrict, setFilterDistrict] = useState("");
+  const [filterSector, setFilterSector] = useState("");
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
-  const COLORS = ["#FF6B6B", "#4ECDC4", "#FFD166", "#F9F871"];
-  const BASE_URL = "http://127.0.0.1:8000/relocation/";
+  // Sort the crops alphabetically for better usability
+  const sortedCrops = [...rwandanCrops].sort((a, b) => a.localeCompare(b));
+  const [selectedCrop, setSelectedCrop] = useState(
+    currentPrediction?.crop || ""
+  );
+
+  const COLORS = [
+    "#FF6B6B",
+    "#4ECDC4",
+    "#FFD166",
+    "#F9F871",
+    "#6A0572",
+    "#AB83A1",
+  ];
+  const BASE_URL = "http://127.0.0.1:8000/weather/";
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -109,227 +164,26 @@ function Admin_Manage_Relocations() {
     handleFetch();
   }, [navigate]);
 
-  // Fetch vehicles when component mounts
-  useEffect(() => {
-    const fetchVehicles = async () => {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/vehicle/list_vehicles/",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setVehicles(response.data);
-      } catch (error) {
-        console.error("Error fetching vehicles:", error);
-      }
-    };
-
-    fetchVehicles();
-  }, [token]);
-
-  // Fetch drivers when component mounts
-  useEffect(() => {
-    const fetchDrivers = async () => {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/driver/drivers/",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setDrivers(response.data);
-      } catch (error) {
-        console.error("Error fetching drivers:", error);
-      }
-    };
-
-    fetchDrivers();
-  }, [token]);
-
-  // Improved useMemo for extracting districts and sectors
-  const allDistricts = useMemo(() => {
-    let districts = [];
-    if (!mapData || !mapData.provinces) {
-      console.error("Map data is not properly structured:", mapData);
-      return [];
-    }
-
-    mapData.provinces.forEach((province) => {
-      if (province.coordinates && province.coordinates.districts) {
-        province.coordinates.districts.forEach((district) => {
-          districts.push(district);
-        });
-      }
-    });
-
-    console.log(
-      "Extracted districts:",
-      districts.map((d) => d.name)
-    );
-    return districts;
-  }, []);
-
-  // Enhanced getSectors function with error handling
-  const getSectors = (districtName) => {
-    if (!districtName) return [];
-
-    const district = allDistricts.find((d) => d.name === districtName);
-    if (!district) {
-      console.warn(`District not found: ${districtName}`);
-      return [];
-    }
-
-    if (!district.sectors || !Array.isArray(district.sectors)) {
-      console.warn(`No sectors found for district: ${districtName}`);
-      return [];
-    }
-
-    return district.sectors;
-  };
-
-  // Improved coordinate finding function
-  const findSectorCoordinates = (districtName, sectorName) => {
-    if (!districtName || !sectorName) {
-      console.warn("Missing district or sector name in coordinate lookup");
-      return null;
-    }
-
-    const district = allDistricts.find((d) => d.name === districtName);
-    if (!district) {
-      console.warn(`District not found for coordinates: ${districtName}`);
-      return null;
-    }
-
-    const sector = district.sectors.find((s) => s.name === sectorName);
-    if (!sector) {
-      console.warn(
-        `Sector not found for coordinates: ${sectorName} in ${districtName}`
-      );
-      return null;
-    }
-
-    if (!sector.latitude || !sector.longitude) {
-      console.warn(`Missing coordinates for sector: ${sectorName}`);
-      return null;
-    }
-
-    return { latitude: sector.latitude, longitude: sector.longitude };
-  };
-
-  // Fix for the openModal function
-  // Fix for the openModal function - properly set location values
-  // Fix for the openModal function
-  const openModal = (relocation = null) => {
-    setIsModalOpen(true);
-
-    if (relocation) {
-      // Set the current relocation first
-      setCurrentRelocation(relocation);
-
-      // Then set location fields with a slight delay to ensure currentRelocation is set
-      setTimeout(() => {
-        // Set districts
-        setSelectedOriginDistrict(relocation.origin_district || "");
-        setSelectedDestDistrict(relocation.destination_district || "");
-
-        // Set sectors after districts are set
-        setTimeout(() => {
-          setSelectedOriginSector(relocation.origin_sector || "");
-          setSelectedDestSector(relocation.destination_sector || "");
-        }, 50);
-      }, 50);
-    } else {
-      // Reset form for new relocation
-      setCurrentRelocation(null);
-      setSelectedOriginDistrict("");
-      setSelectedOriginSector("");
-      setSelectedDestDistrict("");
-      setSelectedDestSector("");
-    }
-  };
-
-  useEffect(() => {
-    if (currentRelocation && isModalOpen) {
-      // Set location values from the current relocation
-      setSelectedOriginDistrict(currentRelocation.origin_district || "");
-      setSelectedDestDistrict(currentRelocation.destination_district || "");
-
-      // Only set sectors if they exist and a district is selected
-      if (
-        currentRelocation.origin_district &&
-        currentRelocation.origin_sector
-      ) {
-        const originSectors = getSectors(currentRelocation.origin_district);
-        const originSectorExists = originSectors.some(
-          (sector) => sector.name === currentRelocation.origin_sector
-        );
-
-        if (originSectorExists) {
-          setSelectedOriginSector(currentRelocation.origin_sector);
-        }
-      }
-
-      if (
-        currentRelocation.destination_district &&
-        currentRelocation.destination_sector
-      ) {
-        const destSectors = getSectors(currentRelocation.destination_district);
-        const destSectorExists = destSectors.some(
-          (sector) => sector.name === currentRelocation.destination_sector
-        );
-
-        if (destSectorExists) {
-          setSelectedDestSector(currentRelocation.destination_sector);
-        }
-      }
-    }
-  }, [currentRelocation, isModalOpen]);
-
-  // Add a debugging useEffect to track all form state changes
-  useEffect(() => {
-    if (currentRelocation) {
-      console.log("Form state updated:", {
-        originDistrict: selectedOriginDistrict,
-        originSector: selectedOriginSector,
-        destDistrict: selectedDestDistrict,
-        destSector: selectedDestSector,
-        relocationData: {
-          origin_district: currentRelocation.origin_district,
-          origin_sector: currentRelocation.origin_sector,
-          destination_district: currentRelocation.destination_district,
-          destination_sector: currentRelocation.destination_sector,
-        },
-      });
-    }
-  }, [
-    selectedOriginDistrict,
-    selectedOriginSector,
-    selectedDestDistrict,
-    selectedDestSector,
-    currentRelocation,
-  ]);
-
   const handleFetch = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}all/`, {
+      const res = await axios.get(`${BASE_URL}predictions/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("Fetched Data: ", res.data);
-      setRelocations(Array.isArray(res.data) ? res.data : []);
+      setPredictions(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error("Error fetching relocations:", err);
+      console.error("Error fetching predictions:", err);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Do you want to delete this relocation?")) return;
+    if (!window.confirm("Do you want to delete this prediction?")) return;
     try {
       await axios.delete(`${BASE_URL}delete/${id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       await handleFetch();
-      setMessage("Relocation deleted successfully");
+      setMessage("Prediction deleted successfully");
       setMessageType("success");
       setCurrentPage(1);
     } catch (err) {
@@ -341,106 +195,159 @@ function Admin_Manage_Relocations() {
   const handleDownload = {
     PDF: () => {
       const doc = new jsPDF();
-      doc.autoTable({ html: "#relocation-table" });
-      doc.save("relocations.pdf");
+      doc.autoTable({ html: "#prediction-table" });
+      doc.save("crop_predictions.pdf");
     },
     Excel: () => {
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(
         workbook,
-        XLSX.utils.json_to_sheet(relocations),
-        "Relocations"
+        XLSX.utils.json_to_sheet(predictions),
+        "Crop Predictions"
       );
-      XLSX.writeFile(workbook, "relocations.xlsx");
+      XLSX.writeFile(workbook, "crop_predictions.xlsx");
     },
     CSV: () => {
       const csvContent =
         "data:text/csv;charset=utf-8," +
-        Object.keys(relocations[0]).join(",") +
+        Object.keys(predictions[0]).join(",") +
         "\n" +
-        relocations.map((row) => Object.values(row).join(",")).join("\n");
+        predictions.map((row) => Object.values(row).join(",")).join("\n");
       const link = document.createElement("a");
       link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", "relocations.csv");
+      link.setAttribute("download", "crop_predictions.csv");
       document.body.appendChild(link);
       link.click();
       link.remove();
     },
   };
 
-  const handleAddUpdateRelocation = async (e) => {
+  const openModal = (prediction = null) => {
+    setIsModalOpen(true);
+    setCurrentPrediction(prediction);
+  };
+
+  const openViewDetailsModal = (prediction) => {
+    setDetailsPrediction(prediction);
+    setViewDetailsModalOpen(true);
+  };
+
+  // const handleAddUpdatePrediction = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const predictionData = {
+  //       crop: e.target.crop.value,
+  //       season: e.target.season.value,
+  //       district: e.target.district.value,
+  //       sector: e.target.sector.value,
+  //       soil_type: e.target.soil_type.value,
+  //       nitrogen_kg_per_ha: parseFloat(e.target.nitrogen_kg_per_ha.value),
+  //       phosphorus_kg_per_ha: parseFloat(e.target.phosphorus_kg_per_ha.value),
+  //       potassium_kg_per_ha: parseFloat(e.target.potassium_kg_per_ha.value),
+  //       expected_yield_tons_per_ha: parseFloat(
+  //         e.target.expected_yield_tons_per_ha.value
+  //       ),
+  //       water_requirement_mm: parseFloat(e.target.water_requirement_mm.value),
+  //       optimal_ph: parseFloat(e.target.optimal_ph.value),
+  //       row_spacing_cm: parseFloat(e.target.row_spacing_cm.value),
+  //       plant_spacing_cm: parseFloat(e.target.plant_spacing_cm.value),
+  //       planting_depth_cm: parseFloat(e.target.planting_depth_cm.value),
+  //       altitude: e.target.altitude.value,
+  //     };
+
+  //     console.log("Sending prediction data:", predictionData);
+
+  //     if (currentPrediction) {
+  //       // Update existing prediction
+  //       await axios.put(
+  //         `${BASE_URL}update/${currentPrediction.id}/`,
+  //         predictionData,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //             "Content-Type": "application/json",
+  //           },
+  //         }
+  //       );
+  //       setMessage("Prediction updated successfully");
+  //     } else {
+  //       // Create new prediction
+  //       await axios.post(`${BASE_URL}create/`, predictionData, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           "Content-Type": "application/json",
+  //         },
+  //       });
+  //       setMessage("Prediction created successfully");
+  //     }
+
+  //     handleFetch();
+  //     setIsModalOpen(false);
+  //     setCurrentPrediction(null);
+  //     setMessageType("success");
+  //   } catch (err) {
+  //     console.error("Error submitting form:", err);
+  //     setMessage(err.response?.data.error || "An error occurred");
+  //     setMessageType("error");
+  //   }
+  // };
+
+  const handleAddUpdatePrediction = async (e) => {
     e.preventDefault();
 
-    // Log the form data being submitted for debugging
-    console.log("Submitting form with locations:", {
-      origin_district: selectedOriginDistrict,
-      origin_sector: selectedOriginSector,
-      destination_district: selectedDestDistrict,
-      destination_sector: selectedDestSector,
-    });
-
-    // Validate location selections
-    if (
-      !selectedOriginDistrict ||
-      !selectedOriginSector ||
-      !selectedDestDistrict ||
-      !selectedDestSector
-    ) {
-      setMessage(
-        "Please select both origin and destination locations completely"
-      );
-      setMessageType("error");
-      return;
-    }
-
-    // Find coordinates for start and end sectors
-    const startCoords = findSectorCoordinates(
-      selectedOriginDistrict,
-      selectedOriginSector
-    );
-
-    const endCoords = findSectorCoordinates(
-      selectedDestDistrict,
-      selectedDestSector
-    );
-
-    if (!startCoords || !endCoords) {
-      setMessage("Invalid location selection. Please select valid locations.");
-      setMessageType("error");
-      return;
-    }
-
     try {
-      const relocationData = {
-        start_point: selectedOriginSector,
-        end_point: selectedDestSector,
-        start_latitude: startCoords.latitude,
-        start_longitude: startCoords.longitude,
-        end_latitude: endCoords.latitude,
-        end_longitude: endCoords.longitude,
-        relocation_size: e.target.vehicle.value, // Vehicle ID
-        driver_id: e.target.driver.value, // Driver ID
-        move_datetime: e.target.move_datetime.value,
-        status: e.target.status.value,
-
-        // Explicitly set location fields
-        origin_sector: selectedOriginSector,
-        origin_district: selectedOriginDistrict,
-        destination_sector: selectedDestSector,
-        destination_district: selectedDestDistrict,
-
-        // Add the cost fields
-        base_cost: e.target.base_cost.value || 0,
-        adjusted_cost: e.target.adjusted_cost.value || 0,
+      // Basic fields always present
+      const predictionData = {
+        crop: e.target.crop.value,
+        district: e.target.district.value,
+        sector: e.target.sector.value,
+        season: e.target.season.value,
       };
 
-      console.log("Sending relocation data:", relocationData);
+      // Add optional fields only if they exist in the form
+      // For edit mode with additional fields
+      if (currentPrediction) {
+        if (e.target.soil_type)
+          predictionData.soil_type = e.target.soil_type.value;
+        if (e.target.nitrogen_kg_per_ha)
+          predictionData.nitrogen_kg_per_ha =
+            parseFloat(e.target.nitrogen_kg_per_ha.value) || 0;
+        if (e.target.phosphorus_kg_per_ha)
+          predictionData.phosphorus_kg_per_ha =
+            parseFloat(e.target.phosphorus_kg_per_ha.value) || 0;
+        if (e.target.potassium_kg_per_ha)
+          predictionData.potassium_kg_per_ha =
+            parseFloat(e.target.potassium_kg_per_ha.value) || 0;
+        if (e.target.expected_yield_tons_per_ha)
+          predictionData.expected_yield_tons_per_ha =
+            parseFloat(e.target.expected_yield_tons_per_ha.value) || 0;
+        if (e.target.water_requirement_mm)
+          predictionData.water_requirement_mm =
+            parseFloat(e.target.water_requirement_mm.value) || 0;
+        if (e.target.optimal_ph)
+          predictionData.optimal_ph =
+            parseFloat(e.target.optimal_ph.value) || 6.5;
+        if (e.target.row_spacing_cm)
+          predictionData.row_spacing_cm =
+            parseFloat(e.target.row_spacing_cm.value) || 0;
+        if (e.target.plant_spacing_cm)
+          predictionData.plant_spacing_cm =
+            parseFloat(e.target.plant_spacing_cm.value) || 0;
+        if (e.target.planting_depth_cm)
+          predictionData.planting_depth_cm =
+            parseFloat(e.target.planting_depth_cm.value) || 0;
+        if (e.target.altitude)
+          predictionData.altitude = e.target.altitude.value;
+      }
 
-      if (currentRelocation) {
-        // Update existing relocation
+      console.log("Sending prediction data:", predictionData);
+
+      if (currentPrediction) {
+        // Update existing prediction
         await axios.put(
-          `${BASE_URL}update/${currentRelocation.id}/`,
-          relocationData,
+          `${BASE_URL}update/${currentPrediction.id}/`,
+          predictionData,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -448,21 +355,21 @@ function Admin_Manage_Relocations() {
             },
           }
         );
-        setMessage("Relocation updated successfully");
+        setMessage("Prediction updated successfully");
       } else {
-        // Create new relocation
-        await axios.post(`${BASE_URL}create/`, relocationData, {
+        // Create new prediction
+        await axios.post(`${BASE_URL}create/`, predictionData, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
-        setMessage("Relocation created successfully");
+        setMessage("Prediction created successfully");
       }
 
       handleFetch();
       setIsModalOpen(false);
-      setCurrentRelocation(null);
+      setCurrentPrediction(null);
       setMessageType("success");
     } catch (err) {
       console.error("Error submitting form:", err);
@@ -471,135 +378,100 @@ function Admin_Manage_Relocations() {
     }
   };
 
-  // Add this function after the handleAddUpdateRelocation function
-  // This will create summary stat cards to display at the top of the page
-
   const renderSummaryCards = () => {
-    if (!relocations.length) return null;
+    if (!predictions.length) return null;
 
     // Calculate summary statistics
-    const totalRelocations = relocations.length;
-    const pendingRelocations = relocations.filter(
-      (r) => r.status === "pending"
-    ).length;
-    const completedRelocations = relocations.filter(
-      (r) => r.status === "completed"
-    ).length;
-    const inProgressRelocations = relocations.filter(
-      (r) => r.status === "in_progress"
-    ).length;
-    const canceledRelocations = relocations.filter(
-      (r) => r.status === "canceled"
-    ).length;
+    const totalPredictions = predictions.length;
 
-    // Calculate total revenue
-    const totalRevenue = relocations.reduce(
-      (sum, r) => sum + Number(r.adjusted_cost || 0),
-      0
-    );
+    // Count unique crops
+    const uniqueCrops = [...new Set(predictions.map((p) => p.crop))].length;
 
-    // Get upcoming relocations (scheduled within the next 7 days)
-    const now = new Date();
-    const nextWeek = new Date();
-    nextWeek.setDate(now.getDate() + 7);
+    // Count unique districts
+    const uniqueDistricts = [...new Set(predictions.map((p) => p.district))]
+      .length;
 
-    const upcomingRelocations = relocations.filter((r) => {
-      const moveDate = new Date(r.move_datetime);
-      return moveDate >= now && moveDate <= nextWeek;
-    }).length;
+    // Calculate average expected yield
+    const averageYield =
+      predictions.reduce(
+        (sum, p) => sum + Number(p.expected_yield_tons_per_ha || 0),
+        0
+      ) / totalPredictions;
+
+    // Count by season
+    const seasonCounts = predictions.reduce((acc, p) => {
+      acc[p.season] = (acc[p.season] || 0) + 1;
+      return acc;
+    }, {});
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {/* Total Relocations Card */}
+        {/* Total Predictions Card */}
         <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center">
           <div className="p-3 rounded-full bg-blue-900 bg-opacity-30 mr-4">
-            <FontAwesomeIcon icon={faTruck} className="text-blue-400 text-xl" />
+            <FontAwesomeIcon icon={faLeaf} className="text-blue-400 text-xl" />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Total Relocations</p>
+            <p className="text-gray-400 text-sm">Total Predictions</p>
             <h3 className="text-2xl font-bold text-white">
-              {totalRelocations}
+              {totalPredictions}
             </h3>
           </div>
         </div>
 
-        {/* Upcoming Relocations Card */}
+        {/* Unique Crops Card */}
         <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center">
           <div className="p-3 rounded-full bg-purple-900 bg-opacity-30 mr-4">
             <FontAwesomeIcon
-              icon={faRoad}
+              icon={faSeedling}
               className="text-purple-400 text-xl"
             />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Upcoming (7 days)</p>
-            <h3 className="text-2xl font-bold text-white">
-              {upcomingRelocations}
-            </h3>
+            <p className="text-gray-400 text-sm">Unique Crops</p>
+            <h3 className="text-2xl font-bold text-white">{uniqueCrops}</h3>
           </div>
         </div>
 
-        {/* Status Distribution Card */}
+        {/* Season Distribution Card */}
         <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-          <p className="text-gray-400 text-sm mb-2">Status Distribution</p>
+          <p className="text-gray-400 text-sm mb-2">Season Distribution</p>
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
-              <div className="flex items-center mb-1">
-                <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                <span className="text-xs text-gray-300">
-                  Pending: {pendingRelocations}
-                </span>
-              </div>
-              <div className="flex items-center mb-1">
-                <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-                <span className="text-xs text-gray-300">
-                  In Progress: {inProgressRelocations}
-                </span>
-              </div>
-              <div className="flex items-center mb-1">
-                <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                <span className="text-xs text-gray-300">
-                  Completed: {completedRelocations}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                <span className="text-xs text-gray-300">
-                  Canceled: {canceledRelocations}
-                </span>
-              </div>
+              {Object.entries(seasonCounts).map(([season, count], index) => (
+                <div key={season} className="flex items-center mb-1">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  ></div>
+                  <span className="text-xs text-gray-300 ml-2">
+                    {season.replace("_", " ")}: {count}
+                  </span>
+                </div>
+              ))}
             </div>
             <div className="h-16 w-16 relative">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div
                   className="h-full w-full rounded-full"
                   style={{
-                    background: `conic-gradient(
-                  #3B82F6 0% ${(pendingRelocations / totalRelocations) * 100}%, 
-                  #EAB308 ${(pendingRelocations / totalRelocations) * 100}% ${
-                      ((pendingRelocations + inProgressRelocations) /
-                        totalRelocations) *
-                      100
-                    }%, 
-                  #10B981 ${
-                    ((pendingRelocations + inProgressRelocations) /
-                      totalRelocations) *
-                    100
-                  }% ${
-                      ((pendingRelocations +
-                        inProgressRelocations +
-                        completedRelocations) /
-                        totalRelocations) *
-                      100
-                    }%, 
-                  #EF4444 ${
-                    ((pendingRelocations +
-                      inProgressRelocations +
-                      completedRelocations) /
-                      totalRelocations) *
-                    100
-                  }% 100%
-                )`,
+                    background: `conic-gradient(${Object.entries(seasonCounts)
+                      .map(([season, count], index) => {
+                        const startPercent =
+                          (Object.entries(seasonCounts)
+                            .slice(0, index)
+                            .reduce((sum, [_, c]) => sum + c, 0) /
+                            totalPredictions) *
+                          100;
+
+                        const endPercent =
+                          startPercent + (count / totalPredictions) * 100;
+
+                        return `${
+                          COLORS[index % COLORS.length]
+                        } ${startPercent}% ${endPercent}%`;
+                      })
+                      .join(", ")})`,
                   }}
                 ></div>
                 <div className="absolute inset-2 rounded-full bg-gray-900"></div>
@@ -608,7 +480,7 @@ function Admin_Manage_Relocations() {
           </div>
         </div>
 
-        {/* Revenue Card */}
+        {/* Average Yield Card */}
         <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center">
           <div className="p-3 rounded-full bg-green-900 bg-opacity-30 mr-4">
             <FontAwesomeIcon
@@ -617,9 +489,9 @@ function Admin_Manage_Relocations() {
             />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Total Revenue</p>
+            <p className="text-gray-400 text-sm">Avg. Expected Yield</p>
             <h3 className="text-2xl font-bold text-white">
-              ${totalRevenue.toFixed(2)}
+              {averageYield.toFixed(2)} t/ha
             </h3>
           </div>
         </div>
@@ -627,8 +499,16 @@ function Admin_Manage_Relocations() {
     );
   };
 
-  // Add this function after the renderSummaryCards function
   const renderAdvancedFilters = () => {
+    // Get unique crops from predictions
+    const uniqueCrops = [...new Set(predictions.map((p) => p.crop))];
+
+    // Get unique districts from predictions
+    const uniqueDistricts = [...new Set(predictions.map((p) => p.district))];
+
+    // Get unique sectors from predictions
+    const uniqueSectors = [...new Set(predictions.map((p) => p.sector))];
+
     return (
       <div className="bg-gray-900 p-4 rounded-lg shadow-lg border border-gray-700 mb-6">
         <div
@@ -657,57 +537,31 @@ function Admin_Manage_Relocations() {
         {isFilterExpanded && (
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-gray-300 mb-2 text-sm">Status</label>
+              <label className="block text-gray-300 mb-2 text-sm">Season</label>
               <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                value={filterSeason}
+                onChange={(e) => setFilterSeason(e.target.value)}
                 className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
               >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="canceled">Canceled</option>
+                <option value="all">All Seasons</option>
+                <option value="long_rainy">Long Rainy</option>
+                <option value="short_rainy">Short Rainy</option>
+                <option value="long_dry">Long Dry</option>
+                <option value="short_dry">Short Dry</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-gray-300 mb-2 text-sm">
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={filterStartDate}
-                onChange={(e) => setFilterStartDate(e.target.value)}
-                className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-300 mb-2 text-sm">
-                End Date
-              </label>
-              <input
-                type="date"
-                value={filterEndDate}
-                onChange={(e) => setFilterEndDate(e.target.value)}
-                className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-300 mb-2 text-sm">
-                Origin District
-              </label>
+              <label className="block text-gray-300 mb-2 text-sm">Crop</label>
               <select
-                value={filterOriginDistrict}
-                onChange={(e) => setFilterOriginDistrict(e.target.value)}
+                value={filterCrop}
+                onChange={(e) => setFilterCrop(e.target.value)}
                 className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
               >
-                <option value="">All Districts</option>
-                {allDistricts.map((district) => (
-                  <option key={district.name} value={district.name}>
-                    {district.name}
+                <option value="">All Crops</option>
+                {uniqueCrops.map((crop) => (
+                  <option key={crop} value={crop}>
+                    {crop}
                   </option>
                 ))}
               </select>
@@ -715,17 +569,33 @@ function Admin_Manage_Relocations() {
 
             <div>
               <label className="block text-gray-300 mb-2 text-sm">
-                Destination District
+                District
               </label>
               <select
-                value={filterDestDistrict}
-                onChange={(e) => setFilterDestDistrict(e.target.value)}
+                value={filterDistrict}
+                onChange={(e) => setFilterDistrict(e.target.value)}
                 className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
               >
                 <option value="">All Districts</option>
-                {allDistricts.map((district) => (
-                  <option key={district.name} value={district.name}>
-                    {district.name}
+                {uniqueDistricts.map((district) => (
+                  <option key={district} value={district}>
+                    {district}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-gray-300 mb-2 text-sm">Sector</label>
+              <select
+                value={filterSector}
+                onChange={(e) => setFilterSector(e.target.value)}
+                className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
+              >
+                <option value="">All Sectors</option>
+                {uniqueSectors.map((sector) => (
+                  <option key={sector} value={sector}>
+                    {sector}
                   </option>
                 ))}
               </select>
@@ -734,11 +604,10 @@ function Admin_Manage_Relocations() {
             <div className="flex items-end">
               <button
                 onClick={() => {
-                  setFilterStatus("all");
-                  setFilterStartDate("");
-                  setFilterEndDate("");
-                  setFilterOriginDistrict("");
-                  setFilterDestDistrict("");
+                  setFilterSeason("all");
+                  setFilterCrop("");
+                  setFilterDistrict("");
+                  setFilterSector("");
                 }}
                 className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm"
               >
@@ -751,87 +620,46 @@ function Admin_Manage_Relocations() {
     );
   };
 
-  // Add this function after the renderAdvancedFilters function
   const renderRecentActivity = () => {
-    // Get 5 most recent relocations (sort by creation date)
-    const recentRelocations = [...relocations]
-      .sort(
-        (a, b) =>
-          new Date(b.created_at || b.move_datetime) -
-          new Date(a.created_at || a.move_datetime)
-      )
+    // Get 5 most recent predictions (sort by creation date)
+    const recentPredictions = [...predictions]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .slice(0, 5);
 
-    if (!recentRelocations.length) return null;
+    if (!recentPredictions.length) return null;
 
     return (
       <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-700 mb-6">
         <h3 className="text-lg font-semibold mb-4 text-green-400 flex items-center">
-          <FontAwesomeIcon icon={faRoad} className="mr-2" />
-          Recent Activity
+          <FontAwesomeIcon icon={faLeaf} className="mr-2" />
+          Recent Predictions
         </h3>
         <div className="space-y-4">
-          {recentRelocations.map((relocation) => {
-            // Determine colors based on status
-            let statusColor;
-            switch (relocation.status) {
-              case "pending":
-                statusColor = "bg-blue-500";
-                break;
-              case "in_progress":
-                statusColor = "bg-yellow-500";
-                break;
-              case "completed":
-                statusColor = "bg-green-500";
-                break;
-              case "canceled":
-                statusColor = "bg-green-500";
-                break;
-              default:
-                statusColor = "bg-gray-500";
-            }
-
+          {recentPredictions.map((prediction) => {
             return (
-              <div key={relocation.id} className="flex">
+              <div key={prediction.id} className="flex">
                 <div className="mr-4 flex flex-col items-center">
-                  <div className={`w-3 h-3 rounded-full ${statusColor}`}></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
                   <div className="w-0.5 h-full bg-gray-700"></div>
                 </div>
                 <div className="flex-1 bg-gray-800 p-3 rounded-lg border border-gray-700">
                   <div className="flex justify-between items-start">
                     <div>
                       <h4 className="font-medium text-gray-200">
-                        Relocation #{relocation.id}
+                        {prediction.crop} Prediction
                       </h4>
                       <p className="text-sm text-gray-400">
-                        {relocation.origin_sector}, {relocation.origin_district}{" "}
-                        → {relocation.destination_sector},{" "}
-                        {relocation.destination_district}
+                        {prediction.sector}, {prediction.district} | Season:{" "}
+                        {prediction.season.replace("_", " ")}
                       </p>
                     </div>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full capitalize ${
-                        relocation.status === "pending"
-                          ? "bg-blue-900 text-blue-200"
-                          : relocation.status === "in_progress"
-                          ? "bg-yellow-900 text-yellow-200"
-                          : relocation.status === "completed"
-                          ? "bg-green-900 text-green-200"
-                          : "bg-green-900 text-green-200"
-                      }`}
-                    >
-                      {relocation.status}
+                    <span className="text-xs px-2 py-1 rounded-full bg-green-900 text-green-200">
+                      {new Date(prediction.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="mt-2 text-xs text-gray-400">
-                    <p>
-                      <strong>Vehicle:</strong>{" "}
-                      {relocation.vehicle?.plate_number || "Not assigned"} •
-                      <strong> Date:</strong>{" "}
-                      {new Date(relocation.move_datetime).toLocaleDateString()}{" "}
-                      •<strong> Cost:</strong> $
-                      {Number(relocation.adjusted_cost || 0).toFixed(2)}
-                    </p>
+                  <div className="mt-2 text-sm text-gray-300">
+                    <span className="text-green-400">Expected yield:</span>{" "}
+                    {prediction.expected_yield_tons_per_ha} tons/ha
                   </div>
                 </div>
               </div>
@@ -843,38 +671,72 @@ function Admin_Manage_Relocations() {
   };
 
   const renderCharts = () => {
-    if (!relocations.length) return null;
+    if (!predictions.length) return null;
 
-    const relocationStatusData = Object.entries(
-      relocations.reduce((acc, relocation) => {
-        acc[relocation.status] = (acc[relocation.status] || 0) + 1;
-        return acc;
-      }, {})
-    ).map(([status, value]) => ({ name: status, value }));
+    // Prepare data for yield by crop chart
+    const yieldByCrop = predictions.reduce((acc, prediction) => {
+      const crop = prediction.crop;
+      if (!acc[crop]) {
+        acc[crop] = {
+          name: crop,
+          yield: prediction.expected_yield_tons_per_ha,
+          count: 1,
+        };
+      } else {
+        acc[crop].yield += prediction.expected_yield_tons_per_ha;
+        acc[crop].count += 1;
+      }
+      return acc;
+    }, {});
 
-    const relocationSizeData = Object.entries(
-      relocations.reduce((acc, relocation) => {
-        acc[relocation.relocation_size] =
-          (acc[relocation.relocation_size] || 0) + 1;
-        return acc;
-      }, {})
-    ).map(([size, count]) => ({
-      name: size,
-      count,
+    // Calculate average yield by crop
+    const yieldByCropData = Object.values(yieldByCrop).map((item) => ({
+      name: item.name,
+      yield: item.yield / item.count,
     }));
+
+    // Prepare data for water requirements by crop
+    const waterByCrop = predictions.reduce((acc, prediction) => {
+      const crop = prediction.crop;
+      if (!acc[crop]) {
+        acc[crop] = {
+          name: crop,
+          water: prediction.water_requirement_mm,
+          count: 1,
+        };
+      } else {
+        acc[crop].water += prediction.water_requirement_mm;
+        acc[crop].count += 1;
+      }
+      return acc;
+    }, {});
+
+    // Calculate average water requirement by crop
+    const waterByCropData = Object.values(waterByCrop).map((item) => ({
+      name: item.name,
+      water: item.water / item.count,
+    }));
+
+    // Count predictions by soil type
+    const soilTypeData = Object.entries(
+      predictions.reduce((acc, prediction) => {
+        acc[prediction.soil_type] = (acc[prediction.soil_type] || 0) + 1;
+        return acc;
+      }, {})
+    ).map(([type, value]) => ({ name: type, value }));
 
     return (
       <div className="w-full lg:w-1/3 space-y-6">
         <ErrorBoundary>
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
             <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
-              <FontAwesomeIcon icon={faRoad} className="mr-2" />
-              Relocation Status Distribution
+              <FontAwesomeIcon icon={faChartPie} className="mr-2" />
+              Soil Type Distribution
             </h3>
             <ResponsiveContainer>
               <PieChart>
                 <Pie
-                  data={relocationStatusData}
+                  data={soilTypeData}
                   dataKey="value"
                   nameKey="name"
                   cx="50%"
@@ -886,7 +748,7 @@ function Admin_Manage_Relocations() {
                     fill: "#e5e7eb",
                   }}
                 >
-                  {relocationStatusData.map((_, index) => (
+                  {soilTypeData.map((_, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
@@ -913,20 +775,24 @@ function Admin_Manage_Relocations() {
         <ErrorBoundary>
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
             <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
-              <FontAwesomeIcon icon={faChartPie} className="mr-2" />
-              Relocation Size Distribution
+              <FontAwesomeIcon icon={faSeedling} className="mr-2" />
+              Expected Yield by Crop
             </h3>
             <ResponsiveContainer>
-              <LineChart data={relocationSizeData}>
+              <BarChart data={yieldByCropData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis
                   dataKey="name"
-                  padding={{ left: 20, right: 20 }}
                   tick={{ fontSize: 12, fill: "#e5e7eb" }}
                 />
                 <YAxis
                   tick={{ fontSize: 12, fill: "#e5e7eb" }}
-                  padding={{ top: 20, bottom: 20 }}
+                  label={{
+                    value: "tons/ha",
+                    angle: -90,
+                    position: "insideLeft",
+                    fill: "#e5e7eb",
+                  }}
                 />
                 <Tooltip
                   contentStyle={{
@@ -935,13 +801,8 @@ function Admin_Manage_Relocations() {
                     color: "#f9fafb",
                   }}
                 />
-                <Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#FF6B6B"
-                  name="Relocation Count"
-                />
-              </LineChart>
+                <Bar dataKey="yield" fill="#4ECDC4" />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </ErrorBoundary>
@@ -949,40 +810,25 @@ function Admin_Manage_Relocations() {
         <ErrorBoundary>
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72 mt-6">
             <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
-              <FontAwesomeIcon icon={faChartPie} className="mr-2" />
-              Popular Destination Districts
+              <FontAwesomeIcon icon={faWater} className="mr-2" />
+              Water Requirements by Crop
             </h3>
             <ResponsiveContainer>
-              <PieChart>
-                <Pie
-                  data={Object.entries(
-                    relocations.reduce((acc, relocation) => {
-                      const district = relocation.destination_district;
-                      if (district) {
-                        acc[district] = (acc[district] || 0) + 1;
-                      }
-                      return acc;
-                    }, {})
-                  )
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 5)
-                    .map(([name, value]) => ({ name, value }))}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={70}
-                  label={(entry) => entry.name}
-                >
-                  {Array(5)
-                    .fill()
-                    .map((_, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                </Pie>
+              <BarChart data={waterByCropData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 12, fill: "#e5e7eb" }}
+                />
+                <YAxis
+                  tick={{ fontSize: 12, fill: "#e5e7eb" }}
+                  label={{
+                    value: "mm",
+                    angle: -90,
+                    position: "insideLeft",
+                    fill: "#e5e7eb",
+                  }}
+                />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#1f2937",
@@ -990,7 +836,8 @@ function Admin_Manage_Relocations() {
                     color: "#f9fafb",
                   }}
                 />
-              </PieChart>
+                <Bar dataKey="water" fill="#FF6B6B" />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </ErrorBoundary>
@@ -998,70 +845,735 @@ function Admin_Manage_Relocations() {
     );
   };
 
-  // Replace your existing filteredData with this enhanced version that includes the advanced filters
-  const filteredData = relocations.filter((relocation) => {
+  // Filter predictions based on search and advanced filters
+  const filteredData = predictions.filter((prediction) => {
     // Text search filter
     const matchesSearch = [
-      relocation.start_point,
-      relocation.end_point,
-      relocation.status,
-      relocation.relocation_size,
-      relocation.origin_district,
-      relocation.destination_district,
-      relocation.origin_sector,
-      relocation.destination_sector,
-      relocation.created_by?.phone_number,
-      relocation.created_by?.email,
-      relocation.vehicle?.plate_number,
-      relocation.driver?.user?.phone_number,
+      prediction.crop,
+      prediction.season,
+      prediction.district,
+      prediction.sector,
+      prediction.soil_type,
+      prediction.created_by?.phone_number,
+      prediction.created_by?.email,
     ].some(
       (field) =>
         field &&
         field.toString().toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // Status filter
-    const matchesStatus =
-      filterStatus === "all" || relocation.status === filterStatus;
+    // Season filter
+    const matchesSeason =
+      filterSeason === "all" || prediction.season === filterSeason;
 
-    // Date filter
-    let matchesDate = true;
-    if (filterStartDate) {
-      const moveDate = new Date(relocation.move_datetime);
-      const startFilterDate = new Date(filterStartDate);
-      startFilterDate.setHours(0, 0, 0, 0);
-      matchesDate = moveDate >= startFilterDate;
-    }
-    if (filterEndDate && matchesDate) {
-      const moveDate = new Date(relocation.move_datetime);
-      const endFilterDate = new Date(filterEndDate);
-      endFilterDate.setHours(23, 59, 59, 999);
-      matchesDate = moveDate <= endFilterDate;
-    }
+    // Crop filter
+    const matchesCrop = !filterCrop || prediction.crop === filterCrop;
 
-    // District filters
-    const matchesOriginDistrict =
-      !filterOriginDistrict ||
-      relocation.origin_district === filterOriginDistrict;
-    const matchesDestDistrict =
-      !filterDestDistrict ||
-      relocation.destination_district === filterDestDistrict;
+    // District filter
+    const matchesDistrict =
+      !filterDistrict || prediction.district === filterDistrict;
+
+    // Sector filter
+    const matchesSector = !filterSector || prediction.sector === filterSector;
 
     return (
       matchesSearch &&
-      matchesStatus &&
-      matchesDate &&
-      matchesOriginDistrict &&
-      matchesDestDistrict
+      matchesSeason &&
+      matchesCrop &&
+      matchesDistrict &&
+      matchesSector
     );
   });
 
-  const currentRelocations = filteredData.slice(
-    (currentPage - 1) * relocationsPerPage,
-    currentPage * relocationsPerPage
+  const currentPredictions = filteredData.slice(
+    (currentPage - 1) * predictionsPerPage,
+    currentPage * predictionsPerPage
   );
 
-  const renderModal = () => {
+  const renderDetailsModal = () => {
+    if (!detailsPrediction) return null;
+
+    return (
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center ${
+          viewDetailsModalOpen ? "visible" : "invisible"
+        }`}
+      >
+        <div
+          className="fixed inset-0 bg-black opacity-50"
+          onClick={() => setViewDetailsModalOpen(false)}
+        ></div>
+        <div className="bg-gray-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-4xl border border-gray-800 max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-green-500">
+              Prediction Details
+            </h2>
+            <button
+              onClick={() => setViewDetailsModalOpen(false)}
+              className="text-gray-400 hover:text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h3 className="text-lg font-medium text-green-400 mb-3">
+                  Basic Information
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Crop:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.crop}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Season:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.season.replace("_", " ")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">District:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.district}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Sector:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.sector}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Soil Type:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.soil_type}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Expected Yield:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.expected_yield_tons_per_ha} tons/ha
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h3 className="text-lg font-medium text-blue-400 mb-3">
+                  Nutrient Requirements
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Nitrogen:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.nitrogen_kg_per_ha} kg/ha
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Phosphorus:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.phosphorus_kg_per_ha} kg/ha
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Potassium:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.potassium_kg_per_ha} kg/ha
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Optimal pH:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.optimal_ph}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h3 className="text-lg font-medium text-yellow-500 mb-3">
+                  <FontAwesomeIcon icon={faWater} className="mr-2" />
+                  Water Requirements
+                </h3>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Water Requirement:</span>
+                  <span className="text-white font-medium">
+                    {detailsPrediction.water_requirement_mm} mm
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h3 className="text-lg font-medium text-purple-400 mb-3">
+                  Planting Information
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Row Spacing:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.row_spacing_cm} cm
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Plant Spacing:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.plant_spacing_cm} cm
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Planting Depth:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.planting_depth_cm} cm
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h3 className="text-lg font-medium text-orange-400 mb-3">
+                  Seasonal Recommendations
+                </h3>
+                {detailsPrediction.seasonal_recommendations &&
+                detailsPrediction.seasonal_recommendations.length > 0 ? (
+                  <ul className="list-disc list-inside space-y-1 text-gray-300">
+                    {detailsPrediction.seasonal_recommendations.map(
+                      (rec, idx) => (
+                        <li key={idx}>{rec}</li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-gray-400">
+                    No seasonal recommendations available
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h3 className="text-lg font-medium text-pink-400 mb-3">
+                  Intercropping Recommendations
+                </h3>
+                {detailsPrediction.intercropping_recommendation &&
+                detailsPrediction.intercropping_recommendation.length > 0 ? (
+                  <ul className="list-disc list-inside space-y-1 text-gray-300">
+                    {detailsPrediction.intercropping_recommendation.map(
+                      (crop, idx) => (
+                        <li key={idx}>{crop}</li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-gray-400">
+                    No intercropping recommendations available
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                <h3 className="text-lg font-medium text-teal-400 mb-3">
+                  Additional Information
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Altitude:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.altitude || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Created By:</span>
+                    <span className="text-white font-medium">
+                      {detailsPrediction.created_by?.email || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Created At:</span>
+                    <span className="text-white font-medium">
+                      {new Date(detailsPrediction.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Updated At:</span>
+                    <span className="text-white font-medium">
+                      {new Date(detailsPrediction.updated_at).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render the data table
+  const renderDataTable = () => {
+    return (
+      <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-700">
+        <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-green-400 mb-4 lg:mb-0">
+            Crop Predictions
+          </h3>
+
+          <div className="flex flex-col sm:flex-row w-full lg:w-auto space-y-3 sm:space-y-0 sm:space-x-3">
+            <div className="relative flex-grow">
+              <input
+                type="text"
+                placeholder="Search predictions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full p-2 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <FontAwesomeIcon
+                icon={faSearch}
+                className="absolute left-3 top-3 text-gray-400"
+              />
+            </div>
+
+            <div className="relative inline-block">
+              <button
+                onClick={() => setDownloadMenuVisible(!downloadMenuVisible)}
+                className="flex items-center px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 hover:bg-gray-700 transition"
+              >
+                <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                Export
+              </button>
+              {downloadMenuVisible && (
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-gray-700 z-10">
+                  <div className="py-1">
+                    {Object.entries(handleDownload).map(([format, handler]) => (
+                      <button
+                        key={format}
+                        onClick={() => {
+                          handler();
+                          setDownloadMenuVisible(false);
+                        }}
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 w-full text-left"
+                      >
+                        Export as {format}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => openModal()}
+              className="flex items-center px-4 py-2 bg-green-600 rounded-lg text-white hover:bg-green-700 transition"
+            >
+              <FontAwesomeIcon icon={faPlus} className="mr-2" />
+              Add Prediction
+            </button>
+          </div>
+        </div>
+
+        {message && (
+          <div
+            className={`p-4 mb-4 rounded-lg ${
+              messageType === "success"
+                ? "bg-green-800 text-green-100"
+                : "bg-red-800 text-red-100"
+            }`}
+          >
+            {message}
+          </div>
+        )}
+
+        <div className="overflow-x-auto">
+          <table
+            id="prediction-table"
+            className="w-full table-auto border-collapse"
+          >
+            <thead>
+              <tr className="bg-gray-800 text-gray-200">
+                <th className="px-4 py-3 text-left">Crop</th>
+                <th className="px-4 py-3 text-left">Season</th>
+                <th className="px-4 py-3 text-left">District</th>
+                <th className="px-4 py-3 text-left">Sector</th>
+                <th className="px-4 py-3 text-left">Soil Type</th>
+                <th className="px-4 py-3 text-left">Altitude</th>
+                <th className="px-4 py-3 text-left">Expected Yield</th>
+                <th className="px-4 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentPredictions.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="7"
+                    className="px-4 py-3 text-center text-gray-400 border-t border-gray-700"
+                  >
+                    No predictions found
+                  </td>
+                </tr>
+              ) : (
+                currentPredictions.map((prediction) => (
+                  <tr
+                    key={prediction.id}
+                    className="border-t border-gray-700 hover:bg-gray-800"
+                  >
+                    <td className="px-4 py-3 text-gray-300">
+                      {prediction.crop}
+                    </td>
+                    <td className="px-4 py-3 text-gray-300">
+                      {prediction.season.replace("_", " ")}
+                    </td>
+                    <td className="px-4 py-3 text-gray-300">
+                      {prediction.district}
+                    </td>
+                    <td className="px-4 py-3 text-gray-300">
+                      {prediction.sector}
+                    </td>
+                    <td className="px-4 py-3 text-gray-300">
+                      {prediction.soil_type}
+                    </td>
+                    <td className="px-4 py-3 text-gray-300">
+                      {prediction.altitude}
+                    </td>
+                    <td className="px-4 py-3 text-gray-300">
+                      {prediction.expected_yield_tons_per_ha} t/ha
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex justify-center space-x-2">
+                        <button
+                          onClick={() => openViewDetailsModal(prediction)}
+                          className="text-blue-400 hover:text-blue-300 transition"
+                          title="View Details"
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </button>
+                        <button
+                          onClick={() => openModal(prediction)}
+                          className="text-yellow-400 hover:text-yellow-300 transition"
+                          title="Edit"
+                        >
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(prediction.id)}
+                          className="text-red-400 hover:text-red-300 transition"
+                          title="Delete"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {filteredData.length > predictionsPerPage && (
+          <div className="flex justify-between items-center mt-6">
+            <div className="flex items-center">
+              <span className="text-gray-400 mr-2">Show</span>
+              <select
+                value={predictionsPerPage}
+                onChange={(e) => {
+                  setPredictionsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="bg-gray-800 border border-gray-700 rounded p-1 text-gray-300"
+              >
+                {[5, 10, 25, 50].map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
+                ))}
+              </select>
+              <span className="text-gray-400 ml-2">per page</span>
+            </div>
+
+            <div className="flex space-x-1">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded ${
+                  currentPage === 1
+                    ? "bg-gray-800 text-gray-600"
+                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                }`}
+              >
+                &laquo;
+              </button>
+              <button
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded ${
+                  currentPage === 1
+                    ? "bg-gray-800 text-gray-600"
+                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                }`}
+              >
+                &lsaquo;
+              </button>
+
+              {/* Page Numbers */}
+              {[
+                ...Array(Math.ceil(filteredData.length / predictionsPerPage)),
+              ].map((_, i) => {
+                const pageNum = i + 1;
+                // Show current page, 2 pages before and after
+                if (
+                  pageNum === 1 ||
+                  pageNum ===
+                    Math.ceil(filteredData.length / predictionsPerPage) ||
+                  (pageNum >= currentPage - 2 && pageNum <= currentPage + 2)
+                ) {
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === pageNum
+                          ? "bg-green-600 text-white"
+                          : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                } else if (
+                  pageNum === currentPage - 3 ||
+                  pageNum === currentPage + 3
+                ) {
+                  return (
+                    <span key={i} className="px-3 py-1 text-gray-600">
+                      ...
+                    </span>
+                  );
+                }
+                return null;
+              })}
+
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={
+                  currentPage ===
+                  Math.ceil(filteredData.length / predictionsPerPage)
+                }
+                className={`px-3 py-1 rounded ${
+                  currentPage ===
+                  Math.ceil(filteredData.length / predictionsPerPage)
+                    ? "bg-gray-800 text-gray-600"
+                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                }`}
+              >
+                &rsaquo;
+              </button>
+              <button
+                onClick={() =>
+                  setCurrentPage(
+                    Math.ceil(filteredData.length / predictionsPerPage)
+                  )
+                }
+                disabled={
+                  currentPage ===
+                  Math.ceil(filteredData.length / predictionsPerPage)
+                }
+                className={`px-3 py-1 rounded ${
+                  currentPage ===
+                  Math.ceil(filteredData.length / predictionsPerPage)
+                    ? "bg-gray-800 text-gray-600"
+                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                }`}
+              >
+                &raquo;
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Render crop distribution map
+  const renderCropDistributionMap = () => {
+    // Count crops by district
+    const cropsByDistrict = {};
+    predictions.forEach((prediction) => {
+      if (!cropsByDistrict[prediction.district]) {
+        cropsByDistrict[prediction.district] = {};
+      }
+      if (!cropsByDistrict[prediction.district][prediction.crop]) {
+        cropsByDistrict[prediction.district][prediction.crop] = 1;
+      } else {
+        cropsByDistrict[prediction.district][prediction.crop]++;
+      }
+    });
+
+    // Find dominant crop by district
+    const dominantCropByDistrict = {};
+    Object.keys(cropsByDistrict).forEach((district) => {
+      let maxCount = 0;
+      let dominantCrop = "";
+      Object.keys(cropsByDistrict[district]).forEach((crop) => {
+        if (cropsByDistrict[district][crop] > maxCount) {
+          maxCount = cropsByDistrict[district][crop];
+          dominantCrop = crop;
+        }
+      });
+      dominantCropByDistrict[district] = {
+        crop: dominantCrop,
+        count: maxCount,
+      };
+    });
+
+    // Get unique crops for legend
+    const uniqueCrops = [...new Set(predictions.map((p) => p.crop))];
+
+    return (
+      <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-700 w-full lg:w-2/3">
+        <h3 className="text-lg font-semibold mb-4 text-green-400 flex items-center">
+          <FontAwesomeIcon icon={faLeaf} className="mr-2" />
+          Crop Distribution by District
+        </h3>
+        <div className="flex flex-col md:flex-row">
+          <div className="w-full md:w-3/4 h-96 relative">
+            {/* This is a placeholder for the map. In a real implementation, you would
+                 use a mapping library like Leaflet or Google Maps to render a real map */}
+            <div className="w-full h-full bg-gray-800 rounded-lg border border-gray-700 p-4">
+              <div className="text-center text-gray-400 italic">
+                Map placeholder - Rwanda districts would be displayed here with
+                color coding for dominant crops in each district
+              </div>
+              <div className="mt-4">
+                <h4 className="text-sm font-medium text-gray-300 mb-2">
+                  District Highlights:
+                </h4>
+                <ul className="space-y-2">
+                  {Object.entries(dominantCropByDistrict).map(
+                    ([district, data]) => (
+                      <li key={district} className="flex justify-between">
+                        <span className="text-gray-400">{district}:</span>
+                        <span className="text-green-400">
+                          {data.crop} ({data.count} predictions)
+                        </span>
+                      </li>
+                    )
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="w-full md:w-1/4 pl-0 md:pl-4 mt-4 md:mt-0">
+            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 h-full">
+              <h4 className="text-sm font-medium text-gray-300 mb-3">Legend</h4>
+              <div className="space-y-2">
+                {uniqueCrops.map((crop, index) => (
+                  <div key={crop} className="flex items-center">
+                    <div
+                      className="w-4 h-4 rounded-full mr-2"
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    ></div>
+                    <span className="text-gray-300 text-sm">{crop}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    if (mapData && mapData.provinces && mapData.provinces.length > 0) {
+      // Get districts from ALL provinces instead of just the first one
+      const allDistrictsFromMap = [];
+
+      // Loop through all provinces to collect districts
+      mapData.provinces.forEach((province) => {
+        if (province.coordinates && province.coordinates.districts) {
+          const districtsInProvince = province.coordinates.districts.map(
+            (district) => district.name
+          );
+          console.log("Districts: ", districtsInProvince);
+          allDistrictsFromMap.push(...districtsInProvince);
+        }
+      });
+
+      // Set all unique districts (in case there are duplicates)
+      setAllDistricts([...new Set(allDistrictsFromMap)]);
+
+      // Handle edit mode - find the district in any province
+      if (currentPrediction?.district) {
+        setSelectedDistrict(currentPrediction.district);
+
+        // Search for the district across all provinces
+        let foundSectors = [];
+        for (const province of mapData.provinces) {
+          if (province.coordinates && province.coordinates.districts) {
+            const districtData = province.coordinates.districts.find(
+              (d) => d.name === currentPrediction.district
+            );
+
+            if (districtData && districtData.sectors) {
+              foundSectors = districtData.sectors.map((sector) => sector.name);
+              console.log("Found sectors: ", foundSectors);
+              break; // Found the district, no need to continue searching
+            }
+          }
+        }
+        console.log("Sectors in district: ", foundSectors);
+
+        setAllSectors(foundSectors);
+        setSelectedSector(currentPrediction.sector);
+      }
+    }
+  }, [currentPrediction, isModalOpen, mapData]);
+
+  // District change handler also moved outside
+  const handleDistrictChange = (e) => {
+    const district = e.target.value;
+    setSelectedDistrict(district);
+
+    const districtData = mapData.provinces[0].coordinates.districts.find(
+      (d) => d.name === district
+    );
+
+    console.log("Selected district:", district);
+
+    if (districtData) {
+      const sectorsInDistrict = districtData.sectors.map(
+        (sector) => sector.name
+      );
+      setAllSectors(sectorsInDistrict);
+      setSelectedSector("");
+      console.log("Sectors in district:", sectorsInDistrict);
+    } else {
+      setAllSectors([]);
+    }
+  };
+
+  const renderPredictionModal = () => {
+    // Define whether we're in edit mode or create mode
+    const isEditMode = !!currentPrediction;
+
     return (
       <div
         className={`fixed inset-0 z-50 flex items-center justify-center ${
@@ -1069,389 +1581,409 @@ function Admin_Manage_Relocations() {
         }`}
       >
         <div
-          className={`fixed inset-0 bg-black opacity-50 ${
-            isModalOpen ? "block" : "hidden"
-          }`}
+          className="fixed inset-0 bg-black opacity-50"
           onClick={() => setIsModalOpen(false)}
         ></div>
         <div className="bg-gray-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-4xl border border-gray-800 max-h-[90vh] overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4 text-green-500">
-            {currentRelocation ? "Update Relocation" : "Add New Relocation"}
-          </h2>
-          <form onSubmit={handleAddUpdateRelocation}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Origin (Start) Location Section */}
-              <div className="space-y-4">
-                <h3 className="text-green-400 font-medium border-b border-gray-700 pb-2">
-                  Origin Location
-                </h3>
-
-                {/* Origin District Dropdown */}
-                <div>
-                  <label className="block text-gray-300 mb-2">
-                    Origin District
-                  </label>
-                  <select
-                    value={selectedOriginDistrict}
-                    onChange={(e) => {
-                      setSelectedOriginDistrict(e.target.value);
-                      setSelectedOriginSector(""); // Reset sector when district changes
-                    }}
-                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300"
-                  >
-                    <option value="">Select District</option>
-                    {allDistricts.map((district) => (
-                      <option key={district.name} value={district.name}>
-                        {district.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Origin Sector Dropdown */}
-                <div>
-                  <label className="block text-gray-300 mb-2">
-                    Origin Sector
-                  </label>
-                  <select
-                    value={selectedOriginSector}
-                    onChange={(e) => setSelectedOriginSector(e.target.value)}
-                    disabled={!selectedOriginDistrict}
-                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300"
-                  >
-                    <option value="">Select Sector</option>
-                    {getSectors(selectedOriginDistrict).map((sector) => (
-                      <option key={sector.name} value={sector.name}>
-                        {sector.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Destination Location Section */}
-              <div className="space-y-4">
-                <h3 className="text-green-400 font-medium border-b border-gray-700 pb-2">
-                  Destination Location
-                </h3>
-
-                {/* Destination District Dropdown */}
-                <div>
-                  <label className="block text-gray-300 mb-2">
-                    Destination District
-                  </label>
-                  <select
-                    value={selectedDestDistrict}
-                    onChange={(e) => {
-                      setSelectedDestDistrict(e.target.value);
-                      setSelectedDestSector("");
-                    }}
-                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300"
-                  >
-                    <option value="">Select District</option>
-                    {allDistricts.map((district) => (
-                      <option key={district.name} value={district.name}>
-                        {district.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Destination Sector Dropdown */}
-                <div>
-                  <label className="block text-gray-300 mb-2">
-                    Destination Sector
-                  </label>
-                  <select
-                    value={selectedDestSector}
-                    onChange={(e) => setSelectedDestSector(e.target.value)}
-                    disabled={!selectedDestDistrict}
-                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300"
-                  >
-                    <option value="">Select Sector</option>
-                    {getSectors(selectedDestDistrict).map((sector) => (
-                      <option key={sector.name} value={sector.name}>
-                        {sector.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Vehicle Dropdown - With onChange handler */}
-              <div>
-                <label className="block text-gray-300 mb-2">Vehicle</label>
-                <div className="relative">
-                  <select
-                    name="vehicle"
-                    value={currentRelocation?.vehicle?.id || ""}
-                    onChange={(e) => {
-                      if (currentRelocation) {
-                        setCurrentRelocation({
-                          ...currentRelocation,
-                          vehicle: {
-                            ...currentRelocation.vehicle,
-                            id: e.target.value,
-                          },
-                        });
-                      }
-                    }}
-                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 pr-10"
-                  >
-                    <option value="">Select Vehicle</option>
-                    {vehicles.map((vehicle) => (
-                      <option key={vehicle.id} value={vehicle.id}>
-                        {vehicle.vehicle_type} - {vehicle.plate_number}
-                      </option>
-                    ))}
-                  </select>
-                  {currentRelocation?.vehicle?.id && vehicles.length > 0 && (
-                    <div className="mt-2 bg-gray-800 p-2 rounded border border-gray-700 text-xs">
-                      {(() => {
-                        const selectedVehicle = vehicles.find(
-                          (v) => v.id === Number(currentRelocation.vehicle.id)
-                        );
-                        if (selectedVehicle) {
-                          return (
-                            <>
-                              <div className="flex justify-between mb-1">
-                                <span className="text-gray-400">
-                                  Plate Number:
-                                </span>
-                                <span className="text-white">
-                                  {selectedVehicle.plate_number}
-                                </span>
-                              </div>
-                              <div className="flex justify-between mb-1">
-                                <span className="text-gray-400">
-                                  Weight Capacity:
-                                </span>
-                                <span className="text-white">
-                                  {selectedVehicle.total_weight_to_carry} kg
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-400">Category:</span>
-                                <span className="text-white">
-                                  {selectedVehicle.driving_category}
-                                </span>
-                              </div>
-                            </>
-                          );
-                        }
-                        return null;
-                      })()}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Driver Dropdown - With onChange handler */}
-              <div>
-                <label className="block text-gray-300 mb-2">Driver</label>
-                <div className="relative">
-                  <select
-                    name="driver"
-                    value={currentRelocation?.driver?.id || ""}
-                    onChange={(e) => {
-                      if (currentRelocation) {
-                        setCurrentRelocation({
-                          ...currentRelocation,
-                          driver: {
-                            ...currentRelocation.driver,
-                            id: e.target.value,
-                          },
-                        });
-                      }
-                    }}
-                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 pr-10"
-                  >
-                    <option value="">Select Driver</option>
-                    {drivers.map((driver) => (
-                      <option key={driver.id} value={driver.id}>
-                        {driver.first_name} {driver.last_name} -{" "}
-                        {driver.user?.phone_number ||
-                          driver.driving_license_number}
-                      </option>
-                    ))}
-                  </select>
-                  {currentRelocation?.driver?.id && drivers.length > 0 && (
-                    <div className="mt-2 bg-gray-800 p-2 rounded border border-gray-700 text-xs">
-                      {(() => {
-                        const selectedDriver = drivers.find(
-                          (d) => d.id === Number(currentRelocation.driver.id)
-                        );
-                        if (selectedDriver) {
-                          return (
-                            <>
-                              <div className="flex justify-between mb-1">
-                                <span className="text-gray-400">Name:</span>
-                                <span className="text-white">
-                                  {selectedDriver.first_name}{" "}
-                                  {selectedDriver.last_name}
-                                </span>
-                              </div>
-                              <div className="flex justify-between mb-1">
-                                <span className="text-gray-400">Contact:</span>
-                                <span className="text-white">
-                                  {selectedDriver.user?.phone_number ||
-                                    selectedDriver.driving_license_number}
-                                </span>
-                              </div>
-                              <div className="flex justify-between mb-1">
-                                <span className="text-gray-400">
-                                  Categories:
-                                </span>
-                                <span className="text-white">
-                                  {selectedDriver.driving_categories}
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-400">
-                                  Availability:
-                                </span>
-                                <span
-                                  className={
-                                    selectedDriver.availability_status ===
-                                    "available"
-                                      ? "text-green-400"
-                                      : "text-green-400"
-                                  }
-                                >
-                                  {selectedDriver.availability_status}
-                                </span>
-                              </div>
-                            </>
-                          );
-                        }
-                        return null;
-                      })()}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Status Dropdown - With onChange handler */}
-              <div>
-                <label className="block text-gray-300 mb-2">Status</label>
-                <select
-                  name="status"
-                  value={currentRelocation?.status || "pending"}
-                  onChange={(e) => {
-                    if (currentRelocation) {
-                      setCurrentRelocation({
-                        ...currentRelocation,
-                        status: e.target.value,
-                      });
-                    }
-                  }}
-                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                  <option value="canceled">Canceled</option>
-                </select>
-              </div>
-
-              {/* Move Date with onChange handler */}
-              <div>
-                <label className="block text-gray-300 mb-2">Move Date</label>
-                <input
-                  type="datetime-local"
-                  name="move_datetime"
-                  value={
-                    currentRelocation?.move_datetime
-                      ? new Date(currentRelocation.move_datetime)
-                          .toISOString()
-                          .slice(0, 16)
-                      : ""
-                  }
-                  onChange={(e) => {
-                    if (currentRelocation) {
-                      setCurrentRelocation({
-                        ...currentRelocation,
-                        move_datetime: e.target.value,
-                      });
-                    }
-                  }}
-                  required
-                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300"
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-green-500">
+              {isEditMode ? "Update Prediction" : "Add New Prediction"}
+            </h2>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="text-gray-400 hover:text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
                 />
-              </div>
+              </svg>
+            </button>
+          </div>
 
-              {/* Cost Section */}
-              <div className="space-y-4 col-span-2">
-                <h3 className="text-green-400 font-medium border-b border-gray-700 pb-2">
-                  Cost Information
+          <form onSubmit={handleAddUpdatePrediction}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Required fields section */}
+              <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
+                <h3 className="text-lg font-medium text-green-400 mb-4">
+                  {isEditMode ? "Basic Information" : "Required Information"}
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Base Cost Field */}
                   <div>
-                    <label className="block text-gray-300 mb-2">
-                      Base Cost ($)
+                    <label htmlFor="crop" className="block text-gray-300 mb-2">
+                      Crop <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="number"
-                      name="base_cost"
-                      step="0.01"
-                      min="0"
-                      value={currentRelocation?.base_cost || ""}
-                      onChange={(e) => {
-                        if (currentRelocation) {
-                          setCurrentRelocation({
-                            ...currentRelocation,
-                            base_cost: e.target.value,
-                          });
-                        }
-                      }}
-                      className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300"
-                    />
+                    <select
+                      id="crop"
+                      name="crop"
+                      value={selectedCrop}
+                      onChange={(e) => setSelectedCrop(e.target.value)}
+                      required
+                      className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="">Select Crop</option>
+                      {sortedCrops.map((crop) => (
+                        <option key={crop} value={crop}>
+                          {crop}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
-                  {/* Adjusted Cost Field */}
                   <div>
-                    <label className="block text-gray-300 mb-2">
-                      Adjusted Cost ($)
+                    <label
+                      htmlFor="season"
+                      className="block text-gray-300 mb-2"
+                    >
+                      Season <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="number"
-                      name="adjusted_cost"
-                      step="0.01"
-                      min="0"
-                      value={currentRelocation?.adjusted_cost || ""}
-                      onChange={(e) => {
-                        if (currentRelocation) {
-                          setCurrentRelocation({
-                            ...currentRelocation,
-                            adjusted_cost: e.target.value,
-                          });
-                        }
-                      }}
-                      className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300"
-                    />
+                    <select
+                      id="season"
+                      name="season"
+                      defaultValue={currentPrediction?.season || "long_rainy"}
+                      className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="long_rainy">Long Rainy</option>
+                      <option value="short_rainy">Short Rainy</option>
+                      <option value="long_dry">Long Dry</option>
+                      <option value="short_dry">Short Dry</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="district"
+                      className="block text-gray-300 mb-2"
+                    >
+                      District <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="district"
+                      name="district"
+                      value={selectedDistrict}
+                      onChange={handleDistrictChange}
+                      required
+                      className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="">Select District</option>
+                      {allDistricts.map((district) => (
+                        <option key={district} value={district}>
+                          {district}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="sector"
+                      className="block text-gray-300 mb-2"
+                    >
+                      Sector <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="sector"
+                      name="sector"
+                      value={selectedSector}
+                      onChange={(e) => setSelectedSector(e.target.value)}
+                      required
+                      disabled={!selectedDistrict}
+                      className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="">Select Sector</option>
+                      {allSectors.map((sector) => (
+                        <option key={sector} value={sector}>
+                          {sector}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex justify-end space-x-2 mt-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsModalOpen(false);
-                }}
-                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
-                {currentRelocation ? "Update" : "Add"}
-              </button>
+              {/* Only show additional fields when editing */}
+              {isEditMode && (
+                <>
+                  {/* Season and soil section */}
+                  <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
+                    <h3 className="text-lg font-medium text-blue-400 mb-4">
+                      Soil Information
+                    </h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                      <div>
+                        <label
+                          htmlFor="soil_type"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Soil Type
+                        </label>
+                        <input
+                          type="text"
+                          id="soil_type"
+                          name="soil_type"
+                          defaultValue={currentPrediction?.soil_type || ""}
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder="e.g. ferralsol"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Nutrient requirements section */}
+                  <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
+                    <h3 className="text-lg font-medium text-purple-400 mb-4">
+                      Nutrient Requirements
+                    </h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <label
+                          htmlFor="nitrogen_kg_per_ha"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Nitrogen (kg/ha)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          id="nitrogen_kg_per_ha"
+                          name="nitrogen_kg_per_ha"
+                          defaultValue={
+                            currentPrediction?.nitrogen_kg_per_ha || "0"
+                          }
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="phosphorus_kg_per_ha"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Phosphorus (kg/ha)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          id="phosphorus_kg_per_ha"
+                          name="phosphorus_kg_per_ha"
+                          defaultValue={
+                            currentPrediction?.phosphorus_kg_per_ha || "0"
+                          }
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="potassium_kg_per_ha"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Potassium (kg/ha)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          id="potassium_kg_per_ha"
+                          name="potassium_kg_per_ha"
+                          defaultValue={
+                            currentPrediction?.potassium_kg_per_ha || "0"
+                          }
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="optimal_ph"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Optimal pH
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="14"
+                          id="optimal_ph"
+                          name="optimal_ph"
+                          defaultValue={currentPrediction?.optimal_ph || "6.5"}
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Planting details section */}
+                  <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
+                    <h3 className="text-lg font-medium text-yellow-400 mb-4">
+                      Planting Details
+                    </h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <label
+                          htmlFor="row_spacing_cm"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Row Spacing (cm)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          id="row_spacing_cm"
+                          name="row_spacing_cm"
+                          defaultValue={
+                            currentPrediction?.row_spacing_cm || "0"
+                          }
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="plant_spacing_cm"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Plant Spacing (cm)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          id="plant_spacing_cm"
+                          name="plant_spacing_cm"
+                          defaultValue={
+                            currentPrediction?.plant_spacing_cm || "0"
+                          }
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="planting_depth_cm"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Planting Depth (cm)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          id="planting_depth_cm"
+                          name="planting_depth_cm"
+                          defaultValue={
+                            currentPrediction?.planting_depth_cm || "0"
+                          }
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="expected_yield_tons_per_ha"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Expected Yield (t/ha)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          id="expected_yield_tons_per_ha"
+                          name="expected_yield_tons_per_ha"
+                          defaultValue={
+                            currentPrediction?.expected_yield_tons_per_ha || "0"
+                          }
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Water requirements section */}
+                  <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
+                    <h3 className="text-lg font-medium text-teal-400 mb-4">
+                      Water Requirements
+                    </h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="water_requirement_mm"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Water Requirement (mm)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          id="water_requirement_mm"
+                          name="water_requirement_mm"
+                          defaultValue={
+                            currentPrediction?.water_requirement_mm || "0"
+                          }
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="altitude"
+                          className="block text-gray-300 mb-2"
+                        >
+                          Altitude
+                        </label>
+                        <input
+                          type="text"
+                          id="altitude"
+                          name="altitude"
+                          defaultValue={currentPrediction?.altitude || "N/A"}
+                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Button section */}
+              <div className="col-span-2 flex justify-end space-x-3 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-5 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition flex items-center"
+                >
+                  <FontAwesomeIcon
+                    icon={isEditMode ? faEdit : faPlus}
+                    className="mr-2"
+                  />
+                  {isEditMode ? "Update Prediction" : "Create Prediction"}
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -1459,292 +1991,48 @@ function Admin_Manage_Relocations() {
     );
   };
 
-  const handleCreateRelocationNavigation = () => {
-    navigate("/admin/createRelocation");
-  };
   return (
-    <ErrorBoundary>
-      <div className="p-4 bg-gray-800 min-h-screen">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-6 p-4 bg-gray-900 rounded-lg shadow-lg border border-gray-700">
-            <h1 className="text-center text-green-500 font-bold text-xl mb-2">
-              Manage Predictions
-            </h1>
-            <p className="text-center text-gray-400 text-sm">
-              View, edit and manage prediction details from a central dashboard
-            </p>
-          </div>
-
-          {message && (
-            <div
-              className={`text-center py-3 px-4 mb-6 rounded-lg shadow-md ${
-                messageType === "success"
-                  ? "bg-green-900 text-green-100"
-                  : "bg-green-900 text-green-100"
-              }`}
-            >
-              {message}
-            </div>
-          )}
-
-{renderSummaryCards()}
-{renderAdvancedFilters()}
-
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="w-full lg:w-2/3">
-              <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-700 mb-6">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-                  <div className="flex items-center">
-                    <span className="text-green-400 flex items-center">
-                      <FontAwesomeIcon icon={faRoad} className="mr-2" />
-                      <span className="font-semibold">Total Relocations:</span>
-                      <span className="ml-2 px-3 py-1 bg-green-600 text-white rounded-full">
-                        {filteredData.length}
-                      </span>
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FontAwesomeIcon
-                          icon={faSearch}
-                          className="text-gray-400"
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        placeholder="Search relocations..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 pr-4 py-2 w-full text-gray-300 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                      />
-                    </div>
-
-                    <div className="relative">
-                      <button
-                        onClick={() =>
-                          setDownloadMenuVisible(!downloadMenuVisible)
-                        }
-                        className="py-2 bg-green-600 px-4 rounded-lg text-white flex items-center justify-center hover:bg-green-700 transition duration-200 w-full sm:w-auto"
-                      >
-                        <FontAwesomeIcon icon={faDownload} className="mr-2" />
-                        Export
-                      </button>
-                      {downloadMenuVisible && (
-                        <div className="absolute right-0 mt-2 bg-gray-800 text-gray-200 shadow-lg rounded-lg p-2 z-10 border border-gray-700 w-32">
-                          {Object.keys(handleDownload).map((format) => (
-                            <button
-                              key={format}
-                              onClick={() => {
-                                handleDownload[format]();
-                                setDownloadMenuVisible(false);
-                              }}
-                              className="block w-full px-4 py-2 text-left hover:bg-gray-700 rounded transition"
-                            >
-                              {format}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={handleCreateRelocationNavigation}
-                      className="py-2 bg-blue-600 px-4 rounded-lg text-white flex items-center justify-center hover:bg-blue-700 transition duration-200 w-full sm:w-auto"
-                    >
-                      <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                      Add Relocation
-                    </button>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto rounded-lg shadow-md border border-gray-700">
-                  <table
-                    id="relocation-table"
-                    className="w-full text-sm text-left"
-                  >
-                    <thead className="text-xs uppercase bg-green-600 text-white">
-                      <tr>
-                        <th className="px-6 py-3 rounded-tl-lg">#</th>
-                        <th className="px-6 py-3">Owner</th>
-                        <th className="px-6 py-3">Start Point</th>
-                        <th className="px-6 py-3">End Point</th>
-                        <th className="px-6 py-3">Size</th>
-                        <th className="px-6 py-3">Status</th>
-                        <th className="px-6 py-3">Move Date</th>
-                        <th className="px-6 py-3">Cost</th>
-                        <th className="px-6 py-3 rounded-tr-lg">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentRelocations.length === 0 ? (
-                        <tr>
-                          <td
-                            colSpan="7"
-                            className="text-center py-8 text-gray-400 bg-gray-800"
-                          >
-                            <div className="flex flex-col items-center">
-                              <FontAwesomeIcon
-                                icon={faRoad}
-                                className="text-4xl mb-3 text-gray-600"
-                              />
-                              <p>No relocations found matching your criteria</p>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        currentRelocations.map((relocation, index) => (
-                          <tr
-                            key={relocation.id}
-                            className="bg-gray-800 border-b border-gray-700 hover:bg-gray-700 transition duration-200"
-                          >
-                            <td className="px-6 py-4 text-gray-300">
-                              {(currentPage - 1) * relocationsPerPage +
-                                index +
-                                1}
-                            </td>
-                            <td className="px-6 py-4 text-gray-300">
-                              {relocation.created_by?.phone_number}
-                              <p className="text-green-700">
-                                {relocation.created_by?.email}
-                              </p>
-                            </td>
-
-                            <td className="px-6 py-4 text-gray-300">
-                              {relocation.origin_sector}
-                              <p className="text-green-700">
-                                {relocation.origin_district}
-                              </p>
-                            </td>
-                            <td className="px-6 py-4 text-gray-300">
-                              {relocation.destination_sector}
-                              <p className="text-green-700">
-                                {relocation.destination_district}
-                              </p>
-                            </td>
-                            <td className="px-6 py-4 text-gray-300 capitalize">
-                              {relocation.relocation_size}
-                              <p className="text-green-700">Assigned car:</p>
-                              <p>{relocation.vehicle.plate_number}</p>
-                            </td>
-                            <td className="px-6 py-4 text-gray-300 capitalize">
-                              {relocation.status}
-                              <p className="text-green-700">Assigned driver:</p>
-                              <p>
-                                {relocation.driver?.user?.phone_number ||
-                                  relocation.driver.driving_license_number}
-                              </p>
-                            </td>
-                            <td className="px-6 py-4 text-gray-300">
-                              {new Date(
-                                relocation.move_datetime
-                              ).toLocaleString()}
-                            </td>
-
-                            <td className="px-12 py-4">
-                              <div className="space-y-2">
-                                <div>
-                                  <span className="text-gray-500 text-sm font-medium">
-                                    Adjusted Cost
-                                  </span>
-                                  <p className="text-lg font-semibold">
-                                    $
-                                    {Number(relocation.adjusted_cost).toFixed(
-                                      2
-                                    )}
-                                  </p>
-                                </div>
-                                <div>
-                                  <span className="text-gray-500 text-sm font-medium">
-                                    Base Cost
-                                  </span>
-                                  <p className="text-lg font-semibold">
-                                    ${Number(relocation.base_cost).toFixed(2)}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-
-                            <td className="px-6 py-4">
-                              <div className="flex space-x-3">
-                                <button
-                                  onClick={() => {
-                                    setCurrentRelocation(relocation);
-                                    setIsModalOpen(true);
-                                  }}
-                                  className="text-blue-400 hover:text-blue-300 transition"
-                                >
-                                  <FontAwesomeIcon icon={faEdit} />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(relocation.id)}
-                                  className="text-green-400 hover:text-green-300 transition"
-                                >
-                                  <FontAwesomeIcon icon={faTrash} />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                  <div className="mt-6">{renderRecentActivity()}</div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-                  <div className="flex items-center">
-                    <span className="mr-2 text-gray-300">Rows per page:</span>
-                    <select
-                      value={relocationsPerPage}
-                      onChange={(e) =>
-                        setRelocationsPerPage(Number(e.target.value))
-                      }
-                      className="border border-gray-700 rounded-lg px-3 py-2 bg-gray-800 text-gray-300 focus:outline-none focus:ring-2 focus:ring-red-600"
-                    >
-                      {[5, 10, 30, 50, 100].map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(1, prev - 1))
-                      }
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50 hover:bg-gray-600 transition disabled:cursor-not-allowed"
-                    >
-                      Previous
-                    </button>
-                    <span className="px-4 py-2 bg-green-600 text-white rounded-lg">
-                      Page {currentPage}
-                    </span>
-                    <button
-                      onClick={() => setCurrentPage((prev) => prev + 1)}
-                      disabled={
-                        currentPage * relocationsPerPage >= filteredData.length
-                      }
-                      className="px-4 py-2 bg-gray-700 text-white rounded-lg disabled:opacity-50 hover:bg-gray-600 transition disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {renderCharts()}
-          </div>
-        </div>
-
-        {renderModal()}
+    <div className="p-6 bg-gray-950 min-h-screen">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-green-500">
+          Crop Prediction Management
+        </h1>
+        <p className="text-gray-400">
+          Manage and analyze crop recommendations and predictions
+        </p>
       </div>
-    </ErrorBoundary>
+
+      {/* Summary Cards */}
+      {renderSummaryCards()}
+
+      {/* Main Content Grid */}
+      <div className="flex flex-col lg:flex-row gap-6 mb-6">
+        {/* Left side - Recent Activity */}
+        {renderRecentActivity()}
+
+        {/* Right side - Charts */}
+        {renderCharts()}
+      </div>
+
+      {/* Crop Distribution Map */}
+      <div className="mb-6">{renderCropDistributionMap()}</div>
+
+      {/* Advanced Filters */}
+      {renderAdvancedFilters()}
+
+      {/* Data Table */}
+      {renderDataTable()}
+
+      {/* Add/Edit Modal */}
+      {/* {isModalOpen && renderPredictionModal()} */}
+
+      {/* View Details Modal */}
+      {viewDetailsModalOpen && renderDetailsModal()}
+
+      {/* Add Prediction Modal */}
+      {isModalOpen && renderPredictionModal()}
+    </div>
   );
 }
 
-export default Admin_Manage_Relocations;
+export default Admin_Manage_predictions;

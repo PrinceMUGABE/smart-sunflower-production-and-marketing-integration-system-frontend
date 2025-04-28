@@ -13,6 +13,14 @@ import {
   Settings,
   BarChart3
 } from "lucide-react";
+import { 
+  FaUserCircle, 
+  FaSignOutAlt, 
+  FaComments,
+  FaCar, 
+  FaTruckMoving,
+  
+} from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../assets/pictures/minagri.jpg";
 
@@ -37,7 +45,7 @@ function Sidebar() {
     { id: 2, name: "Users", path: "/admin/users", icon: <Users size={20} /> },
     { id: 3, name: "Datasets", path: "/admin/datasets", icon: <Database size={20} /> },
     { id: 4, name: "Predictions", path: "/admin/predictions", icon: <BarChart3 size={20} /> },
-    { id: 5, name: "Weather", path: "/admin/weather", icon: <CloudSun size={20} /> },
+    { id: 5, name: "Feedbacks", path: "/admin/feedbacks", icon: <FaComments className="text-xl" /> },
     { id: 6, name: "Profile", path: `/admin/profile/${userId}`, icon: <User size={20} /> },
   ];
 

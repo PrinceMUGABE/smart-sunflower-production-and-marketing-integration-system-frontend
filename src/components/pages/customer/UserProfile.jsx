@@ -187,7 +187,7 @@ function UserProfile() {
     return (
       <section className="relative py-16 px-4 flex items-center justify-center h-full">
         <div className="text-white text-xl flex items-center z-10">
-          <svg className="animate-spin h-8 w-8 mr-3 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin h-8 w-8 mr-3 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
@@ -200,10 +200,10 @@ function UserProfile() {
   return (
     <section className="relative py-16 px-4">
       {/* Background overlay with image - contained within this section */}
-      <div 
+      {/* <div 
         className="absolute inset-0 bg-cover bg-center opacity-20 z-0" 
         style={{ backgroundImage: `url(${profileImage})` }}
-      ></div>
+      ></div> */}
 
       <div className="container mx-auto max-w-2xl relative z-10">
         <div className="text-center mb-8">
@@ -216,7 +216,7 @@ function UserProfile() {
         </div>
 
         <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-6 bg-red-600 text-white">
+          <div className="p-6 bg-green-600 text-white">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <User className="h-5 w-5" />
               Profile Information
@@ -227,7 +227,7 @@ function UserProfile() {
           </div>
 
           {error && (
-            <div className="mx-6 mt-6 p-3 rounded bg-red-900 text-red-100">
+            <div className="mx-6 mt-6 p-3 rounded bg-green-900 text-green-100">
               {error}
             </div>
           )}
@@ -238,7 +238,7 @@ function UserProfile() {
                 <div className="grid grid-cols-1 gap-4">
                   <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
                     <div className="p-2 bg-gray-700 rounded-full mr-4">
-                      <Phone className="h-5 w-5 text-red-500" />
+                      <Phone className="h-5 w-5 text-green-500" />
                     </div>
                     <div>
                       <span className="text-gray-400 text-sm block">Phone Number</span>
@@ -248,7 +248,7 @@ function UserProfile() {
 
                   <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
                     <div className="p-2 bg-gray-700 rounded-full mr-4">
-                      <Mail className="h-5 w-5 text-red-500" />
+                      <Mail className="h-5 w-5 text-green-500" />
                     </div>
                     <div>
                       <span className="text-gray-400 text-sm block">Email Address</span>
@@ -258,7 +258,7 @@ function UserProfile() {
 
                   <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
                     <div className="p-2 bg-gray-700 rounded-full mr-4">
-                      <User className="h-5 w-5 text-red-500" />
+                      <User className="h-5 w-5 text-green-500" />
                     </div>
                     <div>
                       <span className="text-gray-400 text-sm block">Role</span>
@@ -268,7 +268,7 @@ function UserProfile() {
 
                   <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
                     <div className="p-2 bg-gray-700 rounded-full mr-4">
-                      <Clock className="h-5 w-5 text-red-500" />
+                      <Clock className="h-5 w-5 text-green-500" />
                     </div>
                     <div>
                       <span className="text-gray-400 text-sm block">Member Since</span>
@@ -282,7 +282,7 @@ function UserProfile() {
                 <div className="flex justify-center mt-8">
                   <button
                     onClick={handleEditClick}
-                    className="px-6 py-3 text-white bg-red-600 hover:bg-red-700 rounded-md transition duration-200 ease-in-out flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                    className="px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-md transition duration-200 ease-in-out flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
                   >
                     <Edit className="h-5 w-5" />
                     Edit Profile
@@ -376,7 +376,7 @@ function UserProfile() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-6 py-3 text-white bg-red-600 hover:bg-red-700 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50"
+                    className="px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50"
                   >
                     {isLoading ? (
                       <>

@@ -5,10 +5,25 @@ import {
   FaSignOutAlt, 
   FaComments,
   FaCar, 
-  FaTruckMoving
+  FaTruckMoving,
+  
 } from "react-icons/fa";
+import { 
+  LogOut, 
+  User,
+  Menu,
+  X,
+  LayoutDashboard,
+  Users,
+  Database,
+  LineChart,
+  CloudSun,
+  Settings,
+  BarChart3,
+  ChevronDown
+} from "lucide-react";
 import { MdDashboard } from "react-icons/md";
-import { X, Menu, LogOut, ChevronDown, Bell } from "lucide-react";
+// import { X, Menu, LogOut, ChevronDown, Bell } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../assets/pictures/minagri.jpg";
 
@@ -48,10 +63,10 @@ const Customer_Header = () => {
 
   const Navbar_Links = [
     // { id: 1, name: "Dashboard", path: "/customer", icon: <MdDashboard className="text-xl" /> },
-    { id: 1, name: "Vehicles", path: "/customer/vehicles", icon: <FaCar className="text-xl" /> },
-    { id: 2, name: "Relocations", path: "/customer/relocations", icon: <FaTruckMoving className="text-xl" /> },
+    // { id: 1, name: "Home", path: "/farmer", icon: <FaCar className="text-xl" /> },
+    { id: 1, name: "Predictions", path: "/farmer/predictions", icon: <BarChart3 className="text-xl" /> },
     // { id: 5, name: "Forecast", path: "/customer/forecasts", icon: <MdInsights className="text-xl" /> },
-    { id: 3, name: "Feedbacks", path: "/customer/feedbacks", icon: <FaComments className="text-xl" /> },
+    { id: 2, name: "Feedbacks", path: "/farmer/feedbacks", icon: <FaComments className="text-xl" /> },
     // { id: 4, name: "Profile", path: `/customer/profile/${userId}`, icon: <FaUserCircle className="text-xl" /> },
   ];
 
@@ -67,8 +82,8 @@ const Customer_Header = () => {
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link to="/customer/vehicles" className="flex items-center">
-              <img src={Logo} alt="Logo" className="h-12 w-auto mr-2" />
-              <span className="text-white font-bold text-xl hidden sm:block">VehicleMove</span>
+              <img src={Logo} alt="Logo" className="h-12 w-auto rounded-full mr-2" />
+              <span className="text-white font-bold text-xl hidden sm:block">FORMAT</span>
             </Link>
           </div>
 
@@ -80,8 +95,8 @@ const Customer_Header = () => {
                 to={link.path}
                 className={`text-white flex items-center space-x-2 px-4 py-3 rounded-md transition-all duration-200 ${
                   isActive(link.path)
-                    ? "bg-red-600 hover:bg-red-700 text-white font-medium"
-                    : "hover:bg-gray-700 hover:text-red-400"
+                    ? "bg-green-600 hover:bg-green-700 text-white font-medium"
+                    : "hover:bg-gray-700 hover:text-green-400"
                 }`}
               >
                 <span className="text-lg">{link.icon}</span>
@@ -95,11 +110,11 @@ const Customer_Header = () => {
             {/* Notifications */}
             <div className="relative">
               {/* <button 
-                className="text-white hover:text-red-400 p-2 rounded-full hover:bg-gray-700 transition-colors"
+                className="text-white hover:text-green-400 p-2 rounded-full hover:bg-gray-700 transition-colors"
                 onClick={toggleNotifications}
               >
                 <Bell className="h-6 w-6" />
-                <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-red-500 text-xs flex items-center justify-center">3</span>
+                <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-green-500 text-xs flex items-center justify-center">3</span>
               </button> */}
               
               {/* {notificationsOpen && (
@@ -142,7 +157,7 @@ const Customer_Header = () => {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                   <Link 
-                    to={`/customer/profile/${userId}`}
+                    to={`/farmer/profile/${userId}`}
                     className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md"
                     onClick={() => setDropdownOpen(false)}
                   >
@@ -154,7 +169,7 @@ const Customer_Header = () => {
                   <div className="border-t border-gray-100"></div>
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-gray-100 rounded-b-md"
+                    className="block w-full text-left px-4 py-3 text-sm text-green-600 hover:bg-gray-100 rounded-b-md"
                   >
                     <div className="flex items-center">
                       <LogOut className="h-4 w-4 mr-2" />
@@ -170,7 +185,7 @@ const Customer_Header = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-white hover:text-red-400 focus:outline-none p-2 rounded-md"
+              className="text-white hover:text-green-400 focus:outline-none p-2 rounded-md"
             >
               <Menu className="h-6 w-6" />
             </button>
@@ -191,7 +206,7 @@ const Customer_Header = () => {
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-white hover:text-red-400 focus:outline-none p-2 rounded-full hover:bg-gray-700"
+            className="text-white hover:text-green-400 focus:outline-none p-2 rounded-full hover:bg-gray-700"
           >
             <X className="h-6 w-6" />
           </button>
@@ -217,7 +232,7 @@ const Customer_Header = () => {
               to={link.path}
               className={`text-white flex items-center space-x-3 p-3 rounded-md transition-colors duration-200 mb-2 ${
                 isActive(link.path)
-                  ? "bg-red-600 hover:bg-red-700"
+                  ? "bg-green-600 hover:bg-green-700"
                   : "hover:bg-gray-700"
               }`}
               onClick={() => setIsOpen(false)}
@@ -234,7 +249,7 @@ const Customer_Header = () => {
               handleLogout();
               setIsOpen(false);
             }}
-            className="text-white hover:text-red-400 flex items-center space-x-3 p-3 rounded-md hover:bg-gray-700 transition-colors duration-200"
+            className="text-white hover:text-green-400 flex items-center space-x-3 p-3 rounded-md hover:bg-gray-700 transition-colors duration-200"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>

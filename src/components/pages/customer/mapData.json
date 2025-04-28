@@ -1,40 +1,10 @@
 {
     "provinces": [
         {
-            "city": "Kigali",
+
             "country": "Rwanda",
             "coordinates": {
-              "city_center": {
-                "latitude": -1.9441,
-                "longitude": 30.0619
-              },
-              "notable_locations": [
-                {
-                  "name": "Kigali International Airport",
-                  "latitude": -1.9686,
-                  "longitude": 30.1345
-                },
-                {
-                  "name": "Kigali Convention Centre",
-                  "latitude": -1.9557,
-                  "longitude": 30.0939
-                },
-                {
-                  "name": "Kigali Genocide Memorial",
-                  "latitude": -1.9227,
-                  "longitude": 30.0590
-                },
-                {
-                  "name": "Nyamirambo District",
-                  "latitude": -1.9827,
-                  "longitude": 30.0434
-                },
-                {
-                  "name": "Kimironko Market",
-                  "latitude": -1.9335,
-                  "longitude": 30.1139
-                }
-              ],
+              
               "districts": [
                 {
                   "name": "Nyarugenge",
@@ -226,44 +196,7 @@
                       "longitude": 30.1240
                     }
                   ]
-                }
-              ],
-              "boundaries": {
-                "north": -1.8470,
-                "south": -2.0800,
-                "east": 30.1930,
-                "west": 29.9740
-              }
-            }
-          },
-
-          {
-            "province": "Northern Province",
-            "local_name": "Amajyaruguru",
-            "country": "Rwanda",
-            "coordinates": {
-              "province_center": {
-                "latitude": -1.5359,
-                "longitude": 29.8608
-              },
-              "notable_locations": [
-                {
-                  "name": "Volcanoes National Park",
-                  "latitude": -1.4700,
-                  "longitude": 29.5200
                 },
-                {
-                  "name": "Twin Lakes (Burera and Ruhondo)",
-                  "latitude": -1.4456,
-                  "longitude": 29.7361
-                },
-                {
-                  "name": "Musanze Cave",
-                  "latitude": -1.5000,
-                  "longitude": 29.6333
-                }
-              ],
-              "districts": [
                 {
                   "name": "Musanze",
                   "latitude": -1.4973,
@@ -743,44 +676,7 @@
                       "longitude": 29.9069
                     }
                   ]
-                }
-              ],
-              "boundaries": {
-                "north": -1.2720,
-                "south": -1.8750,
-                "east": 30.2190,
-                "west": 29.4800
-              }
-            }
-          },
-
-          {
-            "province": "Eastern Province",
-            "local_name": "Iburasirazuba",
-            "country": "Rwanda",
-            "coordinates": {
-              "province_center": {
-                "latitude": -1.9500,
-                "longitude": 30.4900
-              },
-              "notable_locations": [
-                {
-                  "name": "Akagera National Park",
-                  "latitude": -1.8800,
-                  "longitude": 30.7300
                 },
-                {
-                  "name": "Lake Muhazi",
-                  "latitude": -1.8600,
-                  "longitude": 30.3400
-                },
-                {
-                  "name": "Lake Mugesera",
-                  "latitude": -2.1300,
-                  "longitude": 30.4100
-                }
-              ],
-              "districts": [
                 {
                   "name": "Nyagatare",
                   "latitude": -1.3344,
@@ -1294,44 +1190,7 @@
                       "longitude": 30.2072
                     }
                   ]
-                }
-              ],
-              "boundaries": {
-                "north": -1.0500,
-                "south": -2.4300,
-                "east": 30.8900,
-                "west": 30.0600
-              }
-            }
-          },
-
-          {
-            "province": "Southern Province",
-            "local_name": "Amajyepfo",
-            "country": "Rwanda",
-            "coordinates": {
-              "province_center": {
-                "latitude": -2.1164,
-                "longitude": 29.6563
-              },
-              "notable_locations": [
-                {
-                  "name": "Nyungwe National Park",
-                  "latitude": -2.5275,
-                  "longitude": 29.2211
                 },
-                {
-                  "name": "Lake Kivu (Eastern Shore)",
-                  "latitude": -2.0486,
-                  "longitude": 29.2239
-                },
-                {
-                  "name": "King's Palace Museum (Nyanza)",
-                  "latitude": -2.3517,
-                  "longitude": 29.7483
-                }
-              ],
-              "districts": [
                 {
                   "name": "Nyanza",
                   "latitude": -2.3517,
@@ -1897,44 +1756,7 @@
                       "longitude": 29.9956
                     }
                   ]
-                }
-              ],
-              "boundaries": {
-                "north": -1.9000,
-                "south": -2.8800,
-                "east": 30.0000,
-                "west": 29.2000
-              }
-            }
-          },
-
-          {
-            "province": "Western Province",
-            "local_name": "Amajyepfo-Iburengerazuba",
-            "country": "Rwanda",
-            "coordinates": {
-              "province_center": {
-                "latitude": -2.0100,
-                "longitude": 29.3500
-              },
-              "notable_locations": [
-                {
-                  "name": "Lake Kivu",
-                  "latitude": -2.0500,
-                  "longitude": 29.2300
                 },
-                {
-                  "name": "Volcanoes National Park",
-                  "latitude": -1.4867,
-                  "longitude": 29.4767
-                },
-                {
-                  "name": "Gisenyi Beach",
-                  "latitude": -1.7025,
-                  "longitude": 29.2569
-                }
-              ],
-              "districts": [
                 {
                   "name": "Rubavu",
                   "latitude": -1.6794,
@@ -2459,14 +2281,11 @@
                     }
                   ]
                 }
-              ],
-              "boundaries": {
-                "north": -1.4800,
-                "south": -2.7800,
-                "east": 29.6500,
-                "west": 28.8700
-              }
+              ]
+             
             }
           }
+
+
     ]
 }

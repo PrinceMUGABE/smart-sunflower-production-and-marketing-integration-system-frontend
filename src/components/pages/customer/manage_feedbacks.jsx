@@ -54,11 +54,11 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="p-4 text-red-100 bg-red-900 rounded-lg">
+        <div className="p-4 text-green-100 bg-green-900 rounded-lg">
           <h3 className="font-semibold">Something went wrong</h3>
           <button
             onClick={() => window.location.reload()}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
             Refresh Page
           </button>
@@ -102,7 +102,7 @@ function Customer_Manage_Feedbacks() {
 
   const COLORS = ["#FF6B6B", "#4ECDC4", "#FFD166", "#F9F871", "#A58FE3"];
   const BASE_URL = "http://127.0.0.1:8000/feedback/";
-  const RELOCATIONS_URL = "http://127.0.0.1:8000/relocation/get-driver/";
+  const RELOCATIONS_URL = "http://127.0.0.1:8000/weather/user/";
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -297,9 +297,9 @@ function Customer_Manage_Feedbacks() {
       return <FontAwesomeIcon icon={faSort} className="ml-1 text-gray-500" />;
     }
     return sortConfig.direction === "ascending" ? (
-      <FontAwesomeIcon icon={faSortUp} className="ml-1 text-red-400" />
+      <FontAwesomeIcon icon={faSortUp} className="ml-1 text-green-400" />
     ) : (
-      <FontAwesomeIcon icon={faSortDown} className="ml-1 text-red-400" />
+      <FontAwesomeIcon icon={faSortDown} className="ml-1 text-green-400" />
     );
   };
 
@@ -457,7 +457,7 @@ function Customer_Manage_Feedbacks() {
     const relocationRatings = {};
     feedbackData.forEach((feedback) => {
       if (feedback.relocation) {
-        const relocationName = `${feedback.relocation.start_point} to ${feedback.relocation.end_point}`;
+        const relocationName = `${feedback.relocation.district} - ${feedback.relocation.sector}`;
         if (!relocationRatings[relocationName]) {
           relocationRatings[relocationName] = { total: 0, count: 0 };
         }
@@ -485,7 +485,7 @@ function Customer_Manage_Feedbacks() {
               Average Rating
             </h3>
             <div className="flex items-center">
-              <span className="text-2xl font-bold text-red-400">
+              <span className="text-2xl font-bold text-green-400">
                 {summaryStats.averageRating}
               </span>
               <div className="ml-2">
@@ -498,7 +498,7 @@ function Customer_Manage_Feedbacks() {
             <h3 className="text-xs uppercase font-semibold text-gray-500 mb-1">
               Total Feedbacks
             </h3>
-            <span className="text-2xl font-bold text-red-400">
+            <span className="text-2xl font-bold text-green-400">
               {summaryStats.totalFeedbacks}
             </span>
           </div>
@@ -506,7 +506,7 @@ function Customer_Manage_Feedbacks() {
 
         <ErrorBoundary>
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
-            <h3 className="text-sm font-semibold mb-4 text-red-400 flex items-center">
+            <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faStar} className="mr-2" />
               Rating Distribution
             </h3>
@@ -551,7 +551,7 @@ function Customer_Manage_Feedbacks() {
 
         <ErrorBoundary>
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
-            <h3 className="text-sm font-semibold mb-4 text-red-400 flex items-center">
+            <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faChartPie} className="mr-2" />
               Average Rating Trend
             </h3>
@@ -588,7 +588,7 @@ function Customer_Manage_Feedbacks() {
 
         <ErrorBoundary>
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-80">
-            <h3 className="text-sm font-semibold mb-4 text-red-400 flex items-center">
+            <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
               Top Relocation Routes (Avg Rating)
             </h3>
@@ -658,7 +658,7 @@ function Customer_Manage_Feedbacks() {
                   onClick={() => handleFilterChange("rating", rating)}
                   className={`px-3 py-1 rounded-full flex items-center ${
                     filterConfig.rating.includes(rating)
-                      ? "bg-red-600 text-white"
+                      ? "bg-green-600 text-white"
                       : "bg-gray-700 text-gray-300"
                   }`}
                 >
@@ -721,10 +721,10 @@ function Customer_Manage_Feedbacks() {
               onChange={(e) => handleFilterChange("relocation", e.target.value)}
               className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-300"
             >
-              <option value="">All Routes</option>
+              <option value="">All Seasons</option>
               {relocations.map((relocation) => (
                 <option key={relocation.id} value={relocation.id}>
-                  {relocation.start_point} to {relocation.end_point}
+                  {relocation.season}
                 </option>
               ))}
             </select>
@@ -758,7 +758,7 @@ function Customer_Manage_Feedbacks() {
           onClick={() => setIsModalOpen(false)}
         ></div>
         <div className="bg-gray-900 rounded-lg shadow-xl p-6 z-50 w-96 border border-gray-800">
-          <h2 className="text-xl font-bold mb-4 text-red-500">
+          <h2 className="text-xl font-bold mb-4 text-green-500">
             {currentFeedback ? "Update Feedback" : "Add New Feedback"}
           </h2>
           <form onSubmit={handleAddUpdateFeedback}>
@@ -786,7 +786,7 @@ function Customer_Manage_Feedbacks() {
                 </select>
               </div>
               <div>
-                <label className="block text-gray-300 mb-2">Relocation</label>
+                <label className="block text-gray-300 mb-2">Prediction</label>
                 <select
                   name="relocation"
                   defaultValue={currentFeedback?.relocation?.id || ""}
@@ -795,7 +795,7 @@ function Customer_Manage_Feedbacks() {
                 >
                   {relocations.map((relocation) => (
                     <option key={relocation.id} value={relocation.id}>
-                      {relocation.origin_district}-{relocation.origin_sector} to {relocation.destination_district}-{relocation.destination_sector}
+                      {relocation.sector}-{relocation.altitude} to {relocation.soil_type}-{relocation.season}
                     </option>
                   ))}
                 </select>
@@ -824,7 +824,7 @@ function Customer_Manage_Feedbacks() {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
               >
                 {currentFeedback ? "Update" : "Add"}
               </button>
@@ -853,7 +853,7 @@ function Customer_Manage_Feedbacks() {
           onClick={() => setIsCommentModalOpen(false)}
         ></div>
         <div className="bg-gray-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-lg border border-gray-800">
-          <h2 className="text-xl font-bold mb-4 text-red-500 flex items-center">
+          <h2 className="text-xl font-bold mb-4 text-green-500 flex items-center">
             <FontAwesomeIcon icon={faComment} className="mr-2" />
             Feedback Comment
           </h2>
@@ -863,7 +863,7 @@ function Customer_Manage_Feedbacks() {
           <div className="flex justify-end mt-6">
             <button
               onClick={() => setIsCommentModalOpen(false)}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             >
               Close
             </button>
@@ -880,7 +880,7 @@ function Customer_Manage_Feedbacks() {
           className={`p-4 mb-4 rounded-lg ${
             messageType === "success"
               ? "bg-green-800 text-green-100"
-              : "bg-red-800 text-red-100"
+              : "bg-green-800 text-green-100"
           }`}
         >
           {message}
@@ -890,7 +890,7 @@ function Customer_Manage_Feedbacks() {
       <div className="flex flex-col lg:flex-row space-y-6 lg:space-y-0 lg:space-x-6">
         <div className="w-full lg:w-2/3 space-y-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-            <h1 className="text-2xl font-bold text-red-400">
+            <h1 className="text-2xl font-bold text-green-400">
               Manage Feedbacks
             </h1>
 
@@ -903,7 +903,7 @@ function Customer_Manage_Feedbacks() {
                   <FontAwesomeIcon icon={faFilter} className="mr-2" />
                   Filters
                   {activeFilters > 0 && (
-                    <span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
+                    <span className="ml-2 px-2 py-0.5 bg-green-500 text-white text-xs rounded-full">
                       {activeFilters}
                     </span>
                   )}
@@ -958,7 +958,7 @@ function Customer_Manage_Feedbacks() {
 
               <button
                 onClick={() => openModal()}
-                className="flex items-center px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition"
+                className="flex items-center px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2" />
                 Add Feedback
@@ -1026,7 +1026,7 @@ function Customer_Manage_Feedbacks() {
                                 onClick={() =>
                                   openCommentModal(feedback.comment)
                                 }
-                                className="ml-2 text-red-400 hover:text-red-300"
+                                className="ml-2 text-green-400 hover:text-green-300"
                               >
                                 <FontAwesomeIcon icon={faEye} />
                               </button>
@@ -1047,11 +1047,11 @@ function Customer_Manage_Feedbacks() {
                           {feedback.relocation ? (
                             <div className="flex flex-col">
                               <span className="font-medium">
-                                {feedback.relocation.origin_district},{feedback.relocation.origin_sector}
-                                <p className="text-red-800">to</p>
+                                {feedback.relocation.district},{feedback.relocation.sector}
+                                <p className="text-green-800">with</p>
                               </span>
                               <span className="font-medium">
-                                {feedback.relocation.destination_district},{feedback.relocation.destination_sector}
+                                {feedback.relocation.altitude},{feedback.relocation.soil_type}
                               </span>
                             </div>
                           ) : (
@@ -1072,7 +1072,7 @@ function Customer_Manage_Feedbacks() {
                             </button>
                             <button
                               onClick={() => handleDelete(feedback.id)}
-                              className="text-red-400 hover:text-red-300"
+                              className="text-green-400 hover:text-green-300"
                               title="Delete"
                             >
                               <FontAwesomeIcon icon={faTrash} />
