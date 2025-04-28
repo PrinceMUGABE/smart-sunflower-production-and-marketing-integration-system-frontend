@@ -577,7 +577,7 @@ const adaptPredictionsData = (predictionsData) => {
   if (error) {
     return (
       <div className="mt-20 p-6 flex items-center justify-center">
-        <div className="text-lg font-semibold text-red-600">Error: {error}</div>
+        <div className="text-lg font-semibold text-green-600">Error: {error}</div>
       </div>
     );
   }
@@ -592,7 +592,7 @@ const adaptPredictionsData = (predictionsData) => {
   return (
     <div className="p-6 space-y-6 bg-gray-950 min-h-screen text-gray-300">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-red-500">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-green-500">Admin Dashboard</h1>
         <div className="flex space-x-4">
           <select
             className="bg-gray-800 text-gray-300 rounded-md border border-gray-700 px-3 py-2"
@@ -613,7 +613,7 @@ const adaptPredictionsData = (predictionsData) => {
           <div className="p-5">
             <div className="flex items-center">
               <div className="rounded-full bg-gray-800 p-3">
-                <Users className="h-6 w-6 text-red-500" />
+                <Users className="h-6 w-6 text-green-500" />
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-400">Total Users</p>
@@ -638,7 +638,7 @@ const adaptPredictionsData = (predictionsData) => {
           <div className="p-5">
             <div className="flex items-center">
               <div className="rounded-full bg-gray-800 p-3">
-                <MapPin className="h-6 w-6 text-red-500" />
+                <MapPin className="h-6 w-6 text-green-500" />
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-400">Predictions</p>
@@ -663,7 +663,7 @@ const adaptPredictionsData = (predictionsData) => {
           <div className="p-5">
             <div className="flex items-center">
               <div className="rounded-full bg-gray-800 p-3">
-                <Activity className="h-6 w-6 text-red-500" />
+                <Activity className="h-6 w-6 text-green-500" />
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-400">Feedbacks</p>
@@ -679,7 +679,7 @@ const adaptPredictionsData = (predictionsData) => {
                   <span className="text-gray-400">
                     {feedbackMetrics.positiveCount || 0}
                   </span>
-                  <ThumbsDown className="h-4 w-4 text-red-400 ml-3 mr-1" />
+                  <ThumbsDown className="h-4 w-4 text-green-400 ml-3 mr-1" />
                   <span className="text-gray-400">
                     {feedbackMetrics.negativeCount || 0}
                   </span>
@@ -697,7 +697,7 @@ const adaptPredictionsData = (predictionsData) => {
           <div className="p-5">
             <div className="flex items-center">
               <div className="rounded-full bg-gray-800 p-3">
-                <Database className="h-6 w-6 text-red-500" />
+                <Database className="h-6 w-6 text-green-500" />
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-400">Datasets</p>
@@ -720,7 +720,7 @@ const adaptPredictionsData = (predictionsData) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* Time Series Chart - Activity Over Time */}
         <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
-          <h3 className="text-lg font-semibold mb-4 text-red-500">
+          <h3 className="text-lg font-semibold mb-4 text-green-500">
             Activity Over Time
           </h3>
           <div className="h-80">
@@ -785,7 +785,7 @@ const adaptPredictionsData = (predictionsData) => {
   
         {/* User Distribution Chart */}
         <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
-          <h3 className="text-lg font-semibold mb-4 text-red-500">
+          <h3 className="text-lg font-semibold mb-4 text-green-500">
             User Role Distribution
           </h3>
           <div className="h-80">
@@ -854,7 +854,7 @@ const adaptPredictionsData = (predictionsData) => {
   
         {/* Feedback Distribution Chart */}
         <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
-          <h3 className="text-lg font-semibold mb-4 text-red-500">
+          <h3 className="text-lg font-semibold mb-4 text-green-500">
             Feedback Rating Distribution
           </h3>
           <div className="h-80">
@@ -907,7 +907,7 @@ const adaptPredictionsData = (predictionsData) => {
   
         {/* Feedback Trend Chart */}
         <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
-          <h3 className="text-lg font-semibold mb-4 text-red-500">
+          <h3 className="text-lg font-semibold mb-4 text-green-500">
             Feedback Rating Trend
           </h3>
           <div className="h-80">
@@ -970,7 +970,7 @@ const adaptPredictionsData = (predictionsData) => {
 
         {/* Prediction Status Distribution */}
         <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
-          <h3 className="text-lg font-semibold mb-4 text-red-500">
+          <h3 className="text-lg font-semibold mb-4 text-green-500">
             Prediction Status Distribution
           </h3>
           <div className="h-80">
@@ -1031,7 +1031,7 @@ const adaptPredictionsData = (predictionsData) => {
 
         {/* Dataset Statistics */}
         <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
-          <h3 className="text-lg font-semibold mb-4 text-red-500">
+          <h3 className="text-lg font-semibold mb-4 text-green-500">
             Dataset Statistics
           </h3>
           <div className="h-80 flex flex-col justify-center">
@@ -1112,11 +1112,11 @@ const adaptPredictionsData = (predictionsData) => {
 
       {/* Additional Statistics Section */}
       <div className="mt-8">
-        <h2 className="text-xl font-bold text-red-500 mb-4">System Overview</h2>
+        <h2 className="text-xl font-bold text-green-500 mb-4">System Overview</h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* User Growth */}
           <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
-            <h3 className="text-lg font-semibold mb-4 text-red-400">User Growth</h3>
+            <h3 className="text-lg font-semibold mb-4 text-green-400">User Growth</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Total Users</span>
@@ -1141,32 +1141,32 @@ const adaptPredictionsData = (predictionsData) => {
 
           {/* Prediction Statistics */}
           <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
-            <h3 className="text-lg font-semibold mb-4 text-red-400">Prediction Statistics</h3>
+            <h3 className="text-lg font-semibold mb-4 text-green-400">Prediction Statistics</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Total Predictions</span>
                 <span className="text-lg font-semibold text-gray-200">{predictionData.length}</span>
               </div>
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <span className="text-gray-400">Completed Predictions</span>
                 <span className="text-lg font-semibold text-gray-200">
                   {predictionData.filter(p => p.status?.toLowerCase() === 'completed').length}
                 </span>
-              </div>
-              <div className="flex justify-between items-center">
+              </div> */}
+              {/* <div className="flex justify-between items-center">
                 <span className="text-gray-400">Completion Rate</span>
                 <span className="text-lg font-semibold text-blue-400">
                   {predictionData.length > 0 ? 
                     `${((predictionData.filter(p => p.status?.toLowerCase() === 'completed').length / predictionData.length) * 100).toFixed(1)}%` : 
                     '0%'}
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
 
           {/* Feedback Summary */}
           <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
-            <h3 className="text-lg font-semibold mb-4 text-red-400">Feedback Summary</h3>
+            <h3 className="text-lg font-semibold mb-4 text-green-400">Feedback Summary</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Average Rating</span>

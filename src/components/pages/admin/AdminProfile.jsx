@@ -201,7 +201,7 @@ function AdminProfile() {
   return (
     <section className="bg-gray-800 min-h-screen flex items-center justify-center px-4 py-16">
       {/* Background overlay with image */}
-      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${profileImage})` }}></div>
+      {/* <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${profileImage})` }}></div> */}
 
       <div className="container mx-auto max-w-2xl z-10">
         <div className="text-center mb-8">
