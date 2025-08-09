@@ -185,7 +185,7 @@ function AdminProfile() {
 
   if (!userData) {
     return (
-      <section className="bg-gray-800 min-h-screen flex items-center justify-center">
+      <section className="bg-yellow-800 min-h-screen flex items-center justify-center">
         <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${profileImage})` }}></div>
         <div className="text-white text-xl flex items-center z-10">
           <svg className="animate-spin h-8 w-8 mr-3 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -199,7 +199,7 @@ function AdminProfile() {
   }
 
   return (
-    <section className="bg-gray-800 min-h-screen flex items-center justify-center px-4 py-16">
+    <section className="bg-yellow-800 min-h-screen flex items-center justify-center px-4 py-16">
       {/* Background overlay with image */}
       {/* <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${profileImage})` }}></div> */}
 
@@ -213,8 +213,8 @@ function AdminProfile() {
           </p>
         </div>
 
-        <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-6 bg-green-600 text-white">
+        <div className="bg-yellow-900 rounded-lg shadow-xl overflow-hidden">
+          <div className="p-6 bg-yellow-600 text-white">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <User className="h-5 w-5" />
               Profile Information
@@ -225,7 +225,7 @@ function AdminProfile() {
           </div>
 
           {error && (
-            <div className="mx-6 mt-6 p-3 rounded bg-green-900 text-green-100">
+            <div className="mx-6 mt-6 p-3 rounded bg-yellow-900 text-green-100">
               {error}
             </div>
           )}
@@ -234,8 +234,8 @@ function AdminProfile() {
             {!isEditing ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
-                    <div className="p-2 bg-gray-700 rounded-full mr-4">
+                  <div className="p-4 bg-yellow-800 border border-gray-700 rounded-lg flex items-start">
+                    <div className="p-2 bg-yellow-700 rounded-full mr-4">
                       <Phone className="h-5 w-5 text-green-500" />
                     </div>
                     <div>
@@ -244,8 +244,8 @@ function AdminProfile() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
-                    <div className="p-2 bg-gray-700 rounded-full mr-4">
+                  <div className="p-4 bg-yellow-800 border border-gray-700 rounded-lg flex items-start">
+                    <div className="p-2 bg-yellow-700 rounded-full mr-4">
                       <Mail className="h-5 w-5 text-green-500" />
                     </div>
                     <div>
@@ -254,8 +254,8 @@ function AdminProfile() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
-                    <div className="p-2 bg-gray-700 rounded-full mr-4">
+                  <div className="p-4 bg-yellow-800 border border-gray-700 rounded-lg flex items-start">
+                    <div className="p-2 bg-yellow-700 rounded-full mr-4">
                       <User className="h-5 w-5 text-green-500" />
                     </div>
                     <div>
@@ -264,8 +264,8 @@ function AdminProfile() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
-                    <div className="p-2 bg-gray-700 rounded-full mr-4">
+                  <div className="p-4 bg-yellow-800 border border-gray-700 rounded-lg flex items-start">
+                    <div className="p-2 bg-yellow-700 rounded-full mr-4">
                       <Clock className="h-5 w-5 text-green-500" />
                     </div>
                     <div>
@@ -280,7 +280,7 @@ function AdminProfile() {
                 <div className="flex justify-center mt-8">
                   <button
                     onClick={handleEditClick}
-                    className="px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-md transition duration-200 ease-in-out flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                    className="px-6 py-3 text-white bg-yellow-600 hover:bg-yellow-700 rounded-md transition duration-200 ease-in-out flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
                   >
                     <Edit className="h-5 w-5" />
                     Edit Profile
@@ -308,7 +308,7 @@ function AdminProfile() {
                         value={formData.phone_number}
                         onChange={handleChange}
                         placeholder="e.g., 0781234567"
-                        className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+                        className="w-full p-3 pl-10 bg-yellow-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
                         required
                       />
                     </div>
@@ -332,7 +332,7 @@ function AdminProfile() {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="e.g., example@gmail.com"
-                        className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+                        className="w-full p-3 pl-10 bg-yellow-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
                         required
                       />
                     </div>
@@ -355,7 +355,7 @@ function AdminProfile() {
                         name="role"
                         value={formData.role}
                         readOnly
-                        className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-gray-400 cursor-not-allowed"
+                        className="w-full p-3 pl-10 bg-yellow-800 border border-gray-700 rounded-md text-gray-400 cursor-not-allowed"
                         required
                       />
                     </div>
@@ -366,7 +366,7 @@ function AdminProfile() {
                   <button
                     type="button"
                     onClick={handleEditClick}
-                    className="px-6 py-3 text-white bg-gray-700 hover:bg-gray-600 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                    className="px-6 py-3 text-white bg-yellow-700 hover:bg-yellow-600 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                   >
                     <X className="h-5 w-5" />
                     Cancel
@@ -374,7 +374,7 @@ function AdminProfile() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50"
+                    className="px-6 py-3 text-white bg-yellow-600 hover:bg-yellow-700 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 disabled:opacity-50"
                   >
                     {isLoading ? (
                       <>

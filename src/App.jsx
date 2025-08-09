@@ -36,15 +36,28 @@ import Admin_Manage_Relocations from "./components/pages/admin/manage_relocation
 import Admin_Create_Relocation from "./components/pages/admin/create_relocation.jsx";
 import Admin_Manage_Feedbacks from "./components/pages/admin/manage_feedbacks.jsx";
 import Customer_Manage_Feedbacks from "./components/pages/customer/manage_feedbacks.jsx";
-import Driver_Layout from "./components/driver/Layout.jsx";
-import Driver_Home from "./components/pages/driver/Home.jsx";
-import Driver_VehiclesDisplay from "./components/pages/driver/vehicles.jsx";
-import Driver_Map from "./components/pages/driver/map.jsx";
-import Driver_Manage_Feedbacks from "./components/pages/driver/manage_feedbacks.jsx";
-import DriverProfile from "./components/pages/driver/UserProfile.jsx";
-import Driver_Manage_Relocations from "./components/pages/driver/my_relocations.jsx";
-import Datasets from "./components/pages/admin/manage_inventories.jsx";
+import Datasets from "./components/pages/admin/manage_datasets.jsx";
 import Farmer_Manage_predictions from "./components/pages/customer/create_relocation.jsx";
+import Admin_Manage_SunflowerHarvests from "./components/pages/admin/Admin_Manage_Sunflowers.jsx";
+import Farmer_Manage_Stocks from './components/pages/customer/My_Harvest.jsx';
+import Farmer_StockMovementManagement from "./components/pages/customer/My_Stock_Movements.jsx";
+import Admin_Manage_Stocks from "./components/pages/admin/Manage_Stocks.jsx";
+import StockMovementManagement from "./components/pages/admin/Stock_Movements.jsx";
+import FarmerSalesManagement from "./components/pages/customer/manage_my_sales.jsx";
+import SaleDetailView from "./components/pages/customer/sale_details_page.jsx";
+import EditSaleView from "./components/pages/customer/edit_sale_deteil_page.jsx";
+import Manage_Sales from "./components/pages/admin/manage_sales.jsx";
+import Admin_SaleDetailView from "./components/pages/admin/sale_details_page.jsx";
+import Officer_Layout from "./components/officer/Layout.jsx";
+import Officer_Home from "./components/pages/officer/Home.jsx";
+import Officer_Manage_Stocks from "./components/pages/officer/manage_stocks.jsx";
+import Officer_Manage_Sales from "./components/pages/officer/manage_sales.jsx";
+import Officer_Manage_Feedbacks from "./components/pages/officer/manage_feedbacks.jsx";
+import Officer_SaleDetailView from "./components/pages/officer/sale_details.jsx";
+import OfficerProfile from "./components/pages/officer/officer_profile.jsx";
+import Officer_StockMovementManagement from "./components/pages/officer/stock_movements.jsx";
+import Officer_Datasets from "./components/pages/officer/maanage_datasets.jsx";
+import Officer_Manage_predictions from "./components/pages/officer/manage_predictions.jsx";
 
 
 
@@ -90,9 +103,19 @@ const App = () => {
 
 
             <Route path="/admin/drivers" element={<Admin_Manage_Drivers />} />
+            <Route path="/admin/harvest" element={<Admin_Manage_SunflowerHarvests />} />
             <Route path="/admin/feedbacks" element={<Admin_Manage_Feedbacks />} />
             <Route path="/admin/weather" element={<Admin_DemandForecast />} />
             <Route path="/admin/profile/:id" element={<AdminProfile />} />
+            <Route path="/admin/sales" element={<Manage_Sales />} />
+            <Route path="/admin/sales/:saleId" element={<Admin_SaleDetailView />} />
+
+
+            <Route path="/admin/stock" element={<Admin_Manage_Stocks />} />
+            <Route path="/admin/stocks/:stockId/movements" element={<StockMovementManagement />} />
+
+
+            
 
           </Route>
 
@@ -103,6 +126,11 @@ const App = () => {
             <Route index element={<UserHome />} />
             <Route path="/farmer/predictions" element={<Farmer_Manage_predictions />} />
             <Route path="/farmer/feedbacks" element={<Customer_Manage_Feedbacks />} />
+            <Route path="/farmer/stock" element={<Farmer_Manage_Stocks />} />
+            <Route path="/farmer/sales" element={<FarmerSalesManagement />} />
+            <Route path="/farmer/sales/:saleId" element={<SaleDetailView />} />
+            <Route path="/farmer/sales/edit/:saleId" element={<EditSaleView />} />
+            <Route path="/farmer/stocks/:stockId/movements" element={<Farmer_StockMovementManagement />} />
 
             <Route path="/farmer/profile/:id" element={<UserProfile />} />
      
@@ -110,15 +138,18 @@ const App = () => {
 
 
 
-          <Route path="/driver" element={<Driver_Layout />}>
-            <Route index element={<Driver_Home />} />
-            <Route path="/driver/vehicles" element={<Driver_VehiclesDisplay />} />
-            <Route path="/driver/predict" element={<Driver_Map />} />
-            <Route path="/driver/feedbacks" element={<Driver_Manage_Feedbacks />} />
+          <Route path="/officer" element={<Officer_Layout />}>
+            <Route index element={<Officer_Home />} />
+            <Route path="/officer/sales" element={<Officer_Manage_Sales />} />
+            <Route path="/officer/stocks" element={<Officer_Manage_Stocks />} />
+            <Route path="/officer/feedbacks" element={<Officer_Manage_Feedbacks />} />
+            <Route path="/officer/sales/:saleId" element={<Officer_SaleDetailView />} />
+            <Route path="/officer/stocks/:stockId/movements" element={<Officer_StockMovementManagement />} />
+            <Route path="/officer/datasets" element={<Officer_Datasets />} />
+            <Route path="/officer/predictions" element={<Officer_Manage_predictions />} />
 
-            <Route path="/driver/profile" element={<DriverProfile />} />
+            <Route path="/officer/profile/:id" element={<OfficerProfile />} />
 
-            <Route path="/driver/relocations" element={<Driver_Manage_Relocations />} />
      
           </Route>
 

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, CheckCircle, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
-import loginImage from "../../assets/pictures/coffee.jpg";
+import sunflowerField from "../../assets/pictures/sunflower6.jpeg";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const ResetPassword = () => {
   };
 
   const validatePassword = (password) => {
-    const minLength = 5;
+    const minLength = 8;
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
     const hasUppercase = /[A-Z]/.test(password);
     const hasLowercase = /[a-z]/.test(password);
@@ -64,7 +64,7 @@ const ResetPassword = () => {
 
     if (!validatePassword(formData.new_password)) {
       setIsLoading(false);
-      setError('Password must be at least 5 characters long, contain a special character, an uppercase letter, a lowercase letter, and a number.');
+      setError('Password must be at least 8 characters long, contain a special character, an uppercase letter, a lowercase letter, and a number.');
       return;
     }
 
@@ -76,7 +76,6 @@ const ResetPassword = () => {
 
     const csrfToken = getCsrfToken();
     try {
-      // Sending only email and new_password to the backend
       const dataToSend = {
         email: formData.email,
         new_password: formData.new_password
@@ -91,7 +90,7 @@ const ResetPassword = () => {
       setIsLoading(false);
 
       if (response.data.message === "Password reset successfully. A confirmation has been sent to your email.") {
-        setMessage('Password reset successfully. greenirecting to login...');
+        setMessage('Password reset successfully. Redirecting to login...');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
@@ -106,7 +105,7 @@ const ResetPassword = () => {
         } else if (error.response.data && error.response.data.error) {
           setError(error.response.data.error);
         } else {
-          setError('An error occurgreen. Please try again.');
+          setError('An error occurred. Please try again.');
         }
       } else if (error.request) {
         setError('No response from server. Please check your connection.');
@@ -122,52 +121,52 @@ const ResetPassword = () => {
   };
 
   return (
-    <section className="bg-gray-800 min-h-screen flex items-center justify-center px-4 py-16">
-      {/* Background overlay with image */}
+    <section className="bg-yellow-50 min-h-screen flex items-center justify-center px-4 py-16">
+      {/* Background overlay with sunflower field image */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-20"
-        style={{ backgroundImage: `url(${loginImage})` }}
+        style={{ backgroundImage: `url(${sunflowerField})` }}
       ></div>
       
       <div className="container mx-auto w-full z-10">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
             Reset Your Password
           </h2>
-          <p className="text-gray-300 max-w-xl mx-auto">
-            Enter your email and create a new secure password
+          <p className="text-gray-600 max-w-xl mx-auto">
+            Enter your email to reset your password for the Sunflower Production System
           </p>
         </div>
 
-        {/* Form container with responsive width */}
-        <div className="mx-auto bg-gray-900 rounded-lg shadow-xl overflow-hidden 
-                     sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
-          <div className="p-6 bg-green-600 text-white">
-            <h3 className="text-xl font-semibold">Password Recovery</h3>
-            <p className="text-gray-100 mt-1">We'll send a confirmation to your email</p>
+        {/* Form container with sunflower-themed colors */}
+        <div className="mx-auto bg-white rounded-lg shadow-xl overflow-hidden 
+                     sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl border border-yellow-200">
+          <div className="p-6 bg-yellow-600 text-white">
+            <h3 className="text-xl font-semibold">Sunflower System Access</h3>
+            <p className="text-yellow-100 mt-1">Reset your production dashboard password</p>
           </div>
 
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             {error && (
-              <div className="mb-5 p-3 rounded bg-red-900 text-green-100">
+              <div className="mb-5 p-3 rounded bg-red-100 text-red-800 border border-red-200">
                 {error}
               </div>
             )}
             
             {message && (
-              <div className="mb-5 p-3 rounded bg-green-900 text-green-100 flex items-center">
+              <div className="mb-5 p-3 rounded bg-green-100 text-green-800 border border-green-200 flex items-center">
                 <CheckCircle className="h-5 w-5 mr-2" />
                 {message}
               </div>
             )}
 
             <div className="mb-6">
-              <label className="block text-gray-300 mb-2 font-medium">
+              <label className="block text-gray-700 mb-2 font-medium">
                 Email Address
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <Mail className="h-5 w-5 text-yellow-500" />
                 </div>
                 <input
                   id="email"
@@ -175,22 +174,21 @@ const ResetPassword = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter your email address"
-                  className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+                  placeholder="Enter your registered email"
+                  className="w-full p-3 pl-10 bg-yellow-50 border border-yellow-200 rounded-md text-gray-800 placeholder-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   required
                 />
               </div>
             </div>
 
-            {/* On larger screens, arrange password fields side by side */}
             <div className="md:flex md:space-x-4">
               <div className="mb-4 md:w-1/2">
-                <label className="block text-gray-300 mb-2 font-medium">
+                <label className="block text-gray-700 mb-2 font-medium">
                   New Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className="h-5 w-5 text-yellow-500" />
                   </div>
                   <input
                     id="password"
@@ -198,8 +196,8 @@ const ResetPassword = () => {
                     type={showNewPassword ? "text" : "password"}
                     value={formData.new_password}
                     onChange={handleChange}
-                    placeholder="Create a new password"
-                    className="w-full p-3 pl-10 pr-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+                    placeholder="Create a secure password"
+                    className="w-full p-3 pl-10 pr-10 bg-yellow-50 border border-yellow-200 rounded-md text-gray-800 placeholder-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                     required
                   />
                   <div
@@ -207,24 +205,24 @@ const ResetPassword = () => {
                     onClick={() => setShowNewPassword(!showNewPassword)}
                   >
                     {showNewPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400" />
+                      <EyeOff className="h-5 w-5 text-yellow-500" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400" />
+                      <Eye className="h-5 w-5 text-yellow-500" />
                     )}
                   </div>
                 </div>
-                <p className="mt-1 text-xs text-gray-400">
-                  Must contain at least one uppercase letter, lowercase letter, number, and special character.
+                <p className="mt-1 text-xs text-yellow-600">
+                  Must be 8+ characters with uppercase, lowercase, number, and special character.
                 </p>
               </div>
 
               <div className="mb-5 md:w-1/2">
-                <label className="block text-gray-300 mb-2 font-medium">
+                <label className="block text-gray-700 mb-2 font-medium">
                   Confirm Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
+                    <Lock className="h-5 w-5 text-yellow-500" />
                   </div>
                   <input
                     id="confirm_password"
@@ -233,7 +231,7 @@ const ResetPassword = () => {
                     value={formData.confirm_password}
                     onChange={handleChange}
                     placeholder="Confirm your new password"
-                    className="w-full p-3 pl-10 pr-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+                    className="w-full p-3 pl-10 pr-10 bg-yellow-50 border border-yellow-200 rounded-md text-gray-800 placeholder-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                     required
                   />
                   <div
@@ -241,9 +239,9 @@ const ResetPassword = () => {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400" />
+                      <EyeOff className="h-5 w-5 text-yellow-500" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400" />
+                      <Eye className="h-5 w-5 text-yellow-500" />
                     )}
                   </div>
                 </div>
@@ -252,7 +250,7 @@ const ResetPassword = () => {
 
             <button
               type="submit"
-              className="w-full p-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
+              className="w-full p-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -268,10 +266,10 @@ const ResetPassword = () => {
             <div className="mt-5 text-center">
               <Link
                 to="/login"
-                className="text-gray-400 hover:text-white flex items-center justify-center gap-1"
+                className="text-yellow-600 hover:text-yellow-800 flex items-center justify-center gap-1"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back to login
+                Back to Sunflower System Login
               </Link>
             </div>
           </form>

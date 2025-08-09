@@ -45,7 +45,7 @@ const Header = () => {
   ];
 
   return (
-    <nav className="bg-gray-800 shadow-lg py-4">
+    <nav className="bg-yellow-800 shadow-lg py-4">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
           {/* Logo and Brand */}
@@ -59,7 +59,7 @@ const Header = () => {
               <Link
                 key={link.id}
                 to={link.path}
-                className="text-white hover:text-red-400 flex items-center space-x-2 p-2 rounded-md hover:bg-gray-700 transition-colors duration-200"
+                className="text-white hover:text-red-400 flex items-center space-x-2 p-2 rounded-md hover:bg-yellow-700 transition-colors duration-200"
               >
                 <span>{link.icon}</span>
                 <span>{link.name}</span>
@@ -67,7 +67,7 @@ const Header = () => {
             ))}
             <button
               onClick={handleLogout}
-              className="text-white hover:text-red-400 flex items-center space-x-2 p-2 rounded-md hover:bg-gray-700 transition-colors duration-200"
+              className="text-white hover:text-red-400 flex items-center space-x-2 p-2 rounded-md hover:bg-yellow-700 transition-colors duration-200"
             >
               <FaSignOutAlt className="text-xl" />
               <span>Logout</span>
@@ -88,7 +88,7 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-gray-800 transform transition-transform duration-300 ease-in-out z-50 ${
+        className={`fixed top-0 right-0 h-full w-64 bg-yellow-800 transform transition-transform duration-300 ease-in-out z-50 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -106,7 +106,7 @@ const Header = () => {
             <Link
               key={link.id}
               to={link.path}
-              className="text-white hover:text-red-400 flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 transition-colors duration-200"
+              className="text-white hover:text-red-400 flex items-center space-x-3 p-2 rounded-md hover:bg-yellow-700 transition-colors duration-200"
               onClick={() => setIsOpen(false)}
             >
               <span>{link.icon}</span>
@@ -118,7 +118,7 @@ const Header = () => {
               handleLogout();
               setIsOpen(false);
             }}
-            className="text-white hover:text-red-400 flex items-center space-x-3 p-2 rounded-md hover:bg-gray-700 transition-colors duration-200"
+            className="text-white hover:text-red-400 flex items-center space-x-3 p-2 rounded-md hover:bg-yellow-700 transition-colors duration-200"
           >
             <FaSignOutAlt className="text-xl" />
             <span>Logout</span>
@@ -129,7 +129,7 @@ const Header = () => {
       {/* Overlay for mobile menu */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-yellow-800 bg-opacity-50 z-40 md:hidden"
           onClick={() => setIsOpen(false)}
         ></div>
       )}

@@ -1,8 +1,18 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { User, Phone, Mail, Clock, Edit, Save, X, ArrowLeft } from 'lucide-react';
-import profileImage from '../../../assets/pictures/minagri.jpg';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  User,
+  Phone,
+  Mail,
+  Clock,
+  Edit,
+  Save,
+  X,
+  ArrowLeft,
+} from "lucide-react";
+import profileImage from "../../../assets/pictures/minagri.jpg";
+import img from "../../../assets/pictures/sunflower2.jpg";
 
 function UserProfile() {
   const { id } = useParams();
@@ -10,54 +20,56 @@ function UserProfile() {
   const [userData, setUserData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    phone_number: '',
-    email: '',
-    role: ''
+    phone_number: "",
+    email: "",
+    role: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Function to fetch user data from the server
   const fetchUserData = async () => {
     setIsLoading(true);
     try {
-      const accessToken = JSON.parse(localStorage.getItem('userData'))?.access_token;
-      
+      const accessToken = JSON.parse(
+        localStorage.getItem("userData")
+      )?.access_token;
+
       if (!accessToken) {
-        console.error('Access token is missing!');
-        setError('Authentication error. Please log in again.');
+        console.error("Access token is missing!");
+        setError("Authentication error. Please log in again.");
         return;
       }
-      
-      const response = await fetch('http://127.0.0.1:8000/user/', {
-        method: 'GET',
+
+      const response = await fetch("http://127.0.0.1:8000/user/", {
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log("User data retrieved from API:", data);
-        
+
         // Update userData and formData with fresh data
         setUserData({
           ...data,
-          phone: data.phone_number // Ensure compatibility with your component
+          phone: data.phone_number, // Ensure compatibility with your component
         });
-        
+
         setFormData({
           phone_number: data.phone_number,
           email: data.email,
-          role: data.role
+          role: data.role,
         });
       } else {
-        console.error('Failed to fetch user data');
-        setError('Failed to load profile. Please try again.');
+        console.error("Failed to fetch user data");
+        setError("Failed to load profile. Please try again.");
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
-      setError('Network error. Please check your connection.');
+      console.error("Error fetching user data:", error);
+      setError("Network error. Please check your connection.");
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +77,7 @@ function UserProfile() {
 
   // Initial load - try from localStorage first, but then fetch from API
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('userData'));
+    const storedUser = JSON.parse(localStorage.getItem("userData"));
     console.log("Retrieved user from localStorage:", storedUser);
 
     if (storedUser && storedUser.id.toString() === id) {
@@ -73,11 +85,11 @@ function UserProfile() {
       setFormData({
         phone_number: storedUser.phone,
         email: storedUser.email,
-        role: storedUser.role
+        role: storedUser.role,
       });
       console.log("Matching user data:", storedUser);
     }
-    
+
     // Fetch the most up-to-date user data from the server
     fetchUserData();
   }, [id]);
@@ -90,13 +102,13 @@ function UserProfile() {
 
   const handleEditClick = () => {
     setIsEditing(!isEditing);
-    setError('');
+    setError("");
   };
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -112,72 +124,76 @@ function UserProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    
+    setError("");
+
     // Validate phone and email
     if (!validatePhone(formData.phone_number)) {
-      setError("Phone number must be 10 digits and start with 078, 072, 079, or 073.");
+      setError(
+        "Phone number must be 10 digits and start with 078, 072, 079, or 073."
+      );
       return;
     }
-  
+
     if (!validateEmail(formData.email)) {
       setError("Email must be a valid Gmail address ending with @gmail.com.");
       return;
     }
-  
+
     setIsLoading(true);
-    const accessToken = JSON.parse(localStorage.getItem('userData'))?.access_token;
-  
+    const accessToken = JSON.parse(
+      localStorage.getItem("userData")
+    )?.access_token;
+
     if (!accessToken) {
-      console.error('Access token is missing!');
-      setError('Authentication error. Please log in again.');
+      console.error("Access token is missing!");
+      setError("Authentication error. Please log in again.");
       setIsLoading(false);
       return;
     }
-  
+
     const updatedUser = {
       ...userData,
       phone_number: formData.phone_number,
       email: formData.email,
       role: formData.role,
     };
-  
+
     try {
       const response = await fetch(`http://127.0.0.1:8000/update/${id}/`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(updatedUser),
       });
-  
+
       if (response.ok) {
         const updatedData = await response.json();
-        
+
         // Update localStorage with the new data
-        const currentUserData = JSON.parse(localStorage.getItem('userData'));
+        const currentUserData = JSON.parse(localStorage.getItem("userData"));
         const updatedUserData = {
           ...currentUserData,
           phone: updatedData.phone_number,
           phone_number: updatedData.phone_number,
-          email: updatedData.email
+          email: updatedData.email,
         };
-        localStorage.setItem('userData', JSON.stringify(updatedUserData));
-        
+        localStorage.setItem("userData", JSON.stringify(updatedUserData));
+
         // Exit edit mode
         setIsEditing(false);
-        console.log('User data updated:', updatedData);
-        
+        console.log("User data updated:", updatedData);
+
         // Fetch fresh data from the server
         fetchUserData();
       } else {
-        console.error('Failed to update user data');
-        setError('Failed to update profile. Please try again.');
+        console.error("Failed to update user data");
+        setError("Failed to update profile. Please try again.");
       }
     } catch (error) {
-      console.error('Error updating user data:', error);
-      setError('Network error. Please check your connection.');
+      console.error("Error updating user data:", error);
+      setError("Network error. Please check your connection.");
     } finally {
       setIsLoading(false);
     }
@@ -187,9 +203,25 @@ function UserProfile() {
     return (
       <section className="relative py-16 px-4 flex items-center justify-center h-full">
         <div className="text-white text-xl flex items-center z-10">
-          <svg className="animate-spin h-8 w-8 mr-3 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          <svg
+            className="animate-spin h-8 w-8 mr-3 text-yellow-600"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
           </svg>
           Loading your profile...
         </div>
@@ -198,7 +230,15 @@ function UserProfile() {
   }
 
   return (
-    <section className="relative py-16 px-4">
+    <section
+      className="relative py-16 px-4"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(${img})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
       {/* Background overlay with image - contained within this section */}
       {/* <div 
         className="absolute inset-0 bg-cover bg-center opacity-20 z-0" 
@@ -207,27 +247,27 @@ function UserProfile() {
 
       <div className="container mx-auto max-w-2xl relative z-10">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">
-            My Profile
-          </h2>
-          <p className="text-gray-300 max-w-md mx-auto">
+          <h2 className="text-3xl font-bold text-white mb-2">My Profile</h2>
+          <p className="text-yellow-300 max-w-md mx-auto">
             View and manage your account information
           </p>
         </div>
 
-        <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-6 bg-green-600 text-white">
+        <div className="bg-yellow-900 rounded-lg shadow-xl overflow-hidden">
+          <div className="p-6 bg-yellow-600 text-white">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <User className="h-5 w-5" />
               Profile Information
             </h3>
-            <p className="text-gray-100 mt-1">
-              {isEditing ? "Edit your profile details below" : "Your personal account details"}
+            <p className="text-yellow-100 mt-1">
+              {isEditing
+                ? "Edit your profile details below"
+                : "Your personal account details"}
             </p>
           </div>
 
           {error && (
-            <div className="mx-6 mt-6 p-3 rounded bg-green-900 text-green-100">
+            <div className="mx-6 mt-6 p-3 rounded bg-yellow-900 text-yellow-100">
               {error}
             </div>
           )}
@@ -236,44 +276,59 @@ function UserProfile() {
             {!isEditing ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
-                    <div className="p-2 bg-gray-700 rounded-full mr-4">
-                      <Phone className="h-5 w-5 text-green-500" />
+                  <div className="p-4 bg-yellow-800 border border-yellow-700 rounded-lg flex items-start">
+                    <div className="p-2 bg-yellow-700 rounded-full mr-4">
+                      <Phone className="h-5 w-5 text-yellow-500" />
                     </div>
                     <div>
-                      <span className="text-gray-400 text-sm block">Phone Number</span>
-                      <span className="text-white text-lg">{userData.phone || userData.phone_number}</span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
-                    <div className="p-2 bg-gray-700 rounded-full mr-4">
-                      <Mail className="h-5 w-5 text-green-500" />
-                    </div>
-                    <div>
-                      <span className="text-gray-400 text-sm block">Email Address</span>
-                      <span className="text-white text-lg">{userData.email}</span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
-                    <div className="p-2 bg-gray-700 rounded-full mr-4">
-                      <User className="h-5 w-5 text-green-500" />
-                    </div>
-                    <div>
-                      <span className="text-gray-400 text-sm block">Role</span>
-                      <span className="text-white text-lg capitalize">{userData.role}</span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg flex items-start">
-                    <div className="p-2 bg-gray-700 rounded-full mr-4">
-                      <Clock className="h-5 w-5 text-green-500" />
-                    </div>
-                    <div>
-                      <span className="text-gray-400 text-sm block">Member Since</span>
+                      <span className="text-yellow-400 text-sm block">
+                        Phone Number
+                      </span>
                       <span className="text-white text-lg">
-                        {new Date(userData.created_at).toLocaleDateString()} at {new Date(userData.created_at).toLocaleTimeString()}
+                        {userData.phone || userData.phone_number}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-yellow-800 border border-yellow-700 rounded-lg flex items-start">
+                    <div className="p-2 bg-yellow-700 rounded-full mr-4">
+                      <Mail className="h-5 w-5 text-yellow-500" />
+                    </div>
+                    <div>
+                      <span className="text-yellow-400 text-sm block">
+                        Email Address
+                      </span>
+                      <span className="text-white text-lg">
+                        {userData.email}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-yellow-800 border border-yellow-700 rounded-lg flex items-start">
+                    <div className="p-2 bg-yellow-700 rounded-full mr-4">
+                      <User className="h-5 w-5 text-yellow-500" />
+                    </div>
+                    <div>
+                      <span className="text-yellow-400 text-sm block">
+                        Role
+                      </span>
+                      <span className="text-white text-lg capitalize">
+                        {userData.role}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-yellow-800 border border-yellow-700 rounded-lg flex items-start">
+                    <div className="p-2 bg-yellow-700 rounded-full mr-4">
+                      <Clock className="h-5 w-5 text-yellow-500" />
+                    </div>
+                    <div>
+                      <span className="text-yellow-400 text-sm block">
+                        Member Since
+                      </span>
+                      <span className="text-white text-lg">
+                        {new Date(userData.created_at).toLocaleDateString()} at{" "}
+                        {new Date(userData.created_at).toLocaleTimeString()}
                       </span>
                     </div>
                   </div>
@@ -282,7 +337,7 @@ function UserProfile() {
                 <div className="flex justify-center mt-8">
                   <button
                     onClick={handleEditClick}
-                    className="px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-md transition duration-200 ease-in-out flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                    className="px-6 py-3 text-white bg-yellow-600 hover:bg-yellow-700 rounded-md transition duration-200 ease-in-out flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
                   >
                     <Edit className="h-5 w-5" />
                     Edit Profile
@@ -293,15 +348,15 @@ function UserProfile() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <label 
-                      className="block text-gray-300 text-sm font-medium mb-2" 
+                    <label
+                      className="block text-yellow-300 text-sm font-medium mb-2"
                       htmlFor="phone_number"
                     >
                       Phone Number
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Phone className="h-5 w-5 text-gray-400" />
+                        <Phone className="h-5 w-5 text-yellow-400" />
                       </div>
                       <input
                         type="text"
@@ -310,22 +365,22 @@ function UserProfile() {
                         value={formData.phone_number}
                         onChange={handleChange}
                         placeholder="e.g., 0781234567"
-                        className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                        className="w-full p-3 pl-10 bg-yellow-800 border border-yellow-700 rounded-md text-white placeholder-yellow-500 focus:outline-none focus:ring-2 focus:ring-red-600"
                         required
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label 
-                      className="block text-gray-300 text-sm font-medium mb-2" 
+                    <label
+                      className="block text-yellow-300 text-sm font-medium mb-2"
                       htmlFor="email"
                     >
                       Email Address
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Mail className="h-5 w-5 text-gray-400" />
+                        <Mail className="h-5 w-5 text-yellow-400" />
                       </div>
                       <input
                         type="email"
@@ -334,22 +389,22 @@ function UserProfile() {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="e.g., example@gmail.com"
-                        className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                        className="w-full p-3 pl-10 bg-yellow-800 border border-yellow-700 rounded-md text-white placeholder-yellow-500 focus:outline-none focus:ring-2 focus:ring-red-600"
                         required
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label 
-                      className="block text-gray-300 text-sm font-medium mb-2" 
+                    <label
+                      className="block text-yellow-300 text-sm font-medium mb-2"
                       htmlFor="role"
                     >
                       Role
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <User className="h-5 w-5 text-gray-400" />
+                        <User className="h-5 w-5 text-yellow-400" />
                       </div>
                       <input
                         type="text"
@@ -357,7 +412,7 @@ function UserProfile() {
                         name="role"
                         value={formData.role}
                         readOnly
-                        className="w-full p-3 pl-10 bg-gray-800 border border-gray-700 rounded-md text-gray-400 cursor-not-allowed"
+                        className="w-full p-3 pl-10 bg-yellow-800 border border-yellow-700 rounded-md text-yellow-400 cursor-not-allowed"
                         required
                       />
                     </div>
@@ -368,7 +423,7 @@ function UserProfile() {
                   <button
                     type="button"
                     onClick={handleEditClick}
-                    className="px-6 py-3 text-white bg-gray-700 hover:bg-gray-600 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                    className="px-6 py-3 text-white bg-yellow-700 hover:bg-yellow-600 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50"
                   >
                     <X className="h-5 w-5" />
                     Cancel
@@ -376,13 +431,29 @@ function UserProfile() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-6 py-3 text-white bg-green-600 hover:bg-green-700 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50"
+                    className="px-6 py-3 text-white bg-yellow-600 hover:bg-yellow-700 rounded-md transition duration-200 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50"
                   >
                     {isLoading ? (
                       <>
-                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg
+                          className="animate-spin h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         Saving...
                       </>

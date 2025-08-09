@@ -85,28 +85,28 @@ const EditUser = () => {
   
 
   return (
-    <section className="bg-gray-800 min-h-screen flex items-center justify-center px-4 py-16">
+    <section className="bg-yellow-800 min-h-screen flex items-center justify-center px-4 py-16">
       {/* Background overlay with subtle pattern */}
-      <div className="absolute inset-0 bg-gray-900 opacity-50 pattern-grid-lg"></div>
+      <div className="absolute inset-0 bg-yellow-900 opacity-50 pattern-grid-lg"></div>
 
       <div className="container mx-auto max-w-md z-10">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">
             Update User
           </h2>
-          <p className="text-gray-300 max-w-md mx-auto">
+          <p className="text-yellow-300 max-w-md mx-auto">
             Modify user information and assign roles
           </p>
         </div>
 
-        <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-6 bg-green-600 text-white">
+        <div className="bg-yellow-900 rounded-lg shadow-xl overflow-hidden">
+          <div className="p-6 bg-yellow-600 text-white">
             <h3 className="text-xl font-semibold">Edit User Profile</h3>
-            <p className="text-gray-100 mt-1">Update user account details</p>
+            <p className="text-yellow-100 mt-1">Update user account details</p>
           </div>
 
           {errorMessage && (
-            <div className="mx-6 mt-6 p-3 rounded bg-green-900 text-red-100">
+            <div className="mx-6 mt-6 p-3 rounded bg-yellow-900 text-red-100">
               {errorMessage}
             </div>
           )}
@@ -115,7 +115,7 @@ const EditUser = () => {
             <div>
               <label
                 htmlFor="phone_number"
-                className="block text-gray-300 mb-2 font-medium"
+                className="block text-yellow-300 mb-2 font-medium"
               >
                 Phone Number
               </label>
@@ -126,7 +126,7 @@ const EditUser = () => {
                 value={data.phone_number || ""}
                 onChange={(e) => setData({ ...data, phone_number: e.target.value })}
                 required
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full p-3 bg-yellow-800 border border-yellow-700 rounded-md text-white placeholder-yellow-500 focus:outline-none focus:ring-2 focus:ring-red-600"
                 placeholder="e.g., 0781234567"
               />
             </div>
@@ -134,7 +134,7 @@ const EditUser = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-gray-300 mb-2 font-medium"
+                className="block text-yellow-300 mb-2 font-medium"
               >
                 Email Address
               </label>
@@ -145,7 +145,7 @@ const EditUser = () => {
                 value={data.email || ""}
                 onChange={(e) => setData({ ...data, email: e.target.value })}
                 required
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full p-3 bg-yellow-800 border border-yellow-700 rounded-md text-white placeholder-yellow-500 focus:outline-none focus:ring-2 focus:ring-red-600"
                 placeholder="e.g., example@gmail.com"
               />
             </div>
@@ -153,7 +153,7 @@ const EditUser = () => {
             <div>
               <label
                 htmlFor="role"
-                className="block text-gray-300 mb-2 font-medium"
+                className="block text-yellow-300 mb-2 font-medium"
               >
                 Role
               </label>
@@ -163,7 +163,7 @@ const EditUser = () => {
                 value={data.role || ""}
                 onChange={(e) => setData({ ...data, role: e.target.value })}
                 required
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full p-3 bg-yellow-800 border border-yellow-700 rounded-md text-white placeholder-yellow-500 focus:outline-none focus:ring-2 focus:ring-black"
               >
                 <option value="admin">Admin</option>
                 <option value="farmer">Farmer</option>
@@ -174,7 +174,7 @@ const EditUser = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full p-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
+              className="w-full p-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
             >
               {loading ? (
                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -183,7 +183,7 @@ const EditUser = () => {
                 </svg>
               ) : (
                 <>
-                  <LockClosedIcon className="h-5 w-5 text-gray-100 group-hover:text-gray-300" aria-hidden="true" />
+                  <LockClosedIcon className="h-5 w-5 text-yellow-100 group-hover:text-yellow-300" aria-hidden="true" />
                   Update User
                 </>
               )}
@@ -192,7 +192,7 @@ const EditUser = () => {
             <div className="mt-5 text-center">
               <Link
                 to="/admin/users"
-                className="text-gray-400 hover:text-white flex items-center justify-center gap-1"
+                className="text-yellow-400 hover:text-white flex items-center justify-center gap-1"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to users

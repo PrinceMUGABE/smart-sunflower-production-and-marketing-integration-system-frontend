@@ -1,16 +1,20 @@
+/* eslint-disable react/jsx-no-undef */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { IoMdClose } from "react-icons/io";
+import { Sun, Leaf, ShoppingCart, BarChart2, User, Phone, Mail } from "lucide-react"; // Add Phone and Mail imports
 import ResponsiveMenu from "./ResponsiveMenu";
 import Logo from "../../assets/pictures/minagri.jpg";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 export const MenuLinks = [
-  { id: 1, name: "home", link: "/" },
-  { id: 4, name: "about", link: "/about" },
-  { id: 5, name: "services", link: "/#service" },
+  { id: 1, name: "home", link: "/", icon: <Sun className="h-5 w-5" /> },
+  { id: 2, name: "production", link: "/production", icon: <Leaf className="h-5 w-5" /> },
+  { id: 3, name: "marketing", link: "/marketing", icon: <ShoppingCart className="h-5 w-5" /> },
+  { id: 4, name: "analytics", link: "/analytics", icon: <BarChart2 className="h-5 w-5" /> },
+  { id: 5, name: "about", link: "/about" },
   { id: 6, name: "contact", link: "#contact" },
 ];
 
@@ -56,7 +60,7 @@ const Navbar = () => {
     { number: "+250783251199", display: "+250 783 251 199" },
     { number: "+250725169154", display: "+250 725 196 154" },
   ];
-  const emails = ["minagri@gmail.com"];
+  const emails = ["info@sunsmart.rw"];
 
   const getEmailLink = (email) => `mailto:${email}`;
 
@@ -64,7 +68,7 @@ const Navbar = () => {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-30 w-full ${
-          scrolled ? "bg-white shadow-md border-b border-green-100" : "bg-white bg-opacity-95"
+          scrolled ? "bg-white shadow-md border-b border-yellow-100" : "bg-white bg-opacity-95"
         } transition-all duration-300`}
       >
         <div className="container mx-auto px-4 py-3 md:py-2">
@@ -78,14 +82,16 @@ const Navbar = () => {
               className="flex items-center gap-3 bg-white p-1 rounded"
               aria-label="Home"
             >
-              <img src={Logo} alt="MINAGRI Logo" className="h-12 w-auto object-contain" />
+              <img src={Logo} alt="SunSmart Logo" className="h-12 w-auto object-contain" />
+              <span className="hidden md:block text-xl font-bold text-yellow-700">SunSmart</span>
             </a>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6">
               <ul className="flex items-center gap-6">
-                {MenuLinks.map(({ id, name, link }) => {
-                  const isActive = location.pathname === link || (location.pathname === "/" && link === "/");
+                {MenuLinks.map(({ id, name, link, icon }) => {
+                  const isActive = location.pathname === link || 
+                                 (location.pathname.startsWith(link) && link !== "/");
                   return (
                     <li key={id}>
                       <a
@@ -94,12 +100,13 @@ const Navbar = () => {
                           e.preventDefault();
                           handleLinkClick(name, link);
                         }}
-                        className={`text-lg font-medium transition-colors duration-300 ${
+                        className={`flex items-center gap-1 text-lg font-medium transition-colors duration-300 ${
                           isActive
-                            ? "text-green-800 border-b-2 border-green-800"
-                            : "text-gray-800 hover:text-green-700 hover:border-b-2 hover:border-green-700"
+                            ? "text-yellow-700 border-b-2 border-yellow-600"
+                            : "text-gray-800 hover:text-yellow-600 hover:border-b-2 hover:border-yellow-400"
                         }`}
                       >
+                        {icon && <span className="mr-1">{icon}</span>}
                         {t(name)}
                       </a>
                     </li>
@@ -107,28 +114,31 @@ const Navbar = () => {
                 })}
               </ul>
 
-              <button
-                onClick={handleLoginClick}
-                className="bg-green-700 text-white py-2 px-5 rounded hover:bg-green-800 transition-colors duration-300 font-medium shadow-sm"
-                aria-label="Login"
-              >
-                {t("login")}
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={handleLoginClick}
+                  className="flex items-center gap-1 bg-yellow-600 text-white py-2 px-5 rounded hover:bg-yellow-700 transition-colors duration-300 font-medium shadow-sm"
+                  aria-label="Login"
+                >
+                  <User className="h-5 w-5" />
+                  {t("login")}
+                </button>
 
-              <select
-                onChange={(e) => i18n.changeLanguage(e.target.value)}
-                value={i18n.language}
-                className="border border-gray-300 text-gray-700 rounded px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
-              >
-                <option value="en">ENG</option>
-                <option value="fr">FR</option>
-                <option value="rw">RW</option>
-              </select>
+                <select
+                  onChange={(e) => i18n.changeLanguage(e.target.value)}
+                  value={i18n.language}
+                  className="border border-gray-300 text-gray-700 rounded px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                >
+                  <option value="en">ENG</option>
+                  <option value="fr">FR</option>
+                  <option value="rw">RW</option>
+                </select>
+              </div>
             </nav>
 
             <button
               onClick={toggleMenu}
-              className="md:hidden flex items-center text-gray-800 hover:text-green-700 transition-colors"
+              className="md:hidden flex items-center text-gray-800 hover:text-yellow-600 transition-colors"
               aria-label={showMenu ? "Close menu" : "Open menu"}
             >
               {showMenu ? <IoMdClose size={28} /> : <HiMenuAlt3 size={28} />}
@@ -156,14 +166,18 @@ const Navbar = () => {
             </button>
 
             <div className="p-8">
-              <h2 className="text-green-800 font-bold text-3xl mb-6 text-center">{t("Contact Us")}</h2>
+              <h2 className="text-yellow-700 font-bold text-3xl mb-6 text-center">{t("Contact SunSmart Team")}</h2>
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="md:w-1/2">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("Phone Numbers")}</h3>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <Phone className="h-5 w-5 mr-2 text-yellow-600" />
+                    {t("Phone Numbers")}
+                  </h3>
                   <ul className="space-y-3 text-lg text-gray-600">
                     {phoneNumbers.map((phone, idx) => (
-                      <li key={idx}>
-                        <a href={`tel:${phone.number}`} className="text-green-700 hover:underline hover:text-green-800">
+                      <li key={idx} className="flex items-center">
+                        <span className="mr-2 text-yellow-600">•</span>
+                        <a href={`tel:${phone.number}`} className="text-yellow-700 hover:underline hover:text-yellow-800">
                           {phone.display}
                         </a>
                       </li>
@@ -171,11 +185,15 @@ const Navbar = () => {
                   </ul>
                 </div>
                 <div className="md:w-1/2">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">{t("Email Addresses")}</h3>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <Mail className="h-5 w-5 mr-2 text-yellow-600" />
+                    {t("Email Addresses")}
+                  </h3>
                   <ul className="space-y-3 text-lg text-gray-600">
                     {emails.map((email, idx) => (
-                      <li key={idx}>
-                        <a href={getEmailLink(email)} className="text-green-700 hover:underline hover:text-green-800">
+                      <li key={idx} className="flex items-center">
+                        <span className="mr-2 text-yellow-600">•</span>
+                        <a href={getEmailLink(email)} className="text-yellow-700 hover:underline hover:text-yellow-800">
                           {email}
                         </a>
                       </li>

@@ -5,7 +5,7 @@ import Sidebar from './Sidebar';
 
 function Layout() {
   return (
-    <div className="flex bg-gray-800 min-h-screen overflow-x-hidden">
+    <div className="flex bg-yellow-800 min-h-screen overflow-x-hidden">
       <Sidebar />
       <div className="flex-1 ml-0 md:ml-56 w-full overflow-x-auto">
         <main className="max-w-7xl mx-auto p-4 w-full">

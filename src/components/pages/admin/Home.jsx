@@ -590,12 +590,12 @@ const adaptPredictionsData = (predictionsData) => {
   };
 
   return (
-    <div className="p-6 space-y-6 bg-gray-950 min-h-screen text-gray-300">
+    <div className="p-6 space-y-6 bg-yellow-950 min-h-screen text-gray-300">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-green-500">Admin Dashboard</h1>
         <div className="flex space-x-4">
           <select
-            className="bg-gray-800 text-gray-300 rounded-md border border-gray-700 px-3 py-2"
+            className="bg-yellow-800 text-gray-300 rounded-md border border-yellow-700 px-3 py-2"
             value={selectedTimePeriod}
             onChange={(e) => setSelectedTimePeriod(e.target.value)}
           >
@@ -609,10 +609,10 @@ const adaptPredictionsData = (predictionsData) => {
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Users Card */}
-        <div className="bg-gray-900 rounded-xl shadow-md overflow-hidden border border-gray-800 hover:border-gray-700 transition-all">
+        <div className="bg-yellow-900 rounded-xl shadow-md overflow-hidden border border-yellow-800 hover:border-yellow-700 transition-all">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="rounded-full bg-gray-800 p-3">
+              <div className="rounded-full bg-yellow-800 p-3">
                 <Users className="h-6 w-6 text-green-500" />
               </div>
               <div className="ml-4">
@@ -634,10 +634,10 @@ const adaptPredictionsData = (predictionsData) => {
         </div>
 
         {/* Predictions Card */}
-        <div className="bg-gray-900 rounded-xl shadow-md overflow-hidden border border-gray-800 hover:border-gray-700 transition-all">
+        <div className="bg-yellow-900 rounded-xl shadow-md overflow-hidden border border-yellow-800 hover:border-yellow-700 transition-all">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="rounded-full bg-gray-800 p-3">
+              <div className="rounded-full bg-yellow-800 p-3">
                 <MapPin className="h-6 w-6 text-green-500" />
               </div>
               <div className="ml-4">
@@ -659,10 +659,10 @@ const adaptPredictionsData = (predictionsData) => {
         </div>
   
         {/* Feedback Card */}
-        <div className="bg-gray-900 rounded-xl shadow-md overflow-hidden border border-gray-800 hover:border-gray-700 transition-all">
+        <div className="bg-yellow-900 rounded-xl shadow-md overflow-hidden border border-yellow-800 hover:border-yellow-700 transition-all">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="rounded-full bg-gray-800 p-3">
+              <div className="rounded-full bg-yellow-800 p-3">
                 <Activity className="h-6 w-6 text-green-500" />
               </div>
               <div className="ml-4">
@@ -693,10 +693,10 @@ const adaptPredictionsData = (predictionsData) => {
         </div>
 
         {/* Datasets Card */}
-        <div className="bg-gray-900 rounded-xl shadow-md overflow-hidden border border-gray-800 hover:border-gray-700 transition-all">
+        <div className="bg-yellow-900 rounded-xl shadow-md overflow-hidden border border-yellow-800 hover:border-yellow-700 transition-all">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="rounded-full bg-gray-800 p-3">
+              <div className="rounded-full bg-yellow-800 p-3">
                 <Database className="h-6 w-6 text-green-500" />
               </div>
               <div className="ml-4">
@@ -719,7 +719,7 @@ const adaptPredictionsData = (predictionsData) => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* Time Series Chart - Activity Over Time */}
-        <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
+        <div className="bg-yellow-900 p-6 rounded-xl shadow-md border border-yellow-800">
           <h3 className="text-lg font-semibold mb-4 text-green-500">
             Activity Over Time
           </h3>
@@ -784,7 +784,7 @@ const adaptPredictionsData = (predictionsData) => {
         </div>
   
         {/* User Distribution Chart */}
-        <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
+        <div className="bg-yellow-900 p-6 rounded-xl shadow-md border border-yellow-800">
           <h3 className="text-lg font-semibold mb-4 text-green-500">
             User Role Distribution
           </h3>
@@ -853,7 +853,7 @@ const adaptPredictionsData = (predictionsData) => {
         </div>
   
         {/* Feedback Distribution Chart */}
-        <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
+        <div className="bg-yellow-900 p-6 rounded-xl shadow-md border border-yellow-800">
           <h3 className="text-lg font-semibold mb-4 text-green-500">
             Feedback Rating Distribution
           </h3>
@@ -906,7 +906,7 @@ const adaptPredictionsData = (predictionsData) => {
         </div>
   
         {/* Feedback Trend Chart */}
-        <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
+        <div className="bg-yellow-900 p-6 rounded-xl shadow-md border border-yellow-800">
           <h3 className="text-lg font-semibold mb-4 text-green-500">
             Feedback Rating Trend
           </h3>
@@ -969,7 +969,7 @@ const adaptPredictionsData = (predictionsData) => {
         </div>
 
         {/* Prediction Status Distribution */}
-        <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
+        <div className="bg-yellow-900 p-6 rounded-xl shadow-md border border-yellow-800">
           <h3 className="text-lg font-semibold mb-4 text-green-500">
             Prediction Status Distribution
           </h3>
@@ -1030,7 +1030,7 @@ const adaptPredictionsData = (predictionsData) => {
         </div>
 
         {/* Dataset Statistics */}
-        <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
+        <div className="bg-yellow-900 p-6 rounded-xl shadow-md border border-yellow-800">
           <h3 className="text-lg font-semibold mb-4 text-green-500">
             Dataset Statistics
           </h3>
@@ -1115,7 +1115,7 @@ const adaptPredictionsData = (predictionsData) => {
         <h2 className="text-xl font-bold text-green-500 mb-4">System Overview</h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* User Growth */}
-          <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
+          <div className="bg-yellow-900 p-6 rounded-xl shadow-md border border-yellow-800">
             <h3 className="text-lg font-semibold mb-4 text-green-400">User Growth</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -1140,7 +1140,7 @@ const adaptPredictionsData = (predictionsData) => {
           </div>
 
           {/* Prediction Statistics */}
-          <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
+          <div className="bg-yellow-900 p-6 rounded-xl shadow-md border border-yellow-800">
             <h3 className="text-lg font-semibold mb-4 text-green-400">Prediction Statistics</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -1165,7 +1165,7 @@ const adaptPredictionsData = (predictionsData) => {
           </div>
 
           {/* Feedback Summary */}
-          <div className="bg-gray-900 p-6 rounded-xl shadow-md border border-gray-800">
+          <div className="bg-yellow-900 p-6 rounded-xl shadow-md border border-yellow-800">
             <h3 className="text-lg font-semibold mb-4 text-green-400">Feedback Summary</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">

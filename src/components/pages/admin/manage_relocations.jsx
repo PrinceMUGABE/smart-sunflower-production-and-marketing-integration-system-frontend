@@ -38,6 +38,7 @@ import {
 } from "recharts";
 
 import mapData from "../customer/mapData.json";
+import Logo from "../../../assets/pictures/minagri.jpg";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -52,11 +53,11 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="p-4 text-green-100 bg-green-900 rounded-lg">
+        <div className="p-4 text-yellow-100 bg-yellow-900 rounded-lg">
           <h3 className="font-semibold">Something went wrong</h3>
           <button
             onClick={() => window.location.reload()}
-            className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+            className="mt-2 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
           >
             Refresh Page
           </button>
@@ -67,45 +68,11 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const rwandanCrops = [
-  "Maize",
-  "Rice",
-  "Sorghum",
-  "Wheat",
-  "Millet",
-  "Cassava",
-  "Sweet Potatoes",
-  "Irish Potatoes",
-  "Yams",
-  "Taro",
-  "Beans",
-  "Soybeans",
-  "Groundnuts",
-  "Peas",
-  "Green Grams",
-  "Coffee",
-  "Tea",
-  "Pyrethrum",
-  "Sugarcane",
-  "Cotton",
-  "Banana",
-  "Avocado",
-  "Mango",
-  "Pineapple",
-  "Passion Fruit",
-  "Tree Tomato",
-  "Tomatoes",
-  "Cabbage",
-  "Carrots",
-  "Onions",
-  "Green Peppers",
-  "Eggplant",
-  "Sunflower",
-  "Palm Oil",
-  "Macadamia",
-  "Ginger",
-  "Chili Peppers",
-  "Vanilla",
+const RWANDA_SEASONS = [
+  { value: "long_rainy", label: "Season A (September - January)" },
+  { value: "short_rainy", label: "Season B (February - June)" },
+  { value: "long_dry", label: "Season C (July - August)" },
+  { value: "short_dry", label: "Other Season" },
 ];
 
 function Admin_Manage_predictions() {
@@ -135,11 +102,8 @@ function Admin_Manage_predictions() {
   const [filterSector, setFilterSector] = useState("");
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
-  // Sort the crops alphabetically for better usability
-  const sortedCrops = [...rwandanCrops].sort((a, b) => a.localeCompare(b));
-  const [selectedCrop, setSelectedCrop] = useState(
-    currentPrediction?.crop || ""
-  );
+  const rwandanCrops = ["Sunflower"];
+  const [isLoading, setIsLoading] = useState(false);
 
   const COLORS = [
     "#FF6B6B",
@@ -192,35 +156,417 @@ function Admin_Manage_predictions() {
     }
   };
 
-  const handleDownload = {
-    PDF: () => {
+  // Replace the existing handleDownload object with this modified version
+const handleDownload = {
+  PDF: () => {
+    try {
       const doc = new jsPDF();
-      doc.autoTable({ html: "#prediction-table" });
-      doc.save("crop_predictions.pdf");
-    },
-    Excel: () => {
+
+      try {
+            doc.addImage(Logo, 'JPEG', 14, 10, 30, 20);
+          } catch (error) {
+            console.log('Logo could not be added to PDF:', error);
+          }
+      
+      // Company Header
+      doc.setFontSize(20);
+      doc.setTextColor(40, 40, 40);
+      doc.text('Smart Sunflower Production and Marketing Integration System', 20, 25);
+      
+      doc.setFontSize(16);
+      doc.setTextColor(60, 60, 60);
+      doc.text('Crop Prediction Management Report', 20, 35);
+      
+      // Contact Information
+      doc.setFontSize(10);
+      doc.setTextColor(80, 80, 80);
+      doc.text('Email: minagri@gov.rw', 20, 45);
+      doc.text('Phone: +250 788 457 408', 20, 50);
+      doc.text('Address: Kigali-Rwanda', 20, 55);
+      
+      // Report Details
+      doc.setFontSize(12);
+      doc.setTextColor(40, 40, 40);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 70);
+      doc.text(`Total Records: ${filteredData.length}`, 20, 75);
+      
+      // Filters Applied
+      let yPosition = 85;
+      doc.setFontSize(11);
+      doc.setTextColor(60, 60, 60);
+      doc.text('Applied Filters:', 20, yPosition);
+      yPosition += 5;
+      
+      if (filterSeason !== 'all') {
+        const seasonLabel = RWANDA_SEASONS.find(s => s.value === filterSeason)?.label || filterSeason;
+        doc.text(`• Season: ${seasonLabel}`, 25, yPosition);
+        yPosition += 5;
+      }
+      if (filterCrop) {
+        doc.text(`• Crop: ${filterCrop}`, 25, yPosition);
+        yPosition += 5;
+      }
+      if (filterDistrict) {
+        doc.text(`• District: ${filterDistrict}`, 25, yPosition);
+        yPosition += 5;
+      }
+      if (filterSector) {
+        doc.text(`• Sector: ${filterSector}`, 25, yPosition);
+        yPosition += 5;
+      }
+      if (searchQuery) {
+        doc.text(`• Search: "${searchQuery}"`, 25, yPosition);
+        yPosition += 5;
+      }
+      if (filterSeason === 'all' && !filterCrop && !filterDistrict && !filterSector && !searchQuery) {
+        doc.text('• No filters applied (All records)', 25, yPosition);
+        yPosition += 5;
+      }
+      
+      // Summary Statistics
+      yPosition += 10;
+      doc.setFontSize(12);
+      doc.setTextColor(40, 40, 40);
+      doc.text('Summary Statistics:', 20, yPosition);
+      yPosition += 10;
+      
+      // Calculate summary stats for filtered data
+      const totalPredictions = filteredData.length;
+      const uniqueCrops = [...new Set(filteredData.map(p => p.crop))].length;
+      const uniqueDistricts = [...new Set(filteredData.map(p => p.district))].length;
+      const uniqueSectors = [...new Set(filteredData.map(p => p.sector))].length;
+      const averageYield = totalPredictions > 0 
+        ? (filteredData.reduce((sum, p) => sum + Number(p.expected_yield_tons_per_ha || 0), 0) / totalPredictions).toFixed(2)
+        : '0.00';
+      const averageWaterReq = totalPredictions > 0
+        ? (filteredData.reduce((sum, p) => sum + Number(p.water_requirement_mm || 0), 0) / totalPredictions).toFixed(2)
+        : '0.00';
+      
+      const summaryData = [
+        ['Total Predictions', totalPredictions.toString()],
+        ['Unique Crops', uniqueCrops.toString()],
+        ['Unique Districts', uniqueDistricts.toString()],
+        ['Unique Sectors', uniqueSectors.toString()],
+        ['Average Expected Yield', `${averageYield} tons/ha`],
+        ['Average Water Requirement', `${averageWaterReq} mm`]
+      ];
+      
+      doc.autoTable({
+        startY: yPosition,
+        head: [['Metric', 'Value']],
+        body: summaryData,
+        theme: 'grid',
+        headStyles: { fillColor: [234, 179, 8], textColor: [255, 255, 255] },
+        alternateRowStyles: { fillColor: [252, 248, 227] },
+        margin: { left: 20, right: 20 },
+        tableWidth: 'auto',
+        columnStyles: {
+          0: { cellWidth: 80 },
+          1: { cellWidth: 60 }
+        }
+      });
+      
+      // Predictions Data Table
+      const finalY = doc.lastAutoTable.finalY || yPosition + 40;
+      doc.setFontSize(12);
+      doc.setTextColor(40, 40, 40);
+      doc.text('Prediction Details:', 20, finalY + 15);
+      
+      // Prepare table data
+      const tableData = filteredData.map((prediction, index) => {
+        const seasonLabel = RWANDA_SEASONS.find(s => s.value === prediction.season)?.label || 
+                           prediction.season.replace('_', ' ');
+        
+        return [
+          (index + 1).toString(),
+          prediction.crop || 'N/A',
+          seasonLabel,
+          prediction.district || 'N/A',
+          prediction.sector || 'N/A',
+          prediction.soil_type || 'N/A',
+          `${Number(prediction.expected_yield_tons_per_ha || 0).toFixed(2)}`,
+          `${Number(prediction.water_requirement_mm || 0).toFixed(0)}`,
+          `${Number(prediction.nitrogen_kg_per_ha || 0).toFixed(1)}`,
+          `${Number(prediction.phosphorus_kg_per_ha || 0).toFixed(1)}`,
+          `${Number(prediction.potassium_kg_per_ha || 0).toFixed(1)}`,
+          new Date(prediction.created_at).toLocaleDateString()
+        ];
+      });
+      
+      doc.autoTable({
+        startY: finalY + 25,
+        head: [['#', 'Crop', 'Season', 'District', 'Sector', 'Soil Type', 'Yield (t/ha)', 'Water (mm)', 'N (kg/ha)', 'P (kg/ha)', 'K (kg/ha)', 'Created']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { 
+          fillColor: [234, 179, 8], 
+          textColor: [255, 255, 255],
+          fontSize: 8,
+          fontStyle: 'bold'
+        },
+        bodyStyles: { 
+          fontSize: 7,
+          textColor: [40, 40, 40]
+        },
+        alternateRowStyles: { fillColor: [252, 248, 227] },
+        margin: { left: 10, right: 10 },
+        columnStyles: {
+          0: { cellWidth: 12 },  // #
+          1: { cellWidth: 16 },  // Crop
+          2: { cellWidth: 20 },  // Season
+          3: { cellWidth: 18 },  // District
+          4: { cellWidth: 16 },  // Sector
+          5: { cellWidth: 16 },  // Soil Type
+          6: { cellWidth: 16 },  // Yield
+          7: { cellWidth: 14 },  // Water
+          8: { cellWidth: 12 },  // N
+          9: { cellWidth: 12 },  // P
+          10: { cellWidth: 12 }, // K
+          11: { cellWidth: 16 }  // Created
+        },
+        styles: {
+          cellPadding: 1.5,
+          fontSize: 7,
+          overflow: 'linebreak'
+        }
+      });
+      
+      // Season Distribution Analysis (if there's space)
+      const lastTableY = doc.lastAutoTable.finalY || finalY + 200;
+      if (lastTableY < 220) { // If there's space on the page
+        const seasonDistribution = filteredData.reduce((acc, prediction) => {
+          const seasonLabel = RWANDA_SEASONS.find(s => s.value === prediction.season)?.label || 
+                             prediction.season.replace('_', ' ');
+          acc[seasonLabel] = (acc[seasonLabel] || 0) + 1;
+          return acc;
+        }, {});
+        
+        if (Object.keys(seasonDistribution).length > 0) {
+          doc.setFontSize(12);
+          doc.setTextColor(40, 40, 40);
+          doc.text('Season Distribution:', 20, lastTableY + 15);
+          
+          const seasonData = Object.entries(seasonDistribution).map(([season, count]) => [
+            season,
+            count.toString(),
+            `${((count / filteredData.length) * 100).toFixed(1)}%`
+          ]);
+          
+          doc.autoTable({
+            startY: lastTableY + 25,
+            head: [['Season', 'Count', 'Percentage']],
+            body: seasonData,
+            theme: 'grid',
+            headStyles: { fillColor: [234, 179, 8], textColor: [255, 255, 255] },
+            alternateRowStyles: { fillColor: [252, 248, 227] },
+            margin: { left: 20, right: 20 },
+            tableWidth: 'auto',
+            columnStyles: {
+              0: { cellWidth: 60 },
+              1: { cellWidth: 30 },
+              2: { cellWidth: 30 }
+            }
+          });
+        }
+      }
+      
+      // Crop Distribution Analysis (on new page if needed)
+      if (doc.lastAutoTable.finalY > 240 || lastTableY >= 220) {
+        doc.addPage();
+        yPosition = 20;
+      } else {
+        yPosition = doc.lastAutoTable.finalY + 20;
+      }
+      
+      const cropDistribution = filteredData.reduce((acc, prediction) => {
+        const crop = prediction.crop || 'Unknown';
+        if (!acc[crop]) {
+          acc[crop] = {
+            count: 0,
+            totalYield: 0,
+            totalWater: 0
+          };
+        }
+        acc[crop].count += 1;
+        acc[crop].totalYield += Number(prediction.expected_yield_tons_per_ha || 0);
+        acc[crop].totalWater += Number(prediction.water_requirement_mm || 0);
+        return acc;
+      }, {});
+      
+      if (Object.keys(cropDistribution).length > 0) {
+        doc.setFontSize(12);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Crop Analysis Summary:', 20, yPosition);
+        
+        const cropData = Object.entries(cropDistribution).map(([crop, data]) => [
+          crop,
+          data.count.toString(),
+          `${(data.totalYield / data.count).toFixed(2)}`,
+          `${(data.totalWater / data.count).toFixed(0)}`
+        ]);
+        
+        doc.autoTable({
+          startY: yPosition + 10,
+          head: [['Crop', 'Count', 'Avg Yield (t/ha)', 'Avg Water (mm)']],
+          body: cropData,
+          theme: 'grid',
+          headStyles: { fillColor: [234, 179, 8], textColor: [255, 255, 255] },
+          alternateRowStyles: { fillColor: [252, 248, 227] },
+          margin: { left: 20, right: 20 },
+          tableWidth: 'auto',
+          columnStyles: {
+            0: { cellWidth: 50 },
+            1: { cellWidth: 30 },
+            2: { cellWidth: 40 },
+            3: { cellWidth: 40 }
+          }
+        });
+      }
+      
+      // Footer
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        const pageHeight = doc.internal.pageSize.height;
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text(`Page ${i} of ${pageCount}`, 20, pageHeight - 10);
+        doc.text(`© ${new Date().getFullYear()} Smart Sunflower Production and Marketing Integration System`, doc.internal.pageSize.width - 80, pageHeight - 10);
+      }
+      
+      // Generate filename with timestamp
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const filename = `Crop_Predictions_Report_${timestamp}.pdf`;
+      
+      // Save the PDF
+      doc.save(filename);
+      
+      setMessage(`PDF report "${filename}" downloaded successfully!`);
+      setMessageType("success");
+      setDownloadMenuVisible(false);
+      
+      // Clear message after 5 seconds
+      setTimeout(() => setMessage(""), 5000);
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      setMessage("Failed to generate PDF report. Please try again.");
+      setMessageType("error");
+      setTimeout(() => setMessage(""), 5000);
+    }
+  },
+  Excel: () => {
+    try {
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(
-        workbook,
-        XLSX.utils.json_to_sheet(predictions),
-        "Crop Predictions"
-      );
-      XLSX.writeFile(workbook, "crop_predictions.xlsx");
-    },
-    CSV: () => {
-      const csvContent =
-        "data:text/csv;charset=utf-8," +
-        Object.keys(predictions[0]).join(",") +
-        "\n" +
-        predictions.map((row) => Object.values(row).join(",")).join("\n");
+      
+      // Prepare data for Excel export
+      const excelData = filteredData.map((prediction, index) => {
+        const seasonLabel = RWANDA_SEASONS.find(s => s.value === prediction.season)?.label || 
+                           prediction.season.replace('_', ' ');
+        
+        return {
+          'Serial No.': index + 1,
+          'Crop': prediction.crop || 'N/A',
+          'Season': seasonLabel,
+          'District': prediction.district || 'N/A',
+          'Sector': prediction.sector || 'N/A',
+          'Soil Type': prediction.soil_type || 'N/A',
+          'Expected Yield (tons/ha)': Number(prediction.expected_yield_tons_per_ha || 0).toFixed(2),
+          'Water Requirement (mm)': Number(prediction.water_requirement_mm || 0).toFixed(0),
+          'Nitrogen (kg/ha)': Number(prediction.nitrogen_kg_per_ha || 0).toFixed(1),
+          'Phosphorus (kg/ha)': Number(prediction.phosphorus_kg_per_ha || 0).toFixed(1),
+          'Potassium (kg/ha)': Number(prediction.potassium_kg_per_ha || 0).toFixed(1),
+          'Optimal pH': Number(prediction.optimal_ph || 0).toFixed(1),
+          'Row Spacing (cm)': Number(prediction.row_spacing_cm || 0).toFixed(1),
+          'Plant Spacing (cm)': Number(prediction.plant_spacing_cm || 0).toFixed(1),
+          'Planting Depth (cm)': Number(prediction.planting_depth_cm || 0).toFixed(1),
+          'Altitude': prediction.altitude || 'N/A',
+          'Created By': prediction.created_by?.email || 'N/A',
+          'Created At': new Date(prediction.created_at).toLocaleString(),
+          'Updated At': new Date(prediction.updated_at).toLocaleString()
+        };
+      });
+      
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(excelData), "Predictions_Data");
+      
+      // Add summary sheet
+      const summaryData = [
+        ['Metric', 'Value'],
+        ['Total Predictions', filteredData.length],
+        ['Unique Crops', [...new Set(filteredData.map(p => p.crop))].length],
+        ['Unique Districts', [...new Set(filteredData.map(p => p.district))].length],
+        ['Unique Sectors', [...new Set(filteredData.map(p => p.sector))].length],
+        ['Average Expected Yield (tons/ha)', filteredData.length > 0 ? 
+          (filteredData.reduce((sum, p) => sum + Number(p.expected_yield_tons_per_ha || 0), 0) / filteredData.length).toFixed(2) : '0.00'],
+        ['Average Water Requirement (mm)', filteredData.length > 0 ?
+          (filteredData.reduce((sum, p) => sum + Number(p.water_requirement_mm || 0), 0) / filteredData.length).toFixed(2) : '0.00']
+      ];
+      
+      XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(summaryData), "Summary");
+      
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      XLSX.writeFile(workbook, `Crop_Predictions_Report_${timestamp}.xlsx`);
+      
+      setMessage("Excel report downloaded successfully!");
+      setMessageType("success");
+      setDownloadMenuVisible(false);
+      setTimeout(() => setMessage(""), 5000);
+    } catch (error) {
+      console.error('Error generating Excel:', error);
+      setMessage("Failed to generate Excel report. Please try again.");
+      setMessageType("error");
+      setTimeout(() => setMessage(""), 5000);
+    }
+  },
+  CSV: () => {
+    try {
+      const csvData = filteredData.map((prediction, index) => {
+        const seasonLabel = RWANDA_SEASONS.find(s => s.value === prediction.season)?.label || 
+                           prediction.season.replace('_', ' ');
+        
+        return {
+          'Serial_No': index + 1,
+          'Crop': prediction.crop || 'N/A',
+          'Season': seasonLabel,
+          'District': prediction.district || 'N/A',
+          'Sector': prediction.sector || 'N/A',
+          'Soil_Type': prediction.soil_type || 'N/A',
+          'Expected_Yield_tons_per_ha': Number(prediction.expected_yield_tons_per_ha || 0).toFixed(2),
+          'Water_Requirement_mm': Number(prediction.water_requirement_mm || 0).toFixed(0),
+          'Nitrogen_kg_per_ha': Number(prediction.nitrogen_kg_per_ha || 0).toFixed(1),
+          'Phosphorus_kg_per_ha': Number(prediction.phosphorus_kg_per_ha || 0).toFixed(1),
+          'Potassium_kg_per_ha': Number(prediction.potassium_kg_per_ha || 0).toFixed(1),
+          'Optimal_pH': Number(prediction.optimal_ph || 0).toFixed(1),
+          'Altitude': prediction.altitude || 'N/A',
+          'Created_At': new Date(prediction.created_at).toLocaleDateString()
+        };
+      });
+      
+      const headers = Object.keys(csvData[0]).join(",");
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        headers + "\n" +
+        csvData.map(row => Object.values(row).join(",")).join("\n");
+      
       const link = document.createElement("a");
       link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", "crop_predictions.csv");
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      link.setAttribute("download", `Crop_Predictions_Report_${timestamp}.csv`);
       document.body.appendChild(link);
       link.click();
       link.remove();
-    },
-  };
+      
+      setMessage("CSV report downloaded successfully!");
+      setMessageType("success");
+      setDownloadMenuVisible(false);
+      setTimeout(() => setMessage(""), 5000);
+    } catch (error) {
+      console.error('Error generating CSV:', error);
+      setMessage("Failed to generate CSV report. Please try again.");
+      setMessageType("error");
+      setTimeout(() => setMessage(""), 5000);
+    }
+  },
+};
 
   const openModal = (prediction = null) => {
     setIsModalOpen(true);
@@ -232,74 +578,14 @@ function Admin_Manage_predictions() {
     setViewDetailsModalOpen(true);
   };
 
-  // const handleAddUpdatePrediction = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const predictionData = {
-  //       crop: e.target.crop.value,
-  //       season: e.target.season.value,
-  //       district: e.target.district.value,
-  //       sector: e.target.sector.value,
-  //       soil_type: e.target.soil_type.value,
-  //       nitrogen_kg_per_ha: parseFloat(e.target.nitrogen_kg_per_ha.value),
-  //       phosphorus_kg_per_ha: parseFloat(e.target.phosphorus_kg_per_ha.value),
-  //       potassium_kg_per_ha: parseFloat(e.target.potassium_kg_per_ha.value),
-  //       expected_yield_tons_per_ha: parseFloat(
-  //         e.target.expected_yield_tons_per_ha.value
-  //       ),
-  //       water_requirement_mm: parseFloat(e.target.water_requirement_mm.value),
-  //       optimal_ph: parseFloat(e.target.optimal_ph.value),
-  //       row_spacing_cm: parseFloat(e.target.row_spacing_cm.value),
-  //       plant_spacing_cm: parseFloat(e.target.plant_spacing_cm.value),
-  //       planting_depth_cm: parseFloat(e.target.planting_depth_cm.value),
-  //       altitude: e.target.altitude.value,
-  //     };
-
-  //     console.log("Sending prediction data:", predictionData);
-
-  //     if (currentPrediction) {
-  //       // Update existing prediction
-  //       await axios.put(
-  //         `${BASE_URL}update/${currentPrediction.id}/`,
-  //         predictionData,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       );
-  //       setMessage("Prediction updated successfully");
-  //     } else {
-  //       // Create new prediction
-  //       await axios.post(`${BASE_URL}create/`, predictionData, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-  //       setMessage("Prediction created successfully");
-  //     }
-
-  //     handleFetch();
-  //     setIsModalOpen(false);
-  //     setCurrentPrediction(null);
-  //     setMessageType("success");
-  //   } catch (err) {
-  //     console.error("Error submitting form:", err);
-  //     setMessage(err.response?.data.error || "An error occurred");
-  //     setMessageType("error");
-  //   }
-  // };
-
   const handleAddUpdatePrediction = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       // Basic fields always present
       const predictionData = {
-        crop: e.target.crop.value,
+        crop: "sunflower",
         district: e.target.district.value,
         sector: e.target.sector.value,
         season: e.target.season.value,
@@ -375,6 +661,8 @@ function Admin_Manage_predictions() {
       console.error("Error submitting form:", err);
       setMessage(err.response?.data.error || "An error occurred");
       setMessageType("error");
+    } finally {
+      setIsLoading(false); // End loading regardless of success/error
     }
   };
 
@@ -407,12 +695,15 @@ function Admin_Manage_predictions() {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* Total Predictions Card */}
-        <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center">
-          <div className="p-3 rounded-full bg-blue-900 bg-opacity-30 mr-4">
-            <FontAwesomeIcon icon={faLeaf} className="text-blue-400 text-xl" />
+        <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-yellow-700 flex items-center">
+          <div className="p-3 rounded-full bg-yellow-800 bg-opacity-30 mr-4">
+            <FontAwesomeIcon
+              icon={faLeaf}
+              className="text-yellow-400 text-xl"
+            />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Total Predictions</p>
+            <p className="text-yellow-300 text-sm">Total Predictions</p>
             <h3 className="text-2xl font-bold text-white">
               {totalPredictions}
             </h3>
@@ -420,22 +711,22 @@ function Admin_Manage_predictions() {
         </div>
 
         {/* Unique Crops Card */}
-        <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center">
-          <div className="p-3 rounded-full bg-purple-900 bg-opacity-30 mr-4">
+        <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-yellow-700 flex items-center">
+          <div className="p-3 rounded-full bg-yellow-800 bg-opacity-30 mr-4">
             <FontAwesomeIcon
               icon={faSeedling}
-              className="text-purple-400 text-xl"
+              className="text-yellow-400 text-xl"
             />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Unique Crops</p>
+            <p className="text-yellow-300 text-sm">Unique Crops</p>
             <h3 className="text-2xl font-bold text-white">{uniqueCrops}</h3>
           </div>
         </div>
 
         {/* Season Distribution Card */}
-        <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-          <p className="text-gray-400 text-sm mb-2">Season Distribution</p>
+        <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-yellow-700">
+          <p className="text-yellow-300 text-sm mb-2">Season Distribution</p>
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               {Object.entries(seasonCounts).map(([season, count], index) => (
@@ -444,7 +735,7 @@ function Admin_Manage_predictions() {
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: COLORS[index % COLORS.length] }}
                   ></div>
-                  <span className="text-xs text-gray-300 ml-2">
+                  <span className="text-xs text-yellow-200 ml-2">
                     {season.replace("_", " ")}: {count}
                   </span>
                 </div>
@@ -474,22 +765,22 @@ function Admin_Manage_predictions() {
                       .join(", ")})`,
                   }}
                 ></div>
-                <div className="absolute inset-2 rounded-full bg-gray-900"></div>
+                <div className="absolute inset-2 rounded-full bg-yellow-900"></div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Average Yield Card */}
-        <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center">
-          <div className="p-3 rounded-full bg-green-900 bg-opacity-30 mr-4">
+        <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-yellow-700 flex items-center">
+          <div className="p-3 rounded-full bg-yellow-800 bg-opacity-30 mr-4">
             <FontAwesomeIcon
               icon={faChartPie}
-              className="text-green-400 text-xl"
+              className="text-yellow-400 text-xl"
             />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Avg. Expected Yield</p>
+            <p className="text-yellow-300 text-sm">Avg. Expected Yield</p>
             <h3 className="text-2xl font-bold text-white">
               {averageYield.toFixed(2)} t/ha
             </h3>
@@ -510,96 +801,33 @@ function Admin_Manage_predictions() {
     const uniqueSectors = [...new Set(predictions.map((p) => p.sector))];
 
     return (
-      <div className="bg-gray-900 p-4 rounded-lg shadow-lg border border-gray-700 mb-6">
+      <div className="bg-yellow-900 p-4 rounded-lg shadow-lg border border-yellow-700 mb-6">
         <div
           className="flex justify-between items-center cursor-pointer"
           onClick={() => setIsFilterExpanded(!isFilterExpanded)}
         >
-          <h3 className="text-gray-200 font-medium">Advanced Filters</h3>
-          <button className="text-gray-400">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className={`h-5 w-5 transition-transform ${
-                isFilterExpanded ? "transform rotate-180" : ""
-              }`}
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
+          <h3 className="text-yellow-200 font-medium">Advanced Filters</h3>
+          <button className="text-yellow-400">
+            {/* ... existing icon ... */}
           </button>
         </div>
 
         {isFilterExpanded && (
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-gray-300 mb-2 text-sm">Season</label>
+              <label className="block text-yellow-300 mb-2 text-sm">
+                Season
+              </label>
               <select
                 value={filterSeason}
                 onChange={(e) => setFilterSeason(e.target.value)}
-                className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
+                className="w-full p-2 bg-yellow-800 border border-yellow-700 rounded text-yellow-200 text-sm"
               >
-                <option value="all">All Seasons</option>
-                <option value="long_rainy">Long Rainy</option>
-                <option value="short_rainy">Short Rainy</option>
-                <option value="long_dry">Long Dry</option>
-                <option value="short_dry">Short Dry</option>
+                {/* ... existing options ... */}
               </select>
             </div>
 
-            <div>
-              <label className="block text-gray-300 mb-2 text-sm">Crop</label>
-              <select
-                value={filterCrop}
-                onChange={(e) => setFilterCrop(e.target.value)}
-                className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
-              >
-                <option value="">All Crops</option>
-                {uniqueCrops.map((crop) => (
-                  <option key={crop} value={crop}>
-                    {crop}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-300 mb-2 text-sm">
-                District
-              </label>
-              <select
-                value={filterDistrict}
-                onChange={(e) => setFilterDistrict(e.target.value)}
-                className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
-              >
-                <option value="">All Districts</option>
-                {uniqueDistricts.map((district) => (
-                  <option key={district} value={district}>
-                    {district}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-300 mb-2 text-sm">Sector</label>
-              <select
-                value={filterSector}
-                onChange={(e) => setFilterSector(e.target.value)}
-                className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-gray-300 text-sm"
-              >
-                <option value="">All Sectors</option>
-                {uniqueSectors.map((sector) => (
-                  <option key={sector} value={sector}>
-                    {sector}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* ... other filter controls with similar color updates ... */}
 
             <div className="flex items-end">
               <button
@@ -609,7 +837,7 @@ function Admin_Manage_predictions() {
                   setFilterDistrict("");
                   setFilterSector("");
                 }}
-                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm"
+                className="px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-600 text-sm"
               >
                 Reset Filters
               </button>
@@ -629,8 +857,8 @@ function Admin_Manage_predictions() {
     if (!recentPredictions.length) return null;
 
     return (
-      <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-700 mb-6">
-        <h3 className="text-lg font-semibold mb-4 text-green-400 flex items-center">
+      <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-yellow-700 mb-6">
+        <h3 className="text-lg font-semibold mb-4 text-yellow-400 flex items-center">
           <FontAwesomeIcon icon={faLeaf} className="mr-2" />
           Recent Predictions
         </h3>
@@ -639,26 +867,26 @@ function Admin_Manage_predictions() {
             return (
               <div key={prediction.id} className="flex">
                 <div className="mr-4 flex flex-col items-center">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <div className="w-0.5 h-full bg-gray-700"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-0.5 h-full bg-yellow-700"></div>
                 </div>
-                <div className="flex-1 bg-gray-800 p-3 rounded-lg border border-gray-700">
+                <div className="flex-1 bg-yellow-800 p-3 rounded-lg border border-yellow-700">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-medium text-gray-200">
+                      <h4 className="font-medium text-yellow-200">
                         {prediction.crop} Prediction
                       </h4>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-yellow-300">
                         {prediction.sector}, {prediction.district} | Season:{" "}
                         {prediction.season.replace("_", " ")}
                       </p>
                     </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-green-900 text-green-200">
+                    <span className="text-xs px-2 py-1 rounded-full bg-yellow-700 text-yellow-200">
                       {new Date(prediction.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-gray-300">
-                    <span className="text-green-400">Expected yield:</span>{" "}
+                  <div className="mt-2 text-sm text-yellow-200">
+                    <span className="text-yellow-400">Expected yield:</span>{" "}
                     {prediction.expected_yield_tons_per_ha} tons/ha
                   </div>
                 </div>
@@ -728,7 +956,7 @@ function Admin_Manage_predictions() {
     return (
       <div className="w-full lg:w-1/3 space-y-6">
         <ErrorBoundary>
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
+          <div className="bg-yellow-800 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
             <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faChartPie} className="mr-2" />
               Soil Type Distribution
@@ -773,7 +1001,7 @@ function Admin_Manage_predictions() {
         </ErrorBoundary>
 
         <ErrorBoundary>
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
+          <div className="bg-yellow-800 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
             <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faSeedling} className="mr-2" />
               Expected Yield by Crop
@@ -808,7 +1036,7 @@ function Admin_Manage_predictions() {
         </ErrorBoundary>
 
         <ErrorBoundary>
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72 mt-6">
+          <div className="bg-yellow-800 p-6 rounded-lg shadow-lg border border-gray-800 h-72 mt-6">
             <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faWater} className="mr-2" />
               Water Requirements by Crop
@@ -900,10 +1128,10 @@ function Admin_Manage_predictions() {
         }`}
       >
         <div
-          className="fixed inset-0 bg-black opacity-50"
+          className="fixed inset-0 bg-yellow-800 opacity-50"
           onClick={() => setViewDetailsModalOpen(false)}
         ></div>
-        <div className="bg-gray-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-4xl border border-gray-800 max-h-[90vh] overflow-y-auto">
+        <div className="bg-yellow-800 rounded-lg shadow-xl p-6 z-50 w-full max-w-4xl border border-gray-800 max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-green-500">
               Prediction Details
@@ -931,21 +1159,23 @@ function Admin_Manage_predictions() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-green-400 mb-3">
                   Basic Information
                 </h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Crop:</span>
-                    <span className="text-white font-medium">
-                      {detailsPrediction.crop}
-                    </span>
+                  <div>
+                    <label className="block text-gray-300 mb-2">Crop</label>
+                    <div className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200">
+                      Sunflower
+                    </div>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Season:</span>
                     <span className="text-white font-medium">
-                      {detailsPrediction.season.replace("_", " ")}
+                      {RWANDA_SEASONS.find(
+                        (s) => s.value === detailsPrediction.season
+                      )?.label || detailsPrediction.season.replace("_", " ")}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -975,7 +1205,7 @@ function Admin_Manage_predictions() {
                 </div>
               </div>
 
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-blue-400 mb-3">
                   Nutrient Requirements
                 </h3>
@@ -1007,7 +1237,7 @@ function Admin_Manage_predictions() {
                 </div>
               </div>
 
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-yellow-500 mb-3">
                   <FontAwesomeIcon icon={faWater} className="mr-2" />
                   Water Requirements
@@ -1022,7 +1252,7 @@ function Admin_Manage_predictions() {
             </div>
 
             <div className="space-y-4">
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-purple-400 mb-3">
                   Planting Information
                 </h3>
@@ -1048,7 +1278,7 @@ function Admin_Manage_predictions() {
                 </div>
               </div>
 
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-orange-400 mb-3">
                   Seasonal Recommendations
                 </h3>
@@ -1068,7 +1298,7 @@ function Admin_Manage_predictions() {
                 )}
               </div>
 
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-pink-400 mb-3">
                   Intercropping Recommendations
                 </h3>
@@ -1088,7 +1318,7 @@ function Admin_Manage_predictions() {
                 )}
               </div>
 
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-teal-400 mb-3">
                   Additional Information
                 </h3>
@@ -1129,7 +1359,7 @@ function Admin_Manage_predictions() {
   // Render the data table
   const renderDataTable = () => {
     return (
-      <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-700">
+      <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-yellow-700">
         <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
           <h3 className="text-xl font-bold text-green-400 mb-4 lg:mb-0">
             Crop Predictions
@@ -1142,7 +1372,7 @@ function Admin_Manage_predictions() {
                 placeholder="Search predictions..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-2 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-2 pl-10 bg-yellow-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
               <FontAwesomeIcon
                 icon={faSearch}
@@ -1153,13 +1383,13 @@ function Admin_Manage_predictions() {
             <div className="relative inline-block">
               <button
                 onClick={() => setDownloadMenuVisible(!downloadMenuVisible)}
-                className="flex items-center px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 hover:bg-gray-700 transition"
+                className="flex items-center px-4 py-2 bg-yellow-800 border border-gray-700 rounded-lg text-gray-200 hover:bg-yellow-800 transition"
               >
                 <FontAwesomeIcon icon={faDownload} className="mr-2" />
                 Export
               </button>
               {downloadMenuVisible && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-gray-700 z-10">
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-yellow-800 ring-1 ring-gray-700 z-10">
                   <div className="py-1">
                     {Object.entries(handleDownload).map(([format, handler]) => (
                       <button
@@ -1168,7 +1398,7 @@ function Admin_Manage_predictions() {
                           handler();
                           setDownloadMenuVisible(false);
                         }}
-                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 w-full text-left"
+                        className="block px-4 py-2 text-sm text-gray-300 hover:bg-yellow-800 w-full text-left"
                       >
                         Export as {format}
                       </button>
@@ -1200,13 +1430,10 @@ function Admin_Manage_predictions() {
           </div>
         )}
 
-        <div className="overflow-x-auto">
-          <table
-            id="prediction-table"
-            className="w-full table-auto border-collapse"
-          >
-            <thead>
-              <tr className="bg-gray-800 text-gray-200">
+        <div className="overflow-x-auto rounded-lg shadow-md border border-yellow-700">
+          <table id="prediction-table" className="w-full text-sm text-left">
+            <thead className="text-xs uppercase bg-gradient-to-r from-yellow-600 to-yellow-500 text-white">
+              <tr className="bg-yellow-800 text-gray-200">
                 <th className="px-4 py-3 text-left">Crop</th>
                 <th className="px-4 py-3 text-left">Season</th>
                 <th className="px-4 py-3 text-left">District</th>
@@ -1219,11 +1446,8 @@ function Admin_Manage_predictions() {
             </thead>
             <tbody>
               {currentPredictions.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="7"
-                    className="px-4 py-3 text-center text-gray-400 border-t border-gray-700"
-                  >
+                <tr className="bg-yellow-900 border-b border-yellow-800 hover:bg-yellow-800 transition-colors duration-200">
+                  <td colSpan="7" className="text-center py-8 text-yellow-400">
                     No predictions found
                   </td>
                 </tr>
@@ -1231,13 +1455,14 @@ function Admin_Manage_predictions() {
                 currentPredictions.map((prediction) => (
                   <tr
                     key={prediction.id}
-                    className="border-t border-gray-700 hover:bg-gray-800"
+                    className="bg-yellow-900 border-b border-yellow-800 hover:bg-yellow-800 transition duration-200"
                   >
-                    <td className="px-4 py-3 text-gray-300">
+                    <td className="px-6 py-4 text-yellow-200">
                       {prediction.crop}
                     </td>
                     <td className="px-4 py-3 text-gray-300">
-                      {prediction.season.replace("_", " ")}
+                      {RWANDA_SEASONS.find((s) => s.value === prediction.season)
+                        ?.label || prediction.season.replace("_", " ")}
                     </td>
                     <td className="px-4 py-3 text-gray-300">
                       {prediction.district}
@@ -1297,7 +1522,7 @@ function Admin_Manage_predictions() {
                   setPredictionsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="bg-gray-800 border border-gray-700 rounded p-1 text-gray-300"
+                className="bg-yellow-800 border border-gray-700 rounded p-1 text-gray-300"
               >
                 {[5, 10, 25, 50].map((num) => (
                   <option key={num} value={num}>
@@ -1314,8 +1539,8 @@ function Admin_Manage_predictions() {
                 disabled={currentPage === 1}
                 className={`px-3 py-1 rounded ${
                   currentPage === 1
-                    ? "bg-gray-800 text-gray-600"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    ? "bg-yellow-800 text-gray-600"
+                    : "bg-yellow-800 text-gray-300 hover:bg-yellow-800"
                 }`}
               >
                 &laquo;
@@ -1325,8 +1550,8 @@ function Admin_Manage_predictions() {
                 disabled={currentPage === 1}
                 className={`px-3 py-1 rounded ${
                   currentPage === 1
-                    ? "bg-gray-800 text-gray-600"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    ? "bg-yellow-800 text-gray-600"
+                    : "bg-yellow-800 text-gray-300 hover:bg-yellow-800"
                 }`}
               >
                 &lsaquo;
@@ -1351,7 +1576,7 @@ function Admin_Manage_predictions() {
                       className={`px-3 py-1 rounded ${
                         currentPage === pageNum
                           ? "bg-green-600 text-white"
-                          : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                          : "bg-yellow-800 text-gray-300 hover:bg-yellow-800"
                       }`}
                     >
                       {pageNum}
@@ -1379,8 +1604,8 @@ function Admin_Manage_predictions() {
                 className={`px-3 py-1 rounded ${
                   currentPage ===
                   Math.ceil(filteredData.length / predictionsPerPage)
-                    ? "bg-gray-800 text-gray-600"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    ? "bg-yellow-800 text-gray-600"
+                    : "bg-yellow-800 text-gray-300 hover:bg-yellow-800"
                 }`}
               >
                 &rsaquo;
@@ -1398,8 +1623,8 @@ function Admin_Manage_predictions() {
                 className={`px-3 py-1 rounded ${
                   currentPage ===
                   Math.ceil(filteredData.length / predictionsPerPage)
-                    ? "bg-gray-800 text-gray-600"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    ? "bg-yellow-800 text-gray-600"
+                    : "bg-yellow-800 text-gray-300 hover:bg-yellow-800"
                 }`}
               >
                 &raquo;
@@ -1447,7 +1672,7 @@ function Admin_Manage_predictions() {
     const uniqueCrops = [...new Set(predictions.map((p) => p.crop))];
 
     return (
-      <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-700 w-full lg:w-2/3">
+      <div className="bg-yellow-800 p-6 rounded-lg shadow-lg border border-gray-700 w-full lg:w-2/3">
         <h3 className="text-lg font-semibold mb-4 text-green-400 flex items-center">
           <FontAwesomeIcon icon={faLeaf} className="mr-2" />
           Crop Distribution by District
@@ -1456,7 +1681,7 @@ function Admin_Manage_predictions() {
           <div className="w-full md:w-3/4 h-96 relative">
             {/* This is a placeholder for the map. In a real implementation, you would
                  use a mapping library like Leaflet or Google Maps to render a real map */}
-            <div className="w-full h-full bg-gray-800 rounded-lg border border-gray-700 p-4">
+            <div className="w-full h-full bg-yellow-800 rounded-lg border border-gray-700 p-4">
               <div className="text-center text-gray-400 italic">
                 Map placeholder - Rwanda districts would be displayed here with
                 color coding for dominant crops in each district
@@ -1481,7 +1706,7 @@ function Admin_Manage_predictions() {
             </div>
           </div>
           <div className="w-full md:w-1/4 pl-0 md:pl-4 mt-4 md:mt-0">
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 h-full">
+            <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700 h-full">
               <h4 className="text-sm font-medium text-gray-300 mb-3">Legend</h4>
               <div className="space-y-2">
                 {uniqueCrops.map((crop, index) => (
@@ -1581,12 +1806,12 @@ function Admin_Manage_predictions() {
         }`}
       >
         <div
-          className="fixed inset-0 bg-black opacity-50"
+          className="fixed inset-0 from-yellow-900 to-yellow-950 opacity-50"
           onClick={() => setIsModalOpen(false)}
         ></div>
-        <div className="bg-gray-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-4xl border border-gray-800 max-h-[90vh] overflow-y-auto">
+        <div className="bg-yellow-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-4xl border border-white max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-green-500">
+            <h2 className="text-xl font-bold text-yellow-500">
               {isEditMode ? "Update Prediction" : "Add New Prediction"}
             </h2>
             <button
@@ -1613,33 +1838,12 @@ function Admin_Manage_predictions() {
           <form onSubmit={handleAddUpdatePrediction}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Required fields section */}
-              <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
-                <h3 className="text-lg font-medium text-green-400 mb-4">
+              <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-white mb-4">
+                <h3 className="text-lg font-medium text-yellow-400 mb-4">
                   {isEditMode ? "Basic Information" : "Required Information"}
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="crop" className="block text-gray-300 mb-2">
-                      Crop <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      id="crop"
-                      name="crop"
-                      value={selectedCrop}
-                      onChange={(e) => setSelectedCrop(e.target.value)}
-                      required
-                      className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                      <option value="">Select Crop</option>
-                      {sortedCrops.map((crop) => (
-                        <option key={crop} value={crop}>
-                          {crop}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
                   <div>
                     <label
                       htmlFor="season"
@@ -1651,12 +1855,13 @@ function Admin_Manage_predictions() {
                       id="season"
                       name="season"
                       defaultValue={currentPrediction?.season || "long_rainy"}
-                      className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      <option value="long_rainy">Long Rainy</option>
-                      <option value="short_rainy">Short Rainy</option>
-                      <option value="long_dry">Long Dry</option>
-                      <option value="short_dry">Short Dry</option>
+                      {RWANDA_SEASONS.map((season) => (
+                        <option key={season.value} value={season.value}>
+                          {season.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -1673,7 +1878,7 @@ function Admin_Manage_predictions() {
                       value={selectedDistrict}
                       onChange={handleDistrictChange}
                       required
-                      className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full p-2 bg-yellow-700 border border-white rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="">Select District</option>
                       {allDistricts.map((district) => (
@@ -1698,7 +1903,7 @@ function Admin_Manage_predictions() {
                       onChange={(e) => setSelectedSector(e.target.value)}
                       required
                       disabled={!selectedDistrict}
-                      className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full p-2 bg-yellow-700 border border-whiterounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="">Select Sector</option>
                       {allSectors.map((sector) => (
@@ -1715,7 +1920,7 @@ function Admin_Manage_predictions() {
               {isEditMode && (
                 <>
                   {/* Season and soil section */}
-                  <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
+                  <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-white mb-4">
                     <h3 className="text-lg font-medium text-blue-400 mb-4">
                       Soil Information
                     </h3>
@@ -1733,7 +1938,7 @@ function Admin_Manage_predictions() {
                           id="soil_type"
                           name="soil_type"
                           defaultValue={currentPrediction?.soil_type || ""}
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-700 border border-white rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="e.g. ferralsol"
                         />
                       </div>
@@ -1741,7 +1946,7 @@ function Admin_Manage_predictions() {
                   </div>
 
                   {/* Nutrient requirements section */}
-                  <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
+                  <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-whiite mb-4">
                     <h3 className="text-lg font-medium text-purple-400 mb-4">
                       Nutrient Requirements
                     </h3>
@@ -1763,7 +1968,7 @@ function Admin_Manage_predictions() {
                           defaultValue={
                             currentPrediction?.nitrogen_kg_per_ha || "0"
                           }
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-700 border border-white rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
 
@@ -1783,7 +1988,7 @@ function Admin_Manage_predictions() {
                           defaultValue={
                             currentPrediction?.phosphorus_kg_per_ha || "0"
                           }
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-700 border border-white rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
 
@@ -1803,7 +2008,7 @@ function Admin_Manage_predictions() {
                           defaultValue={
                             currentPrediction?.potassium_kg_per_ha || "0"
                           }
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-700 border border-whiterounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
 
@@ -1822,14 +2027,14 @@ function Admin_Manage_predictions() {
                           id="optimal_ph"
                           name="optimal_ph"
                           defaultValue={currentPrediction?.optimal_ph || "6.5"}
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Planting details section */}
-                  <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
+                  <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-gray-700 mb-4">
                     <h3 className="text-lg font-medium text-yellow-400 mb-4">
                       Planting Details
                     </h3>
@@ -1851,7 +2056,7 @@ function Admin_Manage_predictions() {
                           defaultValue={
                             currentPrediction?.row_spacing_cm || "0"
                           }
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
 
@@ -1871,7 +2076,7 @@ function Admin_Manage_predictions() {
                           defaultValue={
                             currentPrediction?.plant_spacing_cm || "0"
                           }
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
 
@@ -1891,7 +2096,7 @@ function Admin_Manage_predictions() {
                           defaultValue={
                             currentPrediction?.planting_depth_cm || "0"
                           }
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
 
@@ -1911,14 +2116,14 @@ function Admin_Manage_predictions() {
                           defaultValue={
                             currentPrediction?.expected_yield_tons_per_ha || "0"
                           }
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Water requirements section */}
-                  <div className="col-span-2 bg-gray-800 p-4 rounded-lg border border-gray-700 mb-4">
+                  <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-gray-700 mb-4">
                     <h3 className="text-lg font-medium text-teal-400 mb-4">
                       Water Requirements
                     </h3>
@@ -1940,7 +2145,7 @@ function Admin_Manage_predictions() {
                           defaultValue={
                             currentPrediction?.water_requirement_mm || "0"
                           }
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
 
@@ -1956,7 +2161,7 @@ function Admin_Manage_predictions() {
                           id="altitude"
                           name="altitude"
                           defaultValue={currentPrediction?.altitude || "N/A"}
-                          className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                       </div>
                     </div>
@@ -1969,19 +2174,48 @@ function Admin_Manage_predictions() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg transition"
+                  className="px-5 py-2 bg-yellow-800 hover:bg-yellow-600 text-gray-200 rounded-lg transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition flex items-center"
+                  className="px-5 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition flex items-center justify-center"
+                  disabled={isLoading}
                 >
-                  <FontAwesomeIcon
-                    icon={isEditMode ? faEdit : faPlus}
-                    className="mr-2"
-                  />
-                  {isEditMode ? "Update Prediction" : "Create Prediction"}
+                  {isLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon
+                        icon={isEditMode ? faEdit : faPlus}
+                        className="mr-2"
+                      />
+                      {isEditMode ? "Update Prediction" : "Create Prediction"}
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -1992,12 +2226,12 @@ function Admin_Manage_predictions() {
   };
 
   return (
-    <div className="p-6 bg-gray-950 min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-green-500">
+    <div className="p-6 bg-gradient-to-b from-yellow-900 to-yellow-950 min-h-screen">
+      <div className="mb-6 p-6 bg-yellow-900 rounded-lg shadow-xl border-b-4 border-yellow-500">
+        <h1 className="text-center text-yellow-400 font-bold text-2xl mb-2">
           Crop Prediction Management
         </h1>
-        <p className="text-gray-400">
+        <p className="text-center text-yellow-200 text-sm max-w-2xl mx-auto">
           Manage and analyze crop recommendations and predictions
         </p>
       </div>

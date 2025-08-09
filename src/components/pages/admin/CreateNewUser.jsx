@@ -106,34 +106,34 @@ const CreateUser = () => {
   };
 
   return (
-    <section className="bg-gray-800 min-h-screen flex items-center justify-center px-4 py-16">
+    <section className="bg-yellow-800 min-h-screen flex items-center justify-center px-4 py-16">
       {/* Background overlay with subtle pattern */}
-      <div className="absolute inset-0 bg-gray-900 opacity-50 pattern-grid-lg"></div>
+      <div className="absolute inset-0 bg-yellow-900 opacity-50 pattern-grid-lg"></div>
 
       <div className="container mx-auto max-w-md z-10">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">
             Create New User
           </h2>
-          <p className="text-gray-300 max-w-md mx-auto">
+          <p className="text-yellow-300 max-w-md mx-auto">
             Add a new user to the system
           </p>
         </div>
 
-        <div className="bg-gray-900 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-6 bg-green-600 text-white">
+        <div className="bg-yellow-900 rounded-lg shadow-xl overflow-hidden">
+          <div className="p-6 bg-yellow-600 text-white">
             <h3 className="text-xl font-semibold">New User Registration</h3>
-            <p className="text-gray-100 mt-1">Enter details for the new user account</p>
+            <p className="text-yellow-100 mt-1">Enter details for the new user account</p>
           </div>
 
           {errors.form && (
-            <div className="mx-6 mt-6 p-3 rounded bg-green-900 text-green-100">
+            <div className="mx-6 mt-6 p-3 rounded bg-yellow-900 text-yellow-100">
               {errors.form}
             </div>
           )}
           
           {message && (
-            <div className="mx-6 mt-6 p-3 rounded bg-green-900 text-green-100">
+            <div className="mx-6 mt-6 p-3 rounded bg-yellow-900 text-yellow-100">
               {message}
             </div>
           )}
@@ -142,7 +142,7 @@ const CreateUser = () => {
             <div>
               <label 
                 htmlFor="phone" 
-                className="block text-gray-300 mb-2 font-medium"
+                className="block text-yellow-300 mb-2 font-medium"
               >
                 Phone Number
               </label>
@@ -152,17 +152,17 @@ const CreateUser = () => {
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full p-3 bg-yellow-800 border border-yellow-700 rounded-md text-white placeholder-yellow-500 focus:outline-none focus:ring-2 focus:ring-red-600"
                 placeholder="e.g., 0781234567"
                 required
               />
-              {errors.phone && <p className="text-green-400 text-sm mt-1">{errors.phone}</p>}
+              {errors.phone && <p className="text-yellow-400 text-sm mt-1">{errors.phone}</p>}
             </div>
 
             <div>
               <label 
                 htmlFor="email" 
-                className="block text-gray-300 mb-2 font-medium"
+                className="block text-yellow-300 mb-2 font-medium"
               >
                 Email Address
               </label>
@@ -172,17 +172,17 @@ const CreateUser = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-600"
+                className="w-full p-3 bg-yellow-800 border border-yellow-700 rounded-md text-white placeholder-yellow-500 focus:outline-none focus:ring-2 focus:ring-red-600"
                 placeholder="e.g., example@gmail.com"
                 required
               />
-              {errors.email && <p className="text-green-400 text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-yellow-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div>
               <label 
                 htmlFor="role" 
-                className="block text-gray-300 mb-2 font-medium"
+                className="block text-yellow-300 mb-2 font-medium"
               >
                 Role
               </label>
@@ -191,21 +191,22 @@ const CreateUser = () => {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full p-3 bg-yellow-800 border border-yellow-700 rounded-md text-white placeholder-yellow-500 focus:outline-none focus:ring-2 focus:ring-black"
                 required
               >
                 <option value="" disabled>Select Role</option>
                 <option value="admin">Admin</option>
-                <option value="farmer">farmer</option>
+                <option value="farmer">Farmer</option>
+                <option value="minagri_officer">Minagri Officer</option>
                 {/* <option value="driver">Driver</option> */}
               </select>
-              {errors.role && <p className="text-green-400 text-sm mt-1">{errors.role}</p>}
+              {errors.role && <p className="text-yellow-400 text-sm mt-1">{errors.role}</p>}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full p-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
+              className="w-full p-3 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center justify-center gap-2 mt-6"
             >
               {loading ? (
                 <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -214,7 +215,7 @@ const CreateUser = () => {
                 </svg>
               ) : (
                 <>
-                  <LockClosedIcon className="h-5 w-5 text-gray-100 group-hover:text-gray-300" aria-hidden="true" />
+                  <LockClosedIcon className="h-5 w-5 text-yellow-100 group-hover:text-yellow-300" aria-hidden="true" />
                   Create User
                 </>
               )}
@@ -223,7 +224,7 @@ const CreateUser = () => {
             <div className="mt-5 text-center">
               <Link
                 to="/admin/users"
-                className="text-gray-400 hover:text-white flex items-center justify-center gap-1"
+                className="text-yellow-400 hover:text-white flex items-center justify-center gap-1"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to users

@@ -5,7 +5,7 @@ import Customer_Header from './Header';
 
 function Customer_Layout() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-800">
+    <div className="min-h-screen flex flex-col bg-yellow-800">
       <Customer_Header />
       <main className="flex-grow flex flex-col">
         <Outlet />
