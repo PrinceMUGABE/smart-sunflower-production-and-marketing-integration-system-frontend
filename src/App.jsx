@@ -58,6 +58,7 @@ import OfficerProfile from "./components/pages/officer/officer_profile.jsx";
 import Officer_StockMovementManagement from "./components/pages/officer/stock_movements.jsx";
 import Officer_Datasets from "./components/pages/officer/maanage_datasets.jsx";
 import Officer_Manage_predictions from "./components/pages/officer/manage_predictions.jsx";
+import Farmer_Manage_Sales from "./components/pages/customer/all_sales.jsx";
 
 
 
@@ -128,6 +129,7 @@ const App = () => {
             <Route path="/farmer/feedbacks" element={<Customer_Manage_Feedbacks />} />
             <Route path="/farmer/stock" element={<Farmer_Manage_Stocks />} />
             <Route path="/farmer/sales" element={<FarmerSalesManagement />} />
+            <Route path="/farmer/all-sales" element={<Farmer_Manage_Sales />} />
             <Route path="/farmer/sales/:saleId" element={<SaleDetailView />} />
             <Route path="/farmer/sales/edit/:saleId" element={<EditSaleView />} />
             <Route path="/farmer/stocks/:stockId/movements" element={<Farmer_StockMovementManagement />} />
