@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { IoMdClose } from "react-icons/io";
-import { Sun, Leaf, ShoppingCart, BarChart2, User, Phone, Mail } from "lucide-react"; // Add Phone and Mail imports
+import { Sun, Leaf, ShoppingCart, BarChart2, User, Phone, Mail } from "lucide-react";
 import ResponsiveMenu from "./ResponsiveMenu";
 import Logo from "../../assets/pictures/minagri.jpg";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -53,6 +53,13 @@ const Navbar = () => {
     } else {
       navigate(link);
     }
+  };
+
+  // Handle language change with proper error handling
+  const handleLanguageChange = (e) => {
+    const newLanguage = e.target.value;
+    console.log(`Changing language to: ${newLanguage}`);
+    i18n.changeLanguage(newLanguage);
   };
 
   const phoneNumbers = [
@@ -125,7 +132,7 @@ const Navbar = () => {
                 </button>
 
                 <select
-                  onChange={(e) => i18n.changeLanguage(e.target.value)}
+                  onChange={handleLanguageChange}
                   value={i18n.language}
                   className="border border-gray-300 text-gray-700 rounded px-3 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 >
@@ -166,7 +173,9 @@ const Navbar = () => {
             </button>
 
             <div className="p-8">
-              <h2 className="text-yellow-700 font-bold text-3xl mb-6 text-center">{t("Contact SunSmart Team")}</h2>
+              <h2 className="text-yellow-700 font-bold text-3xl mb-6 text-center">
+                {t("Contact SunSmart Team")}
+              </h2>
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="md:w-1/2">
                   <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">

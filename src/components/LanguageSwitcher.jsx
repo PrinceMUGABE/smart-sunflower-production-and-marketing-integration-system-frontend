@@ -14,7 +14,6 @@ const LanguageSwitcher = () => {
     >
       <option value="en">English</option>
       <option value="fr">Français</option>
-      <option value="sw">Kiswahili</option>
       <option value="rw">Kinyarwanda</option>
     </select>
   );

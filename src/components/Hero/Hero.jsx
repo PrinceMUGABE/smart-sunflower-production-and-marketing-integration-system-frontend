@@ -232,17 +232,6 @@ const Hero = () => {
                   <p className="text-sm text-gray-600 mb-3">
                     {renderTextWithLineBreaks(service.description)}
                   </p>
-                  {/* {service.linkText && (
-                    <a 
-                      href={service.link} 
-                      className="text-yellow-600 hover:text-yellow-700 text-sm font-medium inline-flex items-center transition-colors duration-200"
-                    >
-                      {service.linkText}
-                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </a>
-                  )} */}
                 </div>
               ))}
             </div>

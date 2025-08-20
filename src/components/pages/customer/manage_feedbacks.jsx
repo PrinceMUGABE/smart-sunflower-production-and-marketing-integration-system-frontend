@@ -42,6 +42,7 @@ import {
 } from "recharts";
 import Logog from "../../../assets/pictures/sunflower2.jpg";
 import img from "../../../assets/pictures/sunflower2.jpg";
+import { useTranslation } from "react-i18next";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -57,12 +58,12 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="p-4 text-green-100 bg-green-900 rounded-lg">
-          <h3 className="font-semibold">Something went wrong</h3>
+          <h3 className="font-semibold">{this.props.t('common.error.title', 'Something went wrong')}</h3>
           <button
             onClick={() => window.location.reload()}
             className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
-            Refresh Page
+            {this.props.t('common.actions.refresh', 'Refresh Page')}
           </button>
         </div>
       );
@@ -106,6 +107,7 @@ function Customer_Manage_Feedbacks() {
   const BASE_URL = "http://127.0.0.1:8000/feedback/";
   const RELOCATIONS_URL = "http://127.0.0.1:8000/weather/user/";
   const token = localStorage.getItem("token");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const storedUserData = localStorage.getItem("userData");
@@ -173,31 +175,26 @@ function Customer_Manage_Feedbacks() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Do you want to delete this feedback?")) return;
+    if (!window.confirm(t('feedback.delete.confirm', 'Do you want to delete this feedback?'))) return;
     try {
       await axios.delete(`${BASE_URL}delete/${id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       await handleFetch();
-      setMessage("Feedback deleted successfully");
+      setMessage(t('feedback.delete.success', 'Feedback deleted successfully'));
       setMessageType("success");
       setCurrentPage(1);
     } catch (err) {
-      setMessage(err.response?.data.message || "An error occurred");
+      setMessage(err.response?.data.message || t('common.error.generic', 'An error occurred'));
       setMessageType("error");
     }
   };
-
-  // Replace the existing handleDownload object with this updated version
 
   const handleDownload = {
     PDF: () => {
       const doc = new jsPDF();
 
-      // Add logo (you'll need to convert the image to base64 or use a URL)
-      // For now, I'll add a placeholder for the logo
       try {
-        // Add logo at top left
         doc.addImage(Logog, "JPEG", 20, 15, 30, 30);
       } catch (e) {
         console.log("Logo could not be added to PDF");
@@ -206,15 +203,15 @@ function Customer_Manage_Feedbacks() {
       // Add header text
       doc.setFontSize(16);
       doc.setFont(undefined, "bold");
-      doc.text("Sunflower Production and Marketing Integration", 60, 25);
+      doc.text(t('company.name', 'Sunflower Production and Marketing Integration'), 60, 25);
 
       // Add generation info
       doc.setFontSize(10);
       doc.setFont(undefined, "normal");
       const currentDate = new Date().toLocaleDateString();
-      doc.text(`Generated: ${currentDate}`, 60, 35);
-      doc.text(`Total Records: ${filteredData.length}`, 60, 42);
-      doc.text(`Period: ${new Date().getFullYear()}/Current`, 60, 49);
+      doc.text(`${t('reports.generated', 'Generated')}: ${currentDate}`, 60, 35);
+      doc.text(`${t('reports.totalRecords', 'Total Records')}: ${filteredData.length}`, 60, 42);
+      doc.text(`${t('reports.period', 'Period')}: ${new Date().getFullYear()}/${t('common.current', 'Current')}`, 60, 49);
 
       // Calculate totals
       const totalRating = filteredData.reduce(
@@ -226,28 +223,35 @@ function Customer_Manage_Feedbacks() {
           ? (totalRating / filteredData.length).toFixed(2)
           : 0;
 
-      doc.text(`Total Rating: ${totalRating}`, 60, 56);
-      doc.text(`Average Rating: ${averageRating}`, 60, 63);
+      doc.text(`${t('feedback.stats.totalRating', 'Total Rating')}: ${totalRating}`, 60, 56);
+      doc.text(`${t('feedback.stats.averageRating', 'Average Rating')}: ${averageRating}`, 60, 63);
 
       // Add section title
       doc.setFontSize(14);
       doc.setFont(undefined, "bold");
-      doc.text("FEEDBACK RECORDS", 20, 80);
+      doc.text(t('feedback.title.records', 'FEEDBACK RECORDS'), 20, 80);
 
       // Prepare table data from filtered results
       const tableData = filteredData.map((feedback, index) => [
         index + 1, // #
-        feedback.relocation ? `${feedback.relocation.district}` : "N/A", // District
-        feedback.relocation ? feedback.relocation.sector : "N/A", // Sector
-        `${feedback.rating}/5`, // Rating
-        feedback.relocation ? feedback.relocation.season : "N/A", // Season
-        new Date(feedback.created_at).toLocaleDateString(), // Created At
+        feedback.relocation ? `${feedback.relocation.district}` : t('common.notAvailable', 'N/A'),
+        feedback.relocation ? feedback.relocation.sector : t('common.notAvailable', 'N/A'),
+        `${feedback.rating}/5`,
+        feedback.relocation ? feedback.relocation.season : t('common.notAvailable', 'N/A'),
+        new Date(feedback.created_at).toLocaleDateString(),
       ]);
 
       // Add table
       doc.autoTable({
         startY: 90,
-        head: [["#", "District", "Sector", "Rating", "Season", "Created At"]],
+        head: [[
+          "#", 
+          t('location.district', 'District'), 
+          t('location.sector', 'Sector'), 
+          t('feedback.rating', 'Rating'), 
+          t('weather.season', 'Season'), 
+          t('common.createdAt', 'Created At')
+        ]],
         body: tableData,
         theme: "striped",
         headStyles: {
@@ -270,12 +274,12 @@ function Customer_Manage_Feedbacks() {
         doc.setPage(i);
         doc.setFontSize(8);
         doc.text(
-          `Showing Page ${i} of ${pageCount}`,
+          `${t('pagination.showingPage', 'Showing Page')} ${i} ${t('pagination.of', 'of')} ${pageCount}`,
           20,
           doc.internal.pageSize.height - 10
         );
         doc.text(
-          `Status: ${filteredData.length} records found`,
+          `${t('reports.status', 'Status')}: ${filteredData.length} ${t('pagination.recordsFound', 'records found')}`,
           150,
           doc.internal.pageSize.height - 10
         );
@@ -285,24 +289,22 @@ function Customer_Manage_Feedbacks() {
     },
 
     Excel: () => {
-      // Create workbook
       const workbook = XLSX.utils.book_new();
 
-      // Prepare header data for Excel
       const headerData = [
-        ["Sunflower Production and Marketing Integration"],
+        [t('company.name', 'Sunflower Production and Marketing Integration')],
         [""],
-        [`Generated: ${new Date().toLocaleDateString()}`],
-        [`Total Records: ${filteredData.length}`],
-        [`Period: ${new Date().getFullYear()}/Current`],
+        [`${t('reports.generated', 'Generated')}: ${new Date().toLocaleDateString()}`],
+        [`${t('reports.totalRecords', 'Total Records')}: ${filteredData.length}`],
+        [`${t('reports.period', 'Period')}: ${new Date().getFullYear()}/${t('common.current', 'Current')}`],
         [
-          `Total Rating: ${filteredData.reduce(
+          `${t('feedback.stats.totalRating', 'Total Rating')}: ${filteredData.reduce(
             (sum, feedback) => sum + feedback.rating,
             0
           )}`,
         ],
         [
-          `Average Rating: ${
+          `${t('feedback.stats.averageRating', 'Average Rating')}: ${
             filteredData.length > 0
               ? (
                   filteredData.reduce(
@@ -314,57 +316,49 @@ function Customer_Manage_Feedbacks() {
           }`,
         ],
         [""],
-        ["FEEDBACK RECORDS"],
+        [t('feedback.title.records', 'FEEDBACK RECORDS')],
         [""],
         [
           "#",
-          "District",
-          "Sector",
-          "Rating (out of 5)",
-          "Season",
-          "Comment",
-          "User",
-          "Created At",
+          t('location.district', 'District'),
+          t('location.sector', 'Sector'),
+          t('feedback.ratingOutOf5', 'Rating (out of 5)'),
+          t('weather.season', 'Season'),
+          t('feedback.comment', 'Comment'),
+          t('user.label', 'User'),
+          t('common.createdAt', 'Created At'),
         ],
       ];
 
-      // Prepare feedback data
-      const feedbackData = filteredData.map((feedback, index) => [
+      const feedbackExcelData = filteredData.map((feedback, index) => [
         index + 1,
-        feedback.relocation ? feedback.relocation.district : "N/A",
-        feedback.relocation ? feedback.relocation.sector : "N/A",
+        feedback.relocation ? feedback.relocation.district : t('common.notAvailable', 'N/A'),
+        feedback.relocation ? feedback.relocation.sector : t('common.notAvailable', 'N/A'),
         `${feedback.rating}/5`,
-        feedback.relocation ? feedback.relocation.season : "N/A",
+        feedback.relocation ? feedback.relocation.season : t('common.notAvailable', 'N/A'),
         feedback.comment,
-        feedback.created_by ? feedback.created_by.phone_number : "N/A",
+        feedback.created_by ? feedback.created_by.phone_number : t('common.notAvailable', 'N/A'),
         new Date(feedback.created_at).toLocaleDateString(),
       ]);
 
-      // Add footer data
       const footerData = [
         [""],
-        [`Showing Page 1 of 1`],
-        [`Status: ${filteredData.length} records found`],
+        [`${t('pagination.showingPage', 'Showing Page')} 1 ${t('pagination.of', 'of')} 1`],
+        [`${t('reports.status', 'Status')}: ${filteredData.length} ${t('pagination.recordsFound', 'records found')}`],
       ];
 
-      // Combine all data
-      const allData = [...headerData, ...feedbackData, ...footerData];
-
-      // Create worksheet
+      const allData = [...headerData, ...feedbackExcelData, ...footerData];
       const worksheet = XLSX.utils.aoa_to_sheet(allData);
 
-      // Style the header
       const headerStyle = {
         font: { bold: true, size: 14 },
         alignment: { horizontal: "center" },
       };
 
-      // Apply styles to specific cells
       if (worksheet["A1"]) {
         worksheet["A1"].s = headerStyle;
       }
 
-      // Set column widths
       const columnWidths = [
         { wch: 5 }, // #
         { wch: 15 }, // District
@@ -377,26 +371,22 @@ function Customer_Manage_Feedbacks() {
       ];
       worksheet["!cols"] = columnWidths;
 
-      // Add worksheet to workbook
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Feedback Records");
-
-      // Save file
+      XLSX.utils.book_append_sheet(workbook, worksheet, t('feedback.title.records', 'Feedback Records'));
       XLSX.writeFile(workbook, "feedback_records.xlsx");
     },
 
     CSV: () => {
-      // Prepare CSV header with metadata
       const csvHeader = [
-        "Sunflower Production and Marketing Integration",
+        t('company.name', 'Sunflower Production and Marketing Integration'),
         "",
-        `Generated: ${new Date().toLocaleDateString()}`,
-        `Total Records: ${filteredData.length}`,
-        `Period: ${new Date().getFullYear()}/Current`,
-        `Total Rating: ${filteredData.reduce(
+        `${t('reports.generated', 'Generated')}: ${new Date().toLocaleDateString()}`,
+        `${t('reports.totalRecords', 'Total Records')}: ${filteredData.length}`,
+        `${t('reports.period', 'Period')}: ${new Date().getFullYear()}/${t('common.current', 'Current')}`,
+        `${t('feedback.stats.totalRating', 'Total Rating')}: ${filteredData.reduce(
           (sum, feedback) => sum + feedback.rating,
           0
         )}`,
-        `Average Rating: ${
+        `${t('feedback.stats.averageRating', 'Average Rating')}: ${
           filteredData.length > 0
             ? (
                 filteredData.reduce(
@@ -407,36 +397,32 @@ function Customer_Manage_Feedbacks() {
             : 0
         }`,
         "",
-        "FEEDBACK RECORDS",
+        t('feedback.title.records', 'FEEDBACK RECORDS'),
         "",
-        "#,District,Sector,Rating,Season,Comment,User,Created At",
+        `#,${t('location.district', 'District')},${t('location.sector', 'Sector')},${t('feedback.rating', 'Rating')},${t('weather.season', 'Season')},${t('feedback.comment', 'Comment')},${t('user.label', 'User')},${t('common.createdAt', 'Created At')}`,
       ];
 
-      // Prepare feedback data
       const csvData = filteredData.map((feedback, index) =>
         [
           index + 1,
-          feedback.relocation ? feedback.relocation.district : "N/A",
-          feedback.relocation ? feedback.relocation.sector : "N/A",
+          feedback.relocation ? feedback.relocation.district : t('common.notAvailable', 'N/A'),
+          feedback.relocation ? feedback.relocation.sector : t('common.notAvailable', 'N/A'),
           `${feedback.rating}/5`,
-          feedback.relocation ? feedback.relocation.season : "N/A",
-          `"${feedback.comment.replace(/"/g, '""')}"`, // Escape quotes in comments
-          feedback.created_by ? feedback.created_by.phone_number : "N/A",
+          feedback.relocation ? feedback.relocation.season : t('common.notAvailable', 'N/A'),
+          `"${feedback.comment.replace(/"/g, '""')}"`,
+          feedback.created_by ? feedback.created_by.phone_number : t('common.notAvailable', 'N/A'),
           new Date(feedback.created_at).toLocaleDateString(),
         ].join(",")
       );
 
-      // Add footer
       const csvFooter = [
         "",
-        `Showing Page 1 of 1`,
-        `Status: ${filteredData.length} records found`,
+        `${t('pagination.showingPage', 'Showing Page')} 1 ${t('pagination.of', 'of')} 1`,
+        `${t('reports.status', 'Status')}: ${filteredData.length} ${t('pagination.recordsFound', 'records found')}`,
       ];
 
-      // Combine all CSV content
       const csvContent = [...csvHeader, ...csvData, ...csvFooter].join("\n");
 
-      // Create and download CSV
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
@@ -459,7 +445,6 @@ function Customer_Manage_Feedbacks() {
       };
 
       if (currentFeedback) {
-        // Update existing feedback
         await axios.put(
           `${BASE_URL}update/${currentFeedback.id}/`,
           feedbackData,
@@ -470,16 +455,15 @@ function Customer_Manage_Feedbacks() {
             },
           }
         );
-        setMessage("Feedback updated successfully");
+        setMessage(t('feedback.update.success', 'Feedback updated successfully'));
       } else {
-        // Create new feedback
         await axios.post(`${BASE_URL}create/`, feedbackData, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
-        setMessage("Feedback created successfully");
+        setMessage(t('feedback.create.success', 'Feedback created successfully'));
       }
 
       handleFetch();
@@ -487,7 +471,7 @@ function Customer_Manage_Feedbacks() {
       setCurrentFeedback(null);
       setMessageType("success");
     } catch (err) {
-      setMessage(err.response?.data.error || "An error occurred");
+      setMessage(err.response?.data.error || t('common.error.generic', 'An error occurred'));
       setMessageType("error");
     }
   };
@@ -542,7 +526,6 @@ function Customer_Manage_Feedbacks() {
       const newConfig = { ...prev };
 
       if (field === "rating") {
-        // Toggle rating in the array
         if (newConfig.rating.includes(value)) {
           newConfig.rating = newConfig.rating.filter((r) => r !== value);
         } else {
@@ -554,7 +537,6 @@ function Customer_Manage_Feedbacks() {
         newConfig[field] = value;
       }
 
-      // Calculate active filters
       let activeCount = 0;
       if (newConfig.rating.length > 0) activeCount++;
       if (newConfig.dateRange.start || newConfig.dateRange.end) activeCount++;
@@ -576,7 +558,6 @@ function Customer_Manage_Feedbacks() {
 
   // Apply filters and sorting
   const applyFiltersAndSort = (data) => {
-    // First apply search filter
     let filteredData = data.filter((feedback) =>
       [
         feedback.comment,
@@ -588,7 +569,6 @@ function Customer_Manage_Feedbacks() {
       )
     );
 
-    // Apply specific filters
     if (filterConfig.rating.length > 0) {
       filteredData = filteredData.filter((feedback) =>
         filterConfig.rating.includes(feedback.rating)
@@ -618,12 +598,10 @@ function Customer_Manage_Feedbacks() {
       );
     }
 
-    // Apply sorting
     if (sortConfig.key) {
       filteredData.sort((a, b) => {
         let aValue, bValue;
 
-        // Handle nested properties
         if (sortConfig.key === "user") {
           aValue = a.created_by ? a.created_by.phone_number : "";
           bValue = b.created_by ? b.created_by.phone_number : "";
@@ -657,14 +635,12 @@ function Customer_Manage_Feedbacks() {
   const renderCharts = () => {
     if (!feedbackData.length) return null;
 
-    // Rating distribution
     const ratingDistribution = [1, 2, 3, 4, 5].map((rating) => ({
-      name: `${rating} Star${rating > 1 ? "s" : ""}`,
+      name: `${rating} ${t('feedback.star', 'Star')}${rating > 1 ? 's' : ''}`,
       value: feedbackData.filter((feedback) => feedback.rating === rating)
         .length,
     }));
 
-    // Average rating by date (month)
     const ratingsByDate = feedbackData.reduce((acc, feedback) => {
       const date = new Date(feedback.created_at);
       const month = date.toLocaleString("default", { month: "short" });
@@ -686,7 +662,6 @@ function Customer_Manage_Feedbacks() {
       })
     );
 
-    // Relocation ratings
     const relocationRatings = {};
     feedbackData.forEach((feedback) => {
       if (feedback.relocation) {
@@ -707,15 +682,14 @@ function Customer_Manage_Feedbacks() {
         count: data.count,
       }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 5); // Top 5 relocations
+      .slice(0, 5);
 
     return (
       <div className="w-full lg:w-1/3 space-y-6">
-        {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-yellow-900 p-4 rounded-lg shadow-lg border border-yelloq-800">
             <h3 className="text-xs uppercase font-semibold text-yellow-500 mb-1">
-              Average Rating
+              {t('feedback.stats.averageRating', 'Average Rating')}
             </h3>
             <div className="flex items-center">
               <span className="text-2xl font-bold text-yellow-400">
@@ -729,7 +703,7 @@ function Customer_Manage_Feedbacks() {
 
           <div className="bg-yellow-900 p-4 rounded-lg shadow-lg border border-yellow-800">
             <h3 className="text-xs uppercase font-semibold text-yellow-500 mb-1">
-              Total Feedbacks
+              {t('feedback.stats.totalFeedbacks', 'Total Feedbacks')}
             </h3>
             <span className="text-2xl font-bold text-yellow-400">
               {summaryStats.totalFeedbacks}
@@ -737,11 +711,11 @@ function Customer_Manage_Feedbacks() {
           </div>
         </div>
 
-        <ErrorBoundary>
+        <ErrorBoundary t={t}>
           <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-yellow-800 h-72">
             <h3 className="text-sm font-semibold mb-4 text-green-400 flex items-center">
               <FontAwesomeIcon icon={faChartPie} className="mr-2" />
-              Average Rating Trend
+              {t('charts.averageRatingTrend', 'Average Rating Trend')}
             </h3>
             <ResponsiveContainer>
               <LineChart data={ratingTrendData}>
@@ -767,7 +741,7 @@ function Customer_Manage_Feedbacks() {
                   type="monotone"
                   dataKey="rating"
                   stroke="#FF6B6B"
-                  name="Average Rating"
+                  name={t('feedback.stats.averageRating', 'Average Rating')}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -785,11 +759,10 @@ function Customer_Manage_Feedbacks() {
         }`}
       >
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Rating filters */}
           <div>
             <h4 className="text-gray-300 font-semibold mb-2 flex items-center">
               <FontAwesomeIcon icon={faStar} className="mr-2 text-yellow-400" />
-              Rating
+              {t('feedback.rating', 'Rating')}
             </h4>
             <div className="flex flex-wrap gap-2">
               {[5, 4, 3, 2, 1].map((rating) => (
@@ -812,18 +785,19 @@ function Customer_Manage_Feedbacks() {
             </div>
           </div>
 
-          {/* Date range */}
           <div>
             <h4 className="text-gray-300 font-semibold mb-2 flex items-center">
               <FontAwesomeIcon
                 icon={faCalendarAlt}
                 className="mr-2 text-blue-400"
               />
-              Date Range
+              {t('common.dateRange', 'Date Range')}
             </h4>
             <div className="space-y-2">
               <div>
-                <label className="text-xs text-gray-400 block mb-1">From</label>
+                <label className="text-xs text-gray-400 block mb-1">
+                  {t('common.from', 'From')}
+                </label>
                 <input
                   type="date"
                   value={filterConfig.dateRange.start}
@@ -834,7 +808,9 @@ function Customer_Manage_Feedbacks() {
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-400 block mb-1">To</label>
+                <label className="text-xs text-gray-400 block mb-1">
+                  {t('common.to', 'To')}
+                </label>
                 <input
                   type="date"
                   value={filterConfig.dateRange.end}
@@ -847,21 +823,20 @@ function Customer_Manage_Feedbacks() {
             </div>
           </div>
 
-          {/* Relocation filter */}
           <div>
             <h4 className="text-gray-300 font-semibold mb-2 flex items-center">
               <FontAwesomeIcon
                 icon={faMapMarkerAlt}
                 className="mr-2 text-yellow-400"
               />
-              Relocation Route
+              {t('feedback.relocationRoute', 'Relocation Route')}
             </h4>
             <select
               value={filterConfig.relocation}
               onChange={(e) => handleFilterChange("relocation", e.target.value)}
               className="w-full p-2 bg-yellow-700 border border-yellow-600 rounded text-yellow-300"
             >
-              <option value="">All Seasons</option>
+              <option value="">{t('common.allSeasons', 'All Seasons')}</option>
               {relocations.map((relocation) => (
                 <option key={relocation.id} value={relocation.id}>
                   {relocation.season}
@@ -870,13 +845,12 @@ function Customer_Manage_Feedbacks() {
             </select>
           </div>
 
-          {/* Actions */}
           <div className="flex items-end">
             <button
               onClick={resetFilters}
               className="px-4 py-2 bg-yellow-700 text-gray-300 rounded hover:bg-yellow-600 transition w-full"
             >
-              Reset Filters
+              {t('filters.reset', 'Reset Filters')}
             </button>
           </div>
         </div>
@@ -899,12 +873,17 @@ function Customer_Manage_Feedbacks() {
         ></div>
         <div className="bg-yellow-900 rounded-lg shadow-xl p-6 z-50 w-96 border border-yellow-800">
           <h2 className="text-xl font-bold mb-4 text-yellow-500">
-            {currentFeedback ? "Update Feedback" : "Add New Feedback"}
+            {currentFeedback 
+              ? t('feedback.modal.update', 'Update Feedback') 
+              : t('feedback.modal.add', 'Add New Feedback')
+            }
           </h2>
           <form onSubmit={handleAddUpdateFeedback}>
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-300 mb-2">Rating (1-5)</label>
+                <label className="block text-gray-300 mb-2">
+                  {t('feedback.ratingOneToFive', 'Rating (1-5)')}
+                </label>
                 <div className="flex items-center space-x-1 mb-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <div key={star} className="text-2xl text-yellow-400">
@@ -918,15 +897,17 @@ function Customer_Manage_Feedbacks() {
                   required
                   className="w-full p-2 bg-yellow-800 border border-yellow-700 rounded text-yellow-300"
                 >
-                  <option value={1}>1 Star</option>
-                  <option value={2}>2 Stars</option>
-                  <option value={3}>3 Stars</option>
-                  <option value={4}>4 Stars</option>
-                  <option value={5}>5 Stars</option>
+                  <option value={1}>{t('feedback.oneStar', '1 Star')}</option>
+                  <option value={2}>{t('feedback.twoStars', '2 Stars')}</option>
+                  <option value={3}>{t('feedback.threeStars', '3 Stars')}</option>
+                  <option value={4}>{t('feedback.fourStars', '4 Stars')}</option>
+                  <option value={5}>{t('feedback.fiveStars', '5 Stars')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-gray-300 mb-2">Prediction</label>
+                <label className="block text-gray-300 mb-2">
+                  {t('prediction.label', 'Prediction')}
+                </label>
                 <select
                   name="relocation"
                   defaultValue={currentFeedback?.relocation?.id || ""}
@@ -935,20 +916,23 @@ function Customer_Manage_Feedbacks() {
                 >
                   {relocations.map((relocation) => (
                     <option key={relocation.id} value={relocation.id}>
-                      {relocation.sector}-{relocation.altitude} to{" "}
+                      {relocation.sector}-{relocation.altitude} {t('common.to', 'to')}{" "}
                       {relocation.soil_type}-{relocation.season}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-gray-300 mb-2">Comment</label>
+                <label className="block text-gray-300 mb-2">
+                  {t('feedback.comment', 'Comment')}
+                </label>
                 <textarea
                   name="comment"
                   defaultValue={currentFeedback?.comment || ""}
                   required
                   rows={4}
                   className="w-full p-2 bg-yellow-800 border border-yellow-700 rounded text-yellow-300"
+                  placeholder={t('feedback.commentPlaceholder', 'Enter your feedback comment...')}
                 ></textarea>
               </div>
             </div>
@@ -961,13 +945,13 @@ function Customer_Manage_Feedbacks() {
                 }}
                 className="px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-600"
               >
-                Cancel
+                {t('common.actions.cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
                 className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
               >
-                {currentFeedback ? "Update" : "Add"}
+                {currentFeedback ? t('common.actions.update', 'Update') : t('common.actions.add', 'Add')}
               </button>
             </div>
           </form>
@@ -993,10 +977,10 @@ function Customer_Manage_Feedbacks() {
           }`}
           onClick={() => setIsCommentModalOpen(false)}
         ></div>
-        <div className="bg-yello-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-lg border border-yellow-800">
+        <div className="bg-yellow-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-lg border border-yellow-800">
           <h2 className="text-xl font-bold mb-4 text-yellow-500 flex items-center">
             <FontAwesomeIcon icon={faComment} className="mr-2" />
-            Feedback Comment
+            {t('feedback.commentModal.title', 'Feedback Comment')}
           </h2>
           <div className="bg-yellow-800 p-4 rounded-lg border border-yellow-700 max-h-96 overflow-y-auto">
             <p className="text-gray-300 whitespace-pre-wrap">{commentToView}</p>
@@ -1006,7 +990,7 @@ function Customer_Manage_Feedbacks() {
               onClick={() => setIsCommentModalOpen(false)}
               className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
             >
-              Close
+              {t('common.actions.close', 'Close')}
             </button>
           </div>
         </div>
@@ -1014,348 +998,297 @@ function Customer_Manage_Feedbacks() {
     );
   };
 
-  return (
-    <div
-      className="min-h-screen p-6"
-      style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(${img})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      {message && (
-        <div
-          className={`p-4 mb-4 rounded-lg ${
-            messageType === "success"
-              ? "bg-green-800 text-green-100"
-              : "bg-green-800 text-green-100"
-          }`}
-        >
-          {message}
-        </div>
-      )}
+ return (
+  <div
+    className="min-h-screen p-6"
+    style={{
+      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(${img})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundAttachment: "fixed",
+    }}
+  >
+    {message && (
+      <div
+        className={`p-4 mb-4 rounded-lg ${
+          messageType === "success"
+            ? "bg-green-800 text-green-100"
+            : "bg-red-800 text-red-100"
+        }`}
+      >
+        {message}
+      </div>
+    )}
 
-      <div className="flex flex-col lg:flex-row space-y-6 lg:space-y-0 lg:space-x-6">
-        <div className="w-full lg:w-2/3 space-y-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-            <h1 className="text-2xl font-bold text-yellow-400">
-              Manage Feedbacks
-            </h1>
+    <div className="flex flex-col items-center">
+      <div className="w-full max-w-6xl space-y-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+          <h1 className="text-2xl font-bold text-yellow-400">
+            {t('feedback.title.manage', 'Manage Feedbacks')}
+          </h1>
 
-            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
-              <div className="relative">
-                <button
-                  onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
-                  className="flex items-center px-4 py-2 bg-yellow-700 rounded-lg hover:bg-yellow-700 transition"
-                >
-                  <FontAwesomeIcon icon={faFilter} className="mr-2" />
-                  Filters
-                  {activeFilters > 0 && (
-                    <span className="ml-2 px-2 py-0.5 bg-yellow-500 text-white text-xs rounded-full">
-                      {activeFilters}
-                    </span>
-                  )}
-                </button>
-              </div>
-
-              <div className="relative">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search feedbacks..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="px-4 py-2 bg-yellow-800 rounded-lg pr-10 border border-yellow-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full"
-                  />
-                  <FontAwesomeIcon
-                    icon={faSearch}
-                    className="absolute right-3 top-3 text-gray-400"
-                  />
-                </div>
-              </div>
-
-              <div className="relative">
-                <button
-                  onClick={() => setDownloadMenuVisible(!downloadMenuVisible)}
-                  className="flex items-center px-4 py-2 bg-yellow-800 rounded-lg hover:bg-yellow-700 transition"
-                >
-                  <FontAwesomeIcon icon={faDownload} className="mr-2" />
-                  Export
-                </button>
-                {downloadMenuVisible && (
-                  <div className="absolute right-0 mt-2 w-48 bg-yellow-800 rounded-md shadow-lg z-10 border border-yellow-700">
-                    <div className="py-1">
-                      {Object.entries(handleDownload).map(
-                        ([format, handler]) => (
-                          <button
-                            key={format}
-                            onClick={() => {
-                              handler();
-                              setDownloadMenuVisible(false);
-                            }}
-                            className="block w-full text-left px-4 py-2 text-gray-300 hover:bg-yellow-700"
-                          >
-                            Export as {format}
-                          </button>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
+          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+            <div className="relative">
               <button
-                onClick={() => openModal()}
-                className="flex items-center px-4 py-2 bg-yellow-600 rounded-lg hover:bg-yellow-700 transition"
+                onClick={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
+                className="flex items-center px-4 py-2 bg-yellow-700 rounded-lg hover:bg-yellow-600 transition"
               >
-                <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                Add Feedback
+                <FontAwesomeIcon icon={faFilter} className="mr-2" />
+                {t('filters.label', 'Filters')}
+                {activeFilters > 0 && (
+                  <span className="ml-2 px-2 py-0.5 bg-yellow-500 text-white text-xs rounded-full">
+                    {activeFilters}
+                  </span>
+                )}
               </button>
             </div>
-          </div>
 
-          {/* Filter Panel */}
-          {renderFilterPanel()}
-
-          <div className="bg-yellow-900 rounded-lg shadow-lg border border-yellow-900 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table id="feedback-table" className="w-full text-left">
-                <thead className="bg-yellow-800 text-yellow-400 text-xs uppercase">
-                  <tr>
-                    <th
-                      className="p-4 cursor-pointer"
-                      onClick={() => requestSort("rating")}
-                    >
-                      Rating {getSortIcon("rating")}
-                    </th>
-                    <th
-                      className="p-4 cursor-pointer"
-                      onClick={() => requestSort("comment")}
-                    >
-                      Comment {getSortIcon("comment")}
-                    </th>
-                    {/* <th
-                      className="p-4 cursor-pointer"
-                      onClick={() => requestSort("user")}
-                    >
-                      User {getSortIcon("user")}
-                    </th> */}
-                    <th
-                      className="p-4 cursor-pointer"
-                      onClick={() => requestSort("relocation")}
-                    >
-                      Relocation {getSortIcon("relocation")}
-                    </th>
-                    <th
-                      className="p-4 cursor-pointer"
-                      onClick={() => requestSort("created_at")}
-                    >
-                      Date {getSortIcon("created_at")}
-                    </th>
-                    <th className="p-4">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-300">
-                  {currentFeedbacks.length > 0 ? (
-                    currentFeedbacks.map((feedback) => (
-                      <tr
-                        key={feedback.id}
-                        className="border-t border-yellow-800 hover:bg-yellow-800 transition"
-                      >
-                        <td className="p-4">{renderStars(feedback.rating)}</td>
-                        <td className="p-4">
-                          <div className="flex items-center">
-                            <div className="max-w-xs truncate">
-                              {feedback.comment.substring(0, 50)}
-                              {feedback.comment.length > 50 ? "..." : ""}
-                            </div>
-                            {feedback.comment.length > 50 && (
-                              <button
-                                onClick={() =>
-                                  openCommentModal(feedback.comment)
-                                }
-                                className="ml-2 text-yellow-400 hover:text-yellow-300"
-                              >
-                                <FontAwesomeIcon icon={faEye} />
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                        {/* <td className="p-4">
-                          <div className="flex flex-col">
-                            <span className="font-medium">
-                              {feedback.created_by?.phone_number || "N/A"}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {feedback.created_by?.email || ""}
-                            </span>
-                          </div>
-                        </td> */}
-                        <td className="p-4">
-                          {feedback.relocation ? (
-                            <div className="flex flex-col">
-                              <span className="font-medium">
-                                {feedback.relocation.district},
-                                {feedback.relocation.sector}
-                                <p className="text-yellow-800">with</p>
-                              </span>
-                              <span className="font-medium">
-                                {feedback.relocation.altitude},
-                                {feedback.relocation.soil_type}
-                              </span>
-                            </div>
-                          ) : (
-                            "N/A"
-                          )}
-                        </td>
-                        <td className="p-4">
-                          {new Date(feedback.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="p-4">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => openModal(feedback)}
-                              className="text-blue-400 hover:text-blue-300"
-                              title="Edit"
-                            >
-                              <FontAwesomeIcon icon={faEdit} />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(feedback.id)}
-                              className="text-green-400 hover:text-green-300"
-                              title="Delete"
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" className="p-4 text-center text-gray-400">
-                        No feedbacks found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="bg-yellow-800 py-3 px-4 border-t border-yellow-700 flex flex-col md:flex-row justify-between items-center">
-              <div className="text-gray-400 mb-2 md:mb-0">
-                Showing{" "}
-                <span className="font-medium text-white">
-                  {filteredData.length > 0
-                    ? (currentPage - 1) * feedbacksPerPage + 1
-                    : 0}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium text-white">
-                  {Math.min(
-                    currentPage * feedbacksPerPage,
-                    filteredData.length
-                  )}
-                </span>{" "}
-                of{" "}
-                <span className="font-medium text-white">
-                  {filteredData.length}
-                </span>{" "}
-                entries
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <select
-                  value={feedbacksPerPage}
-                  onChange={(e) => {
-                    setFeedbacksPerPage(Number(e.target.value));
-                    setCurrentPage(1);
-                  }}
-                  className="bg-yellow-700 border border-yellow-600 text-yellow-300 px-3 py-1 rounded mr-2"
-                >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                </select>
-
-                <nav>
-                  <ul className="flex space-x-1">
-                    <li>
-                      <button
-                        onClick={() => paginate(Math.max(1, currentPage - 1))}
-                        disabled={currentPage === 1}
-                        className={`px-3 py-1 rounded ${
-                          currentPage === 1
-                            ? "bg-yellow-700 text-yellow-500 cursor-not-allowed"
-                            : "bg-yellow-700 text-yellow-300 hover:bg-yellow-600"
-                        }`}
-                      >
-                        Prev
-                      </button>
-                    </li>
-
-                    {[...Array(Math.min(5, totalPages)).keys()].map(
-                      (_, index) => {
-                        // Show 5 pages max, centered around current page
-                        let pageNum;
-                        if (totalPages <= 5) {
-                          pageNum = index + 1;
-                        } else {
-                          const startPage = Math.max(1, currentPage - 2);
-                          pageNum = startPage + index;
-                          if (pageNum > totalPages) return null;
-                        }
-
-                        return (
-                          <li key={pageNum}>
-                            <button
-                              onClick={() => paginate(pageNum)}
-                              className={`px-3 py-1 rounded ${
-                                currentPage === pageNum
-                                  ? "bg-yellow-600 text-white"
-                                  : "bg-yellow-700 text-gray-300 hover:bg-yellow-600"
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          </li>
-                        );
-                      }
-                    )}
-
-                    <li>
-                      <button
-                        onClick={() =>
-                          paginate(Math.min(totalPages, currentPage + 1))
-                        }
-                        disabled={currentPage === totalPages}
-                        className={`px-3 py-1 rounded ${
-                          currentPage === totalPages
-                            ? "bg-yellow-700 text-yellow-500 cursor-not-allowed"
-                            : "bg-yellow-700 text-gray-300 hover:bg-yellow-600"
-                        }`}
-                      >
-                        Next
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
+            <div className="relative">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder={t('search.placeholder', 'Search feedbacks...')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="px-4 py-2 bg-yellow-800 rounded-lg pr-10 border border-yellow-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full"
+                />
+                <FontAwesomeIcon
+                  icon={faSearch}
+                  className="absolute right-3 top-3 text-gray-400"
+                />
               </div>
             </div>
+
+            <button
+              onClick={() => openModal()}
+              className="flex items-center px-4 py-2 bg-yellow-600 rounded-lg hover:bg-yellow-700 transition"
+            >
+              <FontAwesomeIcon icon={faPlus} className="mr-2" />
+              {t('feedback.actions.add', 'Add Feedback')}
+            </button>
           </div>
         </div>
 
-        {/* Charts Section */}
-        {renderCharts()}
-      </div>
+        {renderFilterPanel()}
 
-      {/* Modals */}
-      {renderModal()}
-      {renderCommentModal()}
+        <div className="bg-yellow-900 rounded-lg shadow-lg border border-yellow-900 overflow-hidden mx-auto">
+          <div className="overflow-x-auto">
+            <table id="feedback-table" className="w-full text-left">
+              <thead className="bg-yellow-800 text-yellow-400 text-xs uppercase">
+                <tr>
+                  <th
+                    className="p-4 cursor-pointer"
+                    onClick={() => requestSort("rating")}
+                  >
+                    {t('feedback.rating', 'Rating')} {getSortIcon("rating")}
+                  </th>
+                  <th
+                    className="p-4 cursor-pointer"
+                    onClick={() => requestSort("comment")}
+                  >
+                    {t('feedback.comment', 'Comment')} {getSortIcon("comment")}
+                  </th>
+                  <th
+                    className="p-4 cursor-pointer"
+                    onClick={() => requestSort("relocation")}
+                  >
+                    {t('prediction.relocation', 'Relocation')} {getSortIcon("relocation")}
+                  </th>
+                  <th
+                    className="p-4 cursor-pointer"
+                    onClick={() => requestSort("created_at")}
+                  >
+                    {t('common.date', 'Date')} {getSortIcon("created_at")}
+                  </th>
+                  <th className="p-4">{t('common.actions', 'Actions')}</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-300">
+                {currentFeedbacks.length > 0 ? (
+                  currentFeedbacks.map((feedback) => (
+                    <tr
+                      key={feedback.id}
+                      className="border-t border-yellow-800 hover:bg-yellow-800 transition"
+                    >
+                      <td className="p-4">{renderStars(feedback.rating)}</td>
+                      <td className="p-4">
+                        <div className="flex items-center">
+                          <div className="max-w-xs truncate">
+                            {feedback.comment.substring(0, 50)}
+                            {feedback.comment.length > 50 ? "..." : ""}
+                          </div>
+                          {feedback.comment.length > 50 && (
+                            <button
+                              onClick={() =>
+                                openCommentModal(feedback.comment)
+                              }
+                              className="ml-2 text-yellow-400 hover:text-yellow-300"
+                              title={t('feedback.viewFullComment', 'View full comment')}
+                            >
+                              <FontAwesomeIcon icon={faEye} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        {feedback.relocation ? (
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {feedback.relocation.district},
+                              {feedback.relocation.sector}
+                              <p className="text-yellow-600">{t('common.with', 'with')}</p>
+                            </span>
+                            <span className="font-medium">
+                              {feedback.relocation.altitude},
+                              {feedback.relocation.soil_type}
+                            </span>
+                          </div>
+                        ) : (
+                          t('common.notAvailable', 'N/A')
+                        )}
+                      </td>
+                      <td className="p-4">
+                        {new Date(feedback.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => openModal(feedback)}
+                            className="text-blue-400 hover:text-blue-300"
+                            title={t('common.actions.edit', 'Edit')}
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(feedback.id)}
+                            className="text-red-400 hover:text-red-300"
+                            title={t('common.actions.delete', 'Delete')}
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="p-4 text-center text-gray-400">
+                      {t('feedback.noFeedbacksFound', 'No feedbacks found')}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="bg-yellow-800 py-3 px-4 border-t border-yellow-700 flex flex-col md:flex-row justify-between items-center">
+            <div className="text-gray-400 mb-2 md:mb-0">
+              {t('pagination.showing', 'Showing')}{" "}
+              <span className="font-medium text-white">
+                {filteredData.length > 0
+                  ? (currentPage - 1) * feedbacksPerPage + 1
+                  : 0}
+              </span>{" "}
+              {t('pagination.to', 'to')}{" "}
+              <span className="font-medium text-white">
+                {Math.min(
+                  currentPage * feedbacksPerPage,
+                  filteredData.length
+                )}
+              </span>{" "}
+              {t('pagination.of', 'of')}{" "}
+              <span className="font-medium text-white">
+                {filteredData.length}
+              </span>{" "}
+              {t('pagination.entries', 'entries')}
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <select
+                value={feedbacksPerPage}
+                onChange={(e) => {
+                  setFeedbacksPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="bg-yellow-700 border border-yellow-600 text-yellow-300 px-3 py-1 rounded mr-2"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>
+
+              <nav>
+                <ul className="flex space-x-1">
+                  <li>
+                    <button
+                      onClick={() => paginate(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === 1
+                          ? "bg-yellow-700 text-yellow-500 cursor-not-allowed"
+                          : "bg-yellow-700 text-yellow-300 hover:bg-yellow-600"
+                      }`}
+                    >
+                      {t('pagination.prev', 'Prev')}
+                    </button>
+                  </li>
+
+                  {[...Array(Math.min(5, totalPages)).keys()].map(
+                    (_, index) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = index + 1;
+                      } else {
+                        const startPage = Math.max(1, currentPage - 2);
+                        pageNum = startPage + index;
+                        if (pageNum > totalPages) return null;
+                      }
+
+                      return (
+                        <li key={pageNum}>
+                          <button
+                            onClick={() => paginate(pageNum)}
+                            className={`px-3 py-1 rounded ${
+                              currentPage === pageNum
+                                ? "bg-yellow-600 text-white"
+                                : "bg-yellow-700 text-gray-300 hover:bg-yellow-600"
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        </li>
+                      );
+                    }
+                  )}
+
+                  <li>
+                    <button
+                      onClick={() =>
+                        paginate(Math.min(totalPages, currentPage + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === totalPages
+                          ? "bg-yellow-700 text-yellow-500 cursor-not-allowed"
+                          : "bg-yellow-700 text-gray-300 hover:bg-yellow-600"
+                      }`}
+                    >
+                      {t('pagination.next', 'Next')}
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+
+    {renderModal()}
+    {renderCommentModal()}
+  </div>
+);
 }
 
 export default Customer_Manage_Feedbacks;

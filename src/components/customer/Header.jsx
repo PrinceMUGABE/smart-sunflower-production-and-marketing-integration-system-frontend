@@ -5,7 +5,8 @@ import {
   FaSignOutAlt, 
   FaComments,
   FaCar, 
-  FaTruckMoving
+  FaTruckMoving,
+  FaGlobe
   
 } from "react-icons/fa";
 import { 
@@ -20,22 +21,24 @@ import {
   CloudSun,
   Settings,
   BarChart3,
-  ChevronDown
+  ChevronDown,
+  Languages
 } from "lucide-react";
 import { MdDashboard } from "react-icons/md";
-// import { X, Menu, LogOut, ChevronDown, Bell } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../assets/pictures/minagri.jpg";
 import { MdInsights } from "react-icons/md";
+import { useTranslation } from "react-i18next";
 
 const Customer_Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [salesDropdownOpen, setSalesDropdownOpen] = useState(false);
-  // const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
   const [phone, setPhone] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const { i18n, t } = useTranslation();
 
   // Retrieve user data from local storage
   const userData = JSON.parse(localStorage.getItem("userData")) || {};
@@ -57,9 +60,15 @@ const Customer_Header = () => {
     setSalesDropdownOpen(!salesDropdownOpen);
   };
 
-  // const toggleNotifications = () => {
-  //   setNotificationsOpen(!notificationsOpen);
-  // };
+  const toggleLanguageDropdown = () => {
+    setLanguageDropdownOpen(!languageDropdownOpen);
+  };
+
+  const handleLanguageChange = (language) => {
+    console.log(`Changing language to: ${language}`);
+    i18n.changeLanguage(language);
+    setLanguageDropdownOpen(false);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("userData");
@@ -68,12 +77,10 @@ const Customer_Header = () => {
   };
 
   const Navbar_Links = [
-    // { id: 1, name: "Dashboard", path: "/customer", icon: <MdDashboard className="text-xl" /> },
-    // { id: 1, name: "Home", path: "/farmer", icon: <FaCar className="text-xl" /> },
-    { id: 2, name: "Predictions", path: "/farmer/predictions", icon: <BarChart3 className="text-xl" /> },
-    { id: 3, name: "Stock", path: "/farmer/stock", icon: <MdInsights className="text-xl" /> },
+    { id: 1, name: "Predictions", path: "/farmer/predictions", icon: <BarChart3 className="text-xl" /> },
+    { id: 2, name: "Stock", path: "/farmer/stock", icon: <MdInsights className="text-xl" /> },
     { 
-      id: 4, 
+      id: 3, 
       name: "Sales", 
       icon: <MdInsights className="text-xl" />, 
       isDropdown: true,
@@ -82,8 +89,13 @@ const Customer_Header = () => {
         { id: "4b", name: "Other Sales", path: "/farmer/all-sales" }
       ]
     },
-    { id: 6, name: "Feedbacks", path: "/farmer/feedbacks", icon: <FaComments className="text-xl" /> },
-    // { id: 4, name: "Profile", path: `/customer/profile/${userId}`, icon: <FaUserCircle className="text-xl" /> },
+    { id: 4, name: "Feedbacks", path: "/farmer/feedbacks", icon: <FaComments className="text-xl" /> },
+  ];
+
+  const languages = [
+    { code: "en", name: "English", flag: "🇺🇸" },
+    { code: "fr", name: "Français", flag: "🇫🇷" },
+    { code: "rw", name: "Kinyarwanda", flag: "🇷🇼" }
   ];
 
   // Check if a link is active
@@ -96,6 +108,9 @@ const Customer_Header = () => {
     return location.pathname === "/farmer/sales" || location.pathname === "/farmer/all-sales";
   };
 
+  // Get current language info
+  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+
   return (
     <nav className="bg-gradient-to-r from-yellow-900 to-yellow-800 shadow-xl">
       <div className="max-w-7xl mx-auto px-4">
@@ -104,7 +119,7 @@ const Customer_Header = () => {
           <div className="flex items-center">
             <Link to="/farmer/predictions" className="flex items-center">
               <img src={Logo} alt="Logo" className="h-12 w-auto rounded-full mr-2" />
-              <span className="text-white font-bold text-xl hidden sm:block">SSPMI</span>
+              <span className="text-white font-bold text-xl hidden sm:block">{t("SSPMI")}</span>
             </Link>
           </div>
 
@@ -122,7 +137,7 @@ const Customer_Header = () => {
                     }`}
                   >
                     <span className="text-lg">{link.icon}</span>
-                    <span>{link.name}</span>
+                    <span>{t(link.name)}</span>
                     <ChevronDown className="h-4 w-4" />
                   </button>
                   
@@ -139,7 +154,7 @@ const Customer_Header = () => {
                           } ${subItem.id === "4a" ? "rounded-t-md" : ""} ${subItem.id === "4b" ? "rounded-b-md" : ""}`}
                           onClick={() => setSalesDropdownOpen(false)}
                         >
-                          {subItem.name}
+                          {t(subItem.name)}
                         </Link>
                       ))}
                     </div>
@@ -156,14 +171,49 @@ const Customer_Header = () => {
                   }`}
                 >
                   <span className="text-lg">{link.icon}</span>
-                  <span>{link.name}</span>
+                  <span>{t(link.name)}</span>
                 </Link>
               )
             ))}
           </div>
 
-          {/* User Menu & Notifications (Desktop) */}
+          {/* User Menu & Language Selector (Desktop) */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* Language Selector */}
+            <div className="relative">
+              <button
+                onClick={toggleLanguageDropdown}
+                className="flex items-center text-white space-x-2 rounded-md px-3 py-2 hover:bg-yellow-700 transition-colors"
+              >
+                <Languages className="h-5 w-5" />
+                <span className="font-medium">{currentLanguage.flag} {currentLanguage.code.toUpperCase()}</span>
+                <ChevronDown className="h-4 w-4" />
+              </button>
+              
+              {languageDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
+                  {languages.map((language) => (
+                    <button
+                      key={language.code}
+                      onClick={() => handleLanguageChange(language.code)}
+                      className={`block w-full text-left px-4 py-3 text-sm hover:bg-yellow-100 ${
+                        i18n.language === language.code
+                          ? "bg-yellow-50 text-yellow-700 font-medium"
+                          : "text-gray-700"
+                      } ${language.code === "en" ? "rounded-t-md" : ""} ${language.code === "rw" ? "rounded-b-md" : ""}`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>{language.flag}</span>
+                        <span>{language.name}</span>
+                        {i18n.language === language.code && (
+                          <span className="ml-auto text-yellow-600">✓</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             
             {/* User Menu */}
             <div className="relative">
@@ -185,7 +235,7 @@ const Customer_Header = () => {
                   >
                     <div className="flex items-center">
                       <FaUserCircle className="mr-2" />
-                      My Profile
+                      {t("My Profile")}
                     </div>
                   </Link>
                   <div className="border-t border-yellow-100"></div>
@@ -195,7 +245,7 @@ const Customer_Header = () => {
                   >
                     <div className="flex items-center">
                       <LogOut className="h-4 w-4 mr-2" />
-                      Logout
+                      {t("Logout")}
                     </div>
                   </button>
                 </div>
@@ -224,7 +274,7 @@ const Customer_Header = () => {
         <div className="flex justify-between items-center p-4 border-b border-yellow-700">
           <div className="flex items-center">
             <img src={Logo} alt="Logo" className="h-10 w-auto mr-2" />
-            <h2 className="text-white text-lg font-semibold">Smart Sunflower</h2>
+            <h2 className="text-white text-lg font-semibold">{t("Smart Sunflower")}</h2>
           </div>
           <button
             onClick={() => setIsOpen(false)}
@@ -246,6 +296,38 @@ const Customer_Header = () => {
             </div>
           </div>
         </div>
+
+        {/* Language Selector in Mobile Menu */}
+        <div className="p-4 border-b border-yellow-700">
+          <div className="mb-2">
+            <p className="text-white text-sm font-medium mb-2 flex items-center">
+              <Languages className="h-4 w-4 mr-2" />
+              Language / Langue / Ururimi
+            </p>
+            <div className="grid grid-cols-1 gap-2">
+              {languages.map((language) => (
+                <button
+                  key={language.code}
+                  onClick={() => {
+                    handleLanguageChange(language.code);
+                    setIsOpen(false);
+                  }}
+                  className={`flex items-center space-x-2 p-2 rounded-md transition-colors text-sm ${
+                    i18n.language === language.code
+                      ? "bg-yellow-600 text-white"
+                      : "text-yellow-100 hover:bg-yellow-700"
+                  }`}
+                >
+                  <span>{language.flag}</span>
+                  <span>{language.name}</span>
+                  {i18n.language === language.code && (
+                    <span className="ml-auto">✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
         
         <div className="flex flex-col p-4">
           {Navbar_Links.map((link) => (
@@ -261,7 +343,7 @@ const Customer_Header = () => {
                 >
                   <div className="flex items-center space-x-3">
                     <span className="text-lg">{link.icon}</span>
-                    <span>{link.name}</span>
+                    <span>{t(link.name)}</span>
                   </div>
                   <ChevronDown className={`h-4 w-4 transform transition-transform ${salesDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -282,7 +364,7 @@ const Customer_Header = () => {
                           setSalesDropdownOpen(false);
                         }}
                       >
-                        <span>{subItem.name}</span>
+                        <span>{t(subItem.name)}</span>
                       </Link>
                     ))}
                   </div>
@@ -300,7 +382,7 @@ const Customer_Header = () => {
                 onClick={() => setIsOpen(false)}
               >
                 <span className="text-lg">{link.icon}</span>
-                <span>{link.name}</span>
+                <span>{t(link.name)}</span>
               </Link>
             )
           ))}
@@ -315,7 +397,7 @@ const Customer_Header = () => {
             className="text-white hover:text-yellow-400 flex items-center space-x-3 p-3 rounded-md hover:bg-yellow-700 transition-colors duration-200"
           >
             <LogOut className="h-5 w-5" />
-            <span>Logout</span>
+            <span>{t("Logout")}</span>
           </button>
         </div>
       </div>

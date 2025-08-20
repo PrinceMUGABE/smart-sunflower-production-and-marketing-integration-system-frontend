@@ -39,6 +39,7 @@ import {
 
 import mapData from "../customer/mapData.json";
 import img from "../../../assets/pictures/sunflower2.jpg";
+import { useTranslation } from "react-i18next";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -53,13 +54,13 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="p-4 text-yellow-100 bg-green-900 rounded-lg">
-          <h3 className="font-semibold">Something went wrong</h3>
+        <div className="p-4 text-yellow-100 bg-yellow-900 rounded-lg">
+          <h3 className="font-semibold">{this.props.t('error.something_went_wrong')}</h3>
           <button
             onClick={() => window.location.reload()}
             className="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
-            Refresh Page
+            {this.props.t('buttons.refresh_page')}
           </button>
         </div>
       );
@@ -109,13 +110,6 @@ const rwandanCrops = [
   "Vanilla",
 ];
 
-const RWANDA_SEASONS = [
-  { value: "long_rainy", label: "Season A (September - January)" },
-  { value: "short_rainy", label: "Season B (February - June)" },
-  { value: "long_dry", label: "Season C (July - August)" },
-  { value: "short_dry", label: "Other Season" },
-];
-
 function Farmer_Manage_predictions() {
   const [predictions, setPredictions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -129,6 +123,7 @@ function Farmer_Manage_predictions() {
   const [viewDetailsModalOpen, setViewDetailsModalOpen] = useState(false);
   const [detailsPrediction, setDetailsPrediction] = useState(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // State for form inputs
   const [allDistricts, setAllDistricts] = useState([]);
@@ -148,6 +143,13 @@ function Farmer_Manage_predictions() {
   const [selectedCrop, setSelectedCrop] = useState(
     currentPrediction?.crop || ""
   );
+
+  const RWANDA_SEASONS = [
+    { value: "long_rainy", label: t('seasons.season_a') },
+    { value: "short_rainy", label: t('seasons.season_b') },
+    { value: "long_dry", label: t('seasons.season_c') },
+    { value: "short_dry", label: t('seasons.other_season') },
+  ];
 
   const COLORS = [
     "#FF6B6B",
@@ -185,17 +187,17 @@ function Farmer_Manage_predictions() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Do you want to delete this prediction?")) return;
+    if (!window.confirm(t('confirmations.delete_prediction'))) return;
     try {
       await axios.delete(`${BASE_URL}delete/${id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       await handleFetch();
-      setMessage("Prediction deleted successfully");
+      setMessage(t('messages.prediction_deleted'));
       setMessageType("success");
       setCurrentPage(1);
     } catch (err) {
-      setMessage(err.response?.data.message || "An error occurred");
+      setMessage(err.response?.data.message || t('messages.error_occurred'));
       setMessageType("error");
     }
   };
@@ -211,7 +213,7 @@ function Farmer_Manage_predictions() {
       XLSX.utils.book_append_sheet(
         workbook,
         XLSX.utils.json_to_sheet(predictions),
-        "Crop Predictions"
+        t('export.crop_predictions')
       );
       XLSX.writeFile(workbook, "crop_predictions.xlsx");
     },
@@ -302,7 +304,7 @@ function Farmer_Manage_predictions() {
             },
           }
         );
-        setMessage("Prediction updated successfully");
+        setMessage(t('messages.prediction_updated'));
       } else {
         // Create new prediction
         await axios.post(`${BASE_URL}create/`, predictionData, {
@@ -311,7 +313,7 @@ function Farmer_Manage_predictions() {
             "Content-Type": "application/json",
           },
         });
-        setMessage("Prediction created successfully");
+        setMessage(t('messages.prediction_created'));
       }
 
       handleFetch();
@@ -320,7 +322,7 @@ function Farmer_Manage_predictions() {
       setMessageType("success");
     } catch (err) {
       console.error("Error submitting form:", err);
-      setMessage(err.response?.data.error || "An error occurred");
+      setMessage(err.response?.data.error || t('messages.error_occurred'));
       setMessageType("error");
     }
   };
@@ -359,7 +361,7 @@ function Farmer_Manage_predictions() {
             <FontAwesomeIcon icon={faLeaf} className="text-blue-400 text-xl" />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Total Predictions</p>
+            <p className="text-gray-400 text-sm">{t('dashboard.total_predictions')}</p>
             <h3 className="text-2xl font-bold text-white">
               {totalPredictions}
             </h3>
@@ -368,7 +370,7 @@ function Farmer_Manage_predictions() {
 
         {/* Season Distribution Card */}
         <div className="bg-gradient-to-br from-yellow-900 to-yellow-800 p-6 rounded-lg shadow-lg border border-gray-700">
-          <p className="text-gray-400 text-sm mb-2">Season Distribution</p>
+          <p className="text-gray-400 text-sm mb-2">{t('dashboard.season_distribution')}</p>
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               {Object.entries(seasonCounts).map(([season, count], index) => (
@@ -422,9 +424,9 @@ function Farmer_Manage_predictions() {
             />
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Avg. Expected Yield</p>
+            <p className="text-gray-400 text-sm">{t('dashboard.avg_expected_yield')}</p>
             <h3 className="text-2xl font-bold text-white">
-              {averageYield.toFixed(2)} t/ha
+              {averageYield.toFixed(2)} {t('units.tons_per_ha')}
             </h3>
           </div>
         </div>
@@ -448,7 +450,7 @@ function Farmer_Manage_predictions() {
           className="flex justify-between items-center cursor-pointer"
           onClick={() => setIsFilterExpanded(!isFilterExpanded)}
         >
-          <h3 className="text-gray-200 font-medium">Advanced Filters</h3>
+          <h3 className="text-gray-200 font-medium">{t('filters.advanced_filters')}</h3>
           <button className="text-gray-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -470,28 +472,28 @@ function Farmer_Manage_predictions() {
         {isFilterExpanded && (
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-gray-300 mb-2 text-sm">Season</label>
+              <label className="block text-gray-300 mb-2 text-sm">{t('labels.season')}</label>
               <select
                 value={filterSeason}
                 onChange={(e) => setFilterSeason(e.target.value)}
                 className="w-full p-2 bg-yellow-800 border border-gray-700 rounded text-gray-300 text-sm"
               >
-                <option value="all">All Seasons</option>
-                <option value="long_rainy">Long Rainy</option>
-                <option value="short_rainy">Short Rainy</option>
-                <option value="long_dry">Long Dry</option>
-                <option value="short_dry">Short Dry</option>
+                <option value="all">{t('filters.all_seasons')}</option>
+                <option value="long_rainy">{t('seasons.long_rainy')}</option>
+                <option value="short_rainy">{t('seasons.short_rainy')}</option>
+                <option value="long_dry">{t('seasons.long_dry')}</option>
+                <option value="short_dry">{t('seasons.short_dry')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-gray-300 mb-2 text-sm">Crop</label>
+              <label className="block text-gray-300 mb-2 text-sm">{t('labels.crop')}</label>
               <select
                 value={filterCrop}
                 onChange={(e) => setFilterCrop(e.target.value)}
                 className="w-full p-2 bg-yellow-800 border border-gray-700 rounded text-gray-300 text-sm"
               >
-                <option value="">All Crops</option>
+                <option value="">{t('filters.all_crops')}</option>
                 {uniqueCrops.map((crop) => (
                   <option key={crop} value={crop}>
                     {crop}
@@ -502,14 +504,14 @@ function Farmer_Manage_predictions() {
 
             <div>
               <label className="block text-gray-300 mb-2 text-sm">
-                District
+                {t('labels.district')}
               </label>
               <select
                 value={filterDistrict}
                 onChange={(e) => setFilterDistrict(e.target.value)}
                 className="w-full p-2 bg-yellow-800 border border-gray-700 rounded text-gray-300 text-sm"
               >
-                <option value="">All Districts</option>
+                <option value="">{t('filters.all_districts')}</option>
                 {uniqueDistricts.map((district) => (
                   <option key={district} value={district}>
                     {district}
@@ -519,13 +521,13 @@ function Farmer_Manage_predictions() {
             </div>
 
             <div>
-              <label className="block text-gray-300 mb-2 text-sm">Sector</label>
+              <label className="block text-gray-300 mb-2 text-sm">{t('labels.sector')}</label>
               <select
                 value={filterSector}
                 onChange={(e) => setFilterSector(e.target.value)}
                 className="w-full p-2 bg-yellow-800 border border-gray-700 rounded text-gray-300 text-sm"
               >
-                <option value="">All Sectors</option>
+                <option value="">{t('filters.all_sectors')}</option>
                 {uniqueSectors.map((sector) => (
                   <option key={sector} value={sector}>
                     {sector}
@@ -544,7 +546,7 @@ function Farmer_Manage_predictions() {
                 }}
                 className="px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-600 text-sm"
               >
-                Reset Filters
+                {t('buttons.reset_filters')}
               </button>
             </div>
           </div>
@@ -565,7 +567,7 @@ function Farmer_Manage_predictions() {
       <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-gray-700 mb-6">
         <h3 className="text-lg font-semibold mb-4 text-yellow-400 flex items-center">
           <FontAwesomeIcon icon={faLeaf} className="mr-2" />
-          Recent Predictions
+          {t('dashboard.recent_predictions')}
         </h3>
         <div className="space-y-4">
           {recentPredictions.map((prediction) => {
@@ -579,10 +581,10 @@ function Farmer_Manage_predictions() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h4 className="font-medium text-gray-200">
-                        {prediction.crop} Prediction
+                        {prediction.crop} {t('dashboard.prediction')}
                       </h4>
                       <p className="text-sm text-gray-400">
-                        {prediction.sector}, {prediction.district} | Season:{" "}
+                        {prediction.sector}, {prediction.district} | {t('labels.season')}:{" "}
                         {prediction.season.replace("_", " ")}
                       </p>
                     </div>
@@ -591,8 +593,8 @@ function Farmer_Manage_predictions() {
                     </span>
                   </div>
                   <div className="mt-2 text-sm text-gray-300">
-                    <span className="text-yellow-400">Expected yield:</span>{" "}
-                    {prediction.expected_yield_tons_per_ha} tons/ha
+                    <span className="text-yellow-400">{t('labels.expected_yield')}:</span>{" "}
+                    {prediction.expected_yield_tons_per_ha} {t('units.tons_per_ha')}
                   </div>
                 </div>
               </div>
@@ -660,11 +662,11 @@ function Farmer_Manage_predictions() {
 
     return (
       <div className="w-full lg:w-1/3 space-y-6">
-        <ErrorBoundary>
+        <ErrorBoundary t={t}>
           <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
             <h3 className="text-sm font-semibold mb-4 text-yellow-400 flex items-center">
               <FontAwesomeIcon icon={faChartPie} className="mr-2" />
-              Soil Type Distribution
+              {t('charts.soil_type_distribution')}
             </h3>
             <ResponsiveContainer>
               <PieChart>
@@ -695,82 +697,8 @@ function Farmer_Manage_predictions() {
                     color: "#f9fafb",
                   }}
                 />
-                <Legend
-                  verticalAlign="bottom"
-                  height={36}
-                  wrapperStyle={{ color: "#e5e7eb" }}
-                />
+                
               </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </ErrorBoundary>
-
-        <ErrorBoundary>
-          <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72">
-            <h3 className="text-sm font-semibold mb-4 text-yellow-400 flex items-center">
-              <FontAwesomeIcon icon={faSeedling} className="mr-2" />
-              Expected Yield by Crop
-            </h3>
-            <ResponsiveContainer>
-              <BarChart data={yieldByCropData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 12, fill: "#e5e7eb" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 12, fill: "#e5e7eb" }}
-                  label={{
-                    value: "tons/ha",
-                    angle: -90,
-                    position: "insideLeft",
-                    fill: "#e5e7eb",
-                  }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1f2937",
-                    borderColor: "#374151",
-                    color: "#f9fafb",
-                  }}
-                />
-                <Bar dataKey="yield" fill="#4ECDC4" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </ErrorBoundary>
-
-        <ErrorBoundary>
-          <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-gray-800 h-72 mt-6">
-            <h3 className="text-sm font-semibold mb-4 text-yellow-400 flex items-center">
-              <FontAwesomeIcon icon={faWater} className="mr-2" />
-              Water Requirements by Crop
-            </h3>
-            <ResponsiveContainer>
-              <BarChart data={waterByCropData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 12, fill: "#e5e7eb" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 12, fill: "#e5e7eb" }}
-                  label={{
-                    value: "mm",
-                    angle: -90,
-                    position: "insideLeft",
-                    fill: "#e5e7eb",
-                  }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1f2937",
-                    borderColor: "#374151",
-                    color: "#f9fafb",
-                  }}
-                />
-                <Bar dataKey="water" fill="#FF6B6B" />
-              </BarChart>
             </ResponsiveContainer>
           </div>
         </ErrorBoundary>
@@ -839,7 +767,7 @@ function Farmer_Manage_predictions() {
         <div className="bg-yellow-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-4xl border border-gray-800 max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-yellow-500">
-              Prediction Details
+              {t('modals.prediction_details')}
             </h2>
             <button
               onClick={() => setViewDetailsModalOpen(false)}
@@ -866,43 +794,43 @@ function Farmer_Manage_predictions() {
             <div className="space-y-4">
               <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-yellow-400 mb-3">
-                  Basic Information
+                  {t('sections.basic_information')}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Crop:</span>
+                    <span className="text-gray-400">{t('labels.crop')}:</span>
                     <span className="text-white font-medium">
                       {detailsPrediction.crop}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Season:</span>
+                    <span className="text-gray-400">{t('labels.season')}:</span>
                     <span className="text-white font-medium">
                       {detailsPrediction.season.replace("_", " ")}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">District:</span>
+                    <span className="text-gray-400">{t('labels.district')}:</span>
                     <span className="text-white font-medium">
                       {detailsPrediction.district}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Sector:</span>
+                    <span className="text-gray-400">{t('labels.sector')}:</span>
                     <span className="text-white font-medium">
                       {detailsPrediction.sector}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Soil Type:</span>
+                    <span className="text-gray-400">{t('labels.soil_type')}:</span>
                     <span className="text-white font-medium">
                       {detailsPrediction.soil_type}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Expected Yield:</span>
+                    <span className="text-gray-400">{t('labels.expected_yield')}:</span>
                     <span className="text-white font-medium">
-                      {detailsPrediction.expected_yield_tons_per_ha} tons/ha
+                      {detailsPrediction.expected_yield_tons_per_ha} {t('units.tons_per_ha')}
                     </span>
                   </div>
                 </div>
@@ -910,29 +838,29 @@ function Farmer_Manage_predictions() {
 
               <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-blue-400 mb-3">
-                  Nutrient Requirements
+                  {t('sections.nutrient_requirements')}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Nitrogen:</span>
+                    <span className="text-gray-400">{t('labels.nitrogen')}:</span>
                     <span className="text-white font-medium">
-                      {detailsPrediction.nitrogen_kg_per_ha} kg/ha
+                      {detailsPrediction.nitrogen_kg_per_ha} {t('units.kg_per_ha')}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Phosphorus:</span>
+                    <span className="text-gray-400">{t('labels.phosphorus')}:</span>
                     <span className="text-white font-medium">
-                      {detailsPrediction.phosphorus_kg_per_ha} kg/ha
+                      {detailsPrediction.phosphorus_kg_per_ha} {t('units.kg_per_ha')}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Potassium:</span>
+                    <span className="text-gray-400">{t('labels.potassium')}:</span>
                     <span className="text-white font-medium">
-                      {detailsPrediction.potassium_kg_per_ha} kg/ha
+                      {detailsPrediction.potassium_kg_per_ha} {t('units.kg_per_ha')}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Optimal pH:</span>
+                    <span className="text-gray-400">{t('labels.optimal_ph')}:</span>
                     <span className="text-white font-medium">
                       {detailsPrediction.optimal_ph}
                     </span>
@@ -943,12 +871,12 @@ function Farmer_Manage_predictions() {
               <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-yellow-500 mb-3">
                   <FontAwesomeIcon icon={faWater} className="mr-2" />
-                  Water Requirements
+                  {t('sections.water_requirements')}
                 </h3>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Water Requirement:</span>
+                  <span className="text-gray-400">{t('labels.water_requirement')}:</span>
                   <span className="text-white font-medium">
-                    {detailsPrediction.water_requirement_mm} mm
+                    {detailsPrediction.water_requirement_mm} {t('units.mm')}
                   </span>
                 </div>
               </div>
@@ -957,25 +885,25 @@ function Farmer_Manage_predictions() {
             <div className="space-y-4">
               <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-purple-400 mb-3">
-                  Planting Information
+                  {t('sections.planting_information')}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Row Spacing:</span>
+                    <span className="text-gray-400">{t('labels.row_spacing')}:</span>
                     <span className="text-white font-medium">
-                      {detailsPrediction.row_spacing_cm} cm
+                      {detailsPrediction.row_spacing_cm} {t('units.cm')}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Plant Spacing:</span>
+                    <span className="text-gray-400">{t('labels.plant_spacing')}:</span>
                     <span className="text-white font-medium">
-                      {detailsPrediction.plant_spacing_cm} cm
+                      {detailsPrediction.plant_spacing_cm} {t('units.cm')}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Planting Depth:</span>
+                    <span className="text-gray-400">{t('labels.planting_depth')}:</span>
                     <span className="text-white font-medium">
-                      {detailsPrediction.planting_depth_cm} cm
+                      {detailsPrediction.planting_depth_cm} {t('units.cm')}
                     </span>
                   </div>
                 </div>
@@ -983,7 +911,7 @@ function Farmer_Manage_predictions() {
 
               <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-orange-400 mb-3">
-                  Seasonal Recommendations
+                  {t('sections.seasonal_recommendations')}
                 </h3>
                 {detailsPrediction.seasonal_recommendations &&
                 detailsPrediction.seasonal_recommendations.length > 0 ? (
@@ -996,14 +924,14 @@ function Farmer_Manage_predictions() {
                   </ul>
                 ) : (
                   <p className="text-gray-400">
-                    No seasonal recommendations available
+                    {t('messages.no_seasonal_recommendations')}
                   </p>
                 )}
               </div>
 
               <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-pink-400 mb-3">
-                  Intercropping Recommendations
+                  {t('sections.intercropping_recommendations')}
                 </h3>
                 {detailsPrediction.intercropping_recommendation &&
                 detailsPrediction.intercropping_recommendation.length > 0 ? (
@@ -1016,40 +944,28 @@ function Farmer_Manage_predictions() {
                   </ul>
                 ) : (
                   <p className="text-gray-400">
-                    No intercropping recommendations available
+                    {t('messages.no_intercropping_recommendations')}
                   </p>
                 )}
               </div>
 
               <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-medium text-teal-400 mb-3">
-                  Additional Information
+                  {t('sections.additional_information')}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Altitude:</span>
+                    <span className="text-gray-400">{t('labels.altitude')}:</span>
                     <span className="text-white font-medium">
                       {detailsPrediction.altitude || "N/A"}
                     </span>
                   </div>
-                  {/* <div className="flex justify-between">
-                    <span className="text-gray-400">Created By:</span>
-                    <span className="text-white font-medium">
-                      {detailsPrediction.created_by?.email || "N/A"}
-                    </span>
-                  </div> */}
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Created At:</span>
+                    <span className="text-gray-400">{t('labels.created_at')}:</span>
                     <span className="text-white font-medium">
                       {new Date(detailsPrediction.created_at).toLocaleString()}
                     </span>
                   </div>
-                  {/* <div className="flex justify-between">
-                    <span className="text-gray-400">Updated At:</span>
-                    <span className="text-white font-medium">
-                      {new Date(detailsPrediction.updated_at).toLocaleString()}
-                    </span>
-                  </div> */}
                 </div>
               </div>
             </div>
@@ -1065,14 +981,14 @@ function Farmer_Manage_predictions() {
       <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-gray-700">
         <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
           <h3 className="text-xl font-bold text-yellow-400 mb-4 lg:mb-0">
-            Crop Predictions
+            {t('table.crop_predictions')}
           </h3>
 
           <div className="flex flex-col sm:flex-row w-full lg:w-auto space-y-3 sm:space-y-0 sm:space-x-3">
             <div className="relative flex-grow">
               <input
                 type="text"
-                placeholder="Search predictions..."
+                placeholder={t('placeholders.search_predictions')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full p-2 pl-10 bg-yellow-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1089,7 +1005,7 @@ function Farmer_Manage_predictions() {
                 className="flex items-center px-4 py-2 bg-yellow-800 border border-gray-700 rounded-lg text-gray-200 hover:bg-yellow-700 transition"
               >
                 <FontAwesomeIcon icon={faDownload} className="mr-2" />
-                Export
+                {t('buttons.export')}
               </button>
               {downloadMenuVisible && (
                 <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-yellow-800 ring-1 ring-gray-700 z-10">
@@ -1103,7 +1019,7 @@ function Farmer_Manage_predictions() {
                         }}
                         className="block px-4 py-2 text-sm text-gray-300 hover:bg-yellow-700 w-full text-left"
                       >
-                        Export as {format}
+                        {t('export.export_as')} {format}
                       </button>
                     ))}
                   </div>
@@ -1116,7 +1032,7 @@ function Farmer_Manage_predictions() {
               className="flex items-center px-4 py-2 bg-green-600 rounded-lg text-white hover:bg-green-700 transition"
             >
               <FontAwesomeIcon icon={faPlus} className="mr-2" />
-              Add Prediction
+              {t('buttons.add_prediction')}
             </button>
           </div>
         </div>
@@ -1140,14 +1056,14 @@ function Farmer_Manage_predictions() {
           >
             <thead>
               <tr className="bg-yellow-800 text-gray-200">
-                <th className="px-4 py-3 text-left">Crop</th>
-                <th className="px-4 py-3 text-left">Season</th>
-                <th className="px-4 py-3 text-left">District</th>
-                <th className="px-4 py-3 text-left">Sector</th>
-                <th className="px-4 py-3 text-left">Soil Type</th>
-                <th className="px-4 py-3 text-left">Altitude</th>
-                <th className="px-4 py-3 text-left">Expected Yield</th>
-                <th className="px-4 py-3 text-center">Actions</th>
+                <th className="px-4 py-3 text-left">{t('table.headers.crop')}</th>
+                <th className="px-4 py-3 text-left">{t('table.headers.season')}</th>
+                <th className="px-4 py-3 text-left">{t('table.headers.district')}</th>
+                <th className="px-4 py-3 text-left">{t('table.headers.sector')}</th>
+                <th className="px-4 py-3 text-left">{t('table.headers.soil_type')}</th>
+                <th className="px-4 py-3 text-left">{t('table.headers.altitude')}</th>
+                <th className="px-4 py-3 text-left">{t('table.headers.expected_yield')}</th>
+                <th className="px-4 py-3 text-center">{t('table.headers.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -1157,7 +1073,7 @@ function Farmer_Manage_predictions() {
                     colSpan="7"
                     className="px-4 py-3 text-center text-gray-400 border-t border-gray-700"
                   >
-                    No predictions found
+                    {t('messages.no_predictions_found')}
                   </td>
                 </tr>
               ) : (
@@ -1185,28 +1101,21 @@ function Farmer_Manage_predictions() {
                       {prediction.altitude}
                     </td>
                     <td className="px-4 py-3 text-gray-300">
-                      {prediction.expected_yield_tons_per_ha} t/ha
+                      {prediction.expected_yield_tons_per_ha} {t('units.tons_per_ha')}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex justify-center space-x-2">
                         <button
                           onClick={() => openViewDetailsModal(prediction)}
                           className="text-blue-400 hover:text-blue-300 transition"
-                          title="View Details"
+                          title={t('tooltips.view_details')}
                         >
                           <FontAwesomeIcon icon={faEye} />
                         </button>
-                        {/* <button
-                          onClick={() => openModal(prediction)}
-                          className="text-yellow-400 hover:text-yellow-300 transition"
-                          title="Edit"
-                        >
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button> */}
                         <button
                           onClick={() => handleDelete(prediction.id)}
                           className="text-red-400 hover:text-red-300 transition"
-                          title="Delete"
+                          title={t('tooltips.delete')}
                         >
                           <FontAwesomeIcon icon={faTrash} />
                         </button>
@@ -1223,7 +1132,7 @@ function Farmer_Manage_predictions() {
         {filteredData.length > predictionsPerPage && (
           <div className="flex justify-between items-center mt-6">
             <div className="flex items-center">
-              <span className="text-gray-400 mr-2">Show</span>
+              <span className="text-gray-400 mr-2">{t('pagination.show')}</span>
               <select
                 value={predictionsPerPage}
                 onChange={(e) => {
@@ -1238,7 +1147,7 @@ function Farmer_Manage_predictions() {
                   </option>
                 ))}
               </select>
-              <span className="text-gray-400 ml-2">per page</span>
+              <span className="text-gray-400 ml-2">{t('pagination.per_page')}</span>
             </div>
 
             <div className="flex space-x-1">
@@ -1383,20 +1292,17 @@ function Farmer_Manage_predictions() {
       <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-gray-700 w-full lg:w-2/3">
         <h3 className="text-lg font-semibold mb-4 text-yellow-400 flex items-center">
           <FontAwesomeIcon icon={faLeaf} className="mr-2" />
-          Crop Distribution by District
+          {t('charts.crop_distribution_by_district')}
         </h3>
         <div className="flex flex-col md:flex-row">
           <div className="w-full md:w-3/4 h-96 relative">
-            {/* This is a placeholder for the map. In a real implementation, you would
-                 use a mapping library like Leaflet or Google Maps to render a real map */}
             <div className="w-full h-full bg-yellow-800 rounded-lg border border-gray-700 p-4">
               <div className="text-center text-gray-400 italic">
-                Map placeholder - Rwanda districts would be displayed here with
-                color coding for dominant crops in each district
+                {t('placeholders.map_placeholder')}
               </div>
               <div className="mt-4">
                 <h4 className="text-sm font-medium text-gray-300 mb-2">
-                  District Highlights:
+                  {t('charts.district_highlights')}:
                 </h4>
                 <ul className="space-y-2">
                   {Object.entries(dominantCropByDistrict).map(
@@ -1404,7 +1310,7 @@ function Farmer_Manage_predictions() {
                       <li key={district} className="flex justify-between">
                         <span className="text-gray-400">{district}:</span>
                         <span className="text-yellow-400">
-                          {data.crop} ({data.count} predictions)
+                          {data.crop} ({data.count} {t('dashboard.predictions').toLowerCase()})
                         </span>
                       </li>
                     )
@@ -1415,7 +1321,7 @@ function Farmer_Manage_predictions() {
           </div>
           <div className="w-full md:w-1/4 pl-0 md:pl-4 mt-4 md:mt-0">
             <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700 h-full">
-              <h4 className="text-sm font-medium text-gray-300 mb-3">Legend</h4>
+              <h4 className="text-sm font-medium text-gray-300 mb-3">{t('charts.legend')}</h4>
               <div className="space-y-2">
                 {uniqueCrops.map((crop, index) => (
                   <div key={crop} className="flex items-center">
@@ -1520,7 +1426,7 @@ function Farmer_Manage_predictions() {
         <div className="bg-yellow-900 rounded-lg shadow-xl p-6 z-50 w-full max-w-4xl border border-gray-800 max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-yellow-500">
-              {isEditMode ? "Update Prediction" : "Add New Prediction"}
+              {isEditMode ? t('modals.edit_prediction') : t('modals.add_prediction')}
             </h2>
             <button
               onClick={() => setIsModalOpen(false)}
@@ -1544,48 +1450,47 @@ function Farmer_Manage_predictions() {
           </div>
 
           <form onSubmit={handleAddUpdatePrediction}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Required fields section */}
-              <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-gray-700 mb-4">
-                <h3 className="text-lg font-medium text-yellow-400 mb-4">
-                  {isEditMode ? "Basic Information" : "Required Information"}
-                </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Basic Information Section */}
+              <div className="space-y-4">
+                <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
+                  <h3 className="text-lg font-medium text-yellow-400 mb-3">
+                    {t('sections.basic_information')}
+                  </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* <div>
-                    <label htmlFor="crop" className="block text-gray-300 mb-2">
-                      Crop <span className="text-red-500">*</span>
+                  {/* Crop Selection */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">
+                      {t('labels.crop')} *
                     </label>
                     <select
-                      id="crop"
                       name="crop"
                       value={selectedCrop}
                       onChange={(e) => setSelectedCrop(e.target.value)}
                       required
-                      className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      <option value="">Select Crop</option>
+                      <option value="">{t('placeholders.select_crop')}</option>
                       {sortedCrops.map((crop) => (
                         <option key={crop} value={crop}>
                           {crop}
                         </option>
                       ))}
                     </select>
-                  </div> */}
+                  </div>
 
-                  <div>
-                    <label
-                      htmlFor="season"
-                      className="block text-gray-300 mb-2"
-                    >
-                      Season <span className="text-red-500">*</span>
+                  {/* Season Selection */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">
+                      {t('labels.season')} *
                     </label>
                     <select
-                      id="season"
                       name="season"
-                      defaultValue={currentPrediction?.season || "long_rainy"}
-                      className="w-full p-2 bg-yellow-800 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      defaultValue={currentPrediction?.season || ""}
+                      required
+                      className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
+                      <option value="">{t('placeholders.select_season')}</option>
                       {RWANDA_SEASONS.map((season) => (
                         <option key={season.value} value={season.value}>
                           {season.label}
@@ -1594,22 +1499,19 @@ function Farmer_Manage_predictions() {
                     </select>
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="district"
-                      className="block text-gray-300 mb-2"
-                    >
-                      District <span className="text-red-500">*</span>
+                  {/* District Selection */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">
+                      {t('labels.district')} *
                     </label>
                     <select
-                      id="district"
                       name="district"
                       value={selectedDistrict}
                       onChange={handleDistrictChange}
                       required
-                      className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      <option value="">Select District</option>
+                      <option value="">{t('placeholders.select_district')}</option>
                       {allDistricts.map((district) => (
                         <option key={district} value={district}>
                           {district}
@@ -1618,23 +1520,20 @@ function Farmer_Manage_predictions() {
                     </select>
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="sector"
-                      className="block text-gray-300 mb-2"
-                    >
-                      Sector <span className="text-red-500">*</span>
+                  {/* Sector Selection */}
+                  <div className="mb-4">
+                    <label className="block text-gray-300 mb-2">
+                      {t('labels.sector')} *
                     </label>
                     <select
-                      id="sector"
                       name="sector"
                       value={selectedSector}
                       onChange={(e) => setSelectedSector(e.target.value)}
                       required
                       disabled={!selectedDistrict}
-                      className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
                     >
-                      <option value="">Select Sector</option>
+                      <option value="">{t('placeholders.select_sector')}</option>
                       {allSectors.map((sector) => (
                         <option key={sector} value={sector}>
                           {sector}
@@ -1643,281 +1542,242 @@ function Farmer_Manage_predictions() {
                     </select>
                   </div>
                 </div>
+
+                {/* Soil and Environmental Information */}
+                {isEditMode && (
+                  <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
+                    <h3 className="text-lg font-medium text-blue-400 mb-3">
+                      {t('sections.soil_environmental_info')}
+                    </h3>
+
+                    {/* Soil Type */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.soil_type')}
+                      </label>
+                      <select
+                        name="soil_type"
+                        defaultValue={currentPrediction?.soil_type || ""}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      >
+                        <option value="">{t('placeholders.select_soil_type')}</option>
+                        <option value="clay">Clay</option>
+                        <option value="loam">Loam</option>
+                        <option value="sandy">Sandy</option>
+                        <option value="silt">Silt</option>
+                        <option value="peat">Peat</option>
+                        <option value="chalk">Chalk</option>
+                      </select>
+                    </div>
+
+                    {/* Optimal pH */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.optimal_ph')}
+                      </label>
+                      <input
+                        type="number"
+                        name="optimal_ph"
+                        step="0.1"
+                        min="0"
+                        max="14"
+                        defaultValue={currentPrediction?.optimal_ph || 6.5}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_ph')}
+                      />
+                    </div>
+
+                    {/* Altitude */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.altitude')}
+                      </label>
+                      <input
+                        type="text"
+                        name="altitude"
+                        defaultValue={currentPrediction?.altitude || ""}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_altitude')}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Only show additional fields when editing */}
+              {/* Advanced Information Section (Edit Mode Only) */}
               {isEditMode && (
-                <>
-                  {/* Season and soil section */}
-                  <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-gray-700 mb-4">
-                    <h3 className="text-lg font-medium text-blue-400 mb-4">
-                      Soil Information
+                <div className="space-y-4">
+                  {/* Nutrient Requirements */}
+                  <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
+                    <h3 className="text-lg font-medium text-green-400 mb-3">
+                      {t('sections.nutrient_requirements')}
                     </h3>
 
-                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-                      <div>
-                        <label
-                          htmlFor="soil_type"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Soil Type
-                        </label>
-                        <input
-                          type="text"
-                          id="soil_type"
-                          name="soil_type"
-                          defaultValue={currentPrediction?.soil_type || ""}
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                          placeholder="e.g. ferralsol"
-                        />
-                      </div>
+                    {/* Nitrogen */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.nitrogen')} ({t('units.kg_per_ha')})
+                      </label>
+                      <input
+                        type="number"
+                        name="nitrogen_kg_per_ha"
+                        step="0.1"
+                        min="0"
+                        defaultValue={currentPrediction?.nitrogen_kg_per_ha || 0}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_nitrogen')}
+                      />
+                    </div>
+
+                    {/* Phosphorus */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.phosphorus')} ({t('units.kg_per_ha')})
+                      </label>
+                      <input
+                        type="number"
+                        name="phosphorus_kg_per_ha"
+                        step="0.1"
+                        min="0"
+                        defaultValue={currentPrediction?.phosphorus_kg_per_ha || 0}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_phosphorus')}
+                      />
+                    </div>
+
+                    {/* Potassium */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.potassium')} ({t('units.kg_per_ha')})
+                      </label>
+                      <input
+                        type="number"
+                        name="potassium_kg_per_ha"
+                        step="0.1"
+                        min="0"
+                        defaultValue={currentPrediction?.potassium_kg_per_ha || 0}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_potassium')}
+                      />
                     </div>
                   </div>
 
-                  {/* Nutrient requirements section */}
-                  <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-gray-700 mb-4">
-                    <h3 className="text-lg font-medium text-purple-400 mb-4">
-                      Nutrient Requirements
+                  {/* Yield and Water Requirements */}
+                  <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
+                    <h3 className="text-lg font-medium text-purple-400 mb-3">
+                      {t('sections.yield_water_requirements')}
                     </h3>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div>
-                        <label
-                          htmlFor="nitrogen_kg_per_ha"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Nitrogen (kg/ha)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          id="nitrogen_kg_per_ha"
-                          name="nitrogen_kg_per_ha"
-                          defaultValue={
-                            currentPrediction?.nitrogen_kg_per_ha || "0"
-                          }
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
+                    {/* Expected Yield */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.expected_yield')} ({t('units.tons_per_ha')})
+                      </label>
+                      <input
+                        type="number"
+                        name="expected_yield_tons_per_ha"
+                        step="0.1"
+                        min="0"
+                        defaultValue={currentPrediction?.expected_yield_tons_per_ha || 0}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_expected_yield')}
+                      />
+                    </div>
 
-                      <div>
-                        <label
-                          htmlFor="phosphorus_kg_per_ha"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Phosphorus (kg/ha)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          id="phosphorus_kg_per_ha"
-                          name="phosphorus_kg_per_ha"
-                          defaultValue={
-                            currentPrediction?.phosphorus_kg_per_ha || "0"
-                          }
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label
-                          htmlFor="potassium_kg_per_ha"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Potassium (kg/ha)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          id="potassium_kg_per_ha"
-                          name="potassium_kg_per_ha"
-                          defaultValue={
-                            currentPrediction?.potassium_kg_per_ha || "0"
-                          }
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label
-                          htmlFor="optimal_ph"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Optimal pH
-                        </label>
-                        <input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          max="14"
-                          id="optimal_ph"
-                          name="optimal_ph"
-                          defaultValue={currentPrediction?.optimal_ph || "6.5"}
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
+                    {/* Water Requirement */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.water_requirement')} ({t('units.mm')})
+                      </label>
+                      <input
+                        type="number"
+                        name="water_requirement_mm"
+                        step="1"
+                        min="0"
+                        defaultValue={currentPrediction?.water_requirement_mm || 0}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_water_requirement')}
+                      />
                     </div>
                   </div>
 
-                  {/* Planting details section */}
-                  <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-gray-700 mb-4">
-                    <h3 className="text-lg font-medium text-yellow-400 mb-4">
-                      Planting Details
+                  {/* Planting Information */}
+                  <div className="bg-yellow-800 p-4 rounded-lg border border-gray-700">
+                    <h3 className="text-lg font-medium text-orange-400 mb-3">
+                      {t('sections.planting_information')}
                     </h3>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div>
-                        <label
-                          htmlFor="row_spacing_cm"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Row Spacing (cm)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          id="row_spacing_cm"
-                          name="row_spacing_cm"
-                          defaultValue={
-                            currentPrediction?.row_spacing_cm || "0"
-                          }
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
+                    {/* Row Spacing */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.row_spacing')} ({t('units.cm')})
+                      </label>
+                      <input
+                        type="number"
+                        name="row_spacing_cm"
+                        step="1"
+                        min="0"
+                        defaultValue={currentPrediction?.row_spacing_cm || 0}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_row_spacing')}
+                      />
+                    </div>
 
-                      <div>
-                        <label
-                          htmlFor="plant_spacing_cm"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Plant Spacing (cm)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          id="plant_spacing_cm"
-                          name="plant_spacing_cm"
-                          defaultValue={
-                            currentPrediction?.plant_spacing_cm || "0"
-                          }
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
+                    {/* Plant Spacing */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.plant_spacing')} ({t('units.cm')})
+                      </label>
+                      <input
+                        type="number"
+                        name="plant_spacing_cm"
+                        step="1"
+                        min="0"
+                        defaultValue={currentPrediction?.plant_spacing_cm || 0}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_plant_spacing')}
+                      />
+                    </div>
 
-                      <div>
-                        <label
-                          htmlFor="planting_depth_cm"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Planting Depth (cm)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          id="planting_depth_cm"
-                          name="planting_depth_cm"
-                          defaultValue={
-                            currentPrediction?.planting_depth_cm || "0"
-                          }
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label
-                          htmlFor="expected_yield_tons_per_ha"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Expected Yield (t/ha)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          id="expected_yield_tons_per_ha"
-                          name="expected_yield_tons_per_ha"
-                          defaultValue={
-                            currentPrediction?.expected_yield_tons_per_ha || "0"
-                          }
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
+                    {/* Planting Depth */}
+                    <div className="mb-4">
+                      <label className="block text-gray-300 mb-2">
+                        {t('labels.planting_depth')} ({t('units.cm')})
+                      </label>
+                      <input
+                        type="number"
+                        name="planting_depth_cm"
+                        step="0.1"
+                        min="0"
+                        defaultValue={currentPrediction?.planting_depth_cm || 0}
+                        className="w-full p-3 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder={t('placeholders.enter_planting_depth')}
+                      />
                     </div>
                   </div>
-
-                  {/* Water requirements section */}
-                  <div className="col-span-2 bg-yellow-800 p-4 rounded-lg border border-gray-700 mb-4">
-                    <h3 className="text-lg font-medium text-teal-400 mb-4">
-                      Water Requirements
-                    </h3>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label
-                          htmlFor="water_requirement_mm"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Water Requirement (mm)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          id="water_requirement_mm"
-                          name="water_requirement_mm"
-                          defaultValue={
-                            currentPrediction?.water_requirement_mm || "0"
-                          }
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label
-                          htmlFor="altitude"
-                          className="block text-gray-300 mb-2"
-                        >
-                          Altitude
-                        </label>
-                        <input
-                          type="text"
-                          id="altitude"
-                          name="altitude"
-                          defaultValue={currentPrediction?.altitude || "N/A"}
-                          className="w-full p-2 bg-yellow-700 border border-gray-600 rounded text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </>
+                </div>
               )}
+            </div>
 
-              {/* Button section */}
-              <div className="col-span-2 flex justify-end space-x-3 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2 bg-yellow-700 hover:bg-yellow-600 text-gray-200 rounded-lg transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition flex items-center"
-                >
-                  <FontAwesomeIcon
-                    icon={isEditMode ? faEdit : faPlus}
-                    className="mr-2"
-                  />
-                  {isEditMode ? "Update Prediction" : "Create Prediction"}
-                </button>
-              </div>
+            {/* Form Actions */}
+            <div className="flex justify-end space-x-4 mt-6 pt-4 border-t border-gray-700">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+              >
+                {t('buttons.cancel')}
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center"
+              >
+                <FontAwesomeIcon 
+                  icon={isEditMode ? faEdit : faPlus} 
+                  className="mr-2" 
+                />
+                {isEditMode ? t('buttons.update_prediction') : t('buttons.create_prediction')}
+              </button>
             </div>
           </form>
         </div>
@@ -1925,51 +1785,58 @@ function Farmer_Manage_predictions() {
     );
   };
 
+
+
   return (
-    <div
-      className="p-6 bg-yellow-950 min-h-screen"
-      style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(${img})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-yellow-500">
-          Crop Prediction Management
-        </h1>
-        <p className="text-gray-400">
-          Manage and analyze crop recommendations and predictions
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-yellow-900 via-yellow-800 to-yellow-900 p-4">
+      <div className="container mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              {t('titles.crop_prediction_management')}
+            </h1>
+            <p className="text-gray-300">
+              {t('descriptions.manage_view_predictions')}
+            </p>
+          </div>
+          <div className="hidden lg:block">
+            <img
+              src={img}
+              alt="Sunflower"
+              className="w-16 h-16 rounded-full object-cover border-4 border-yellow-500"
+            />
+          </div>
+        </div>
+
+        {/* Summary Cards */}
+        {renderSummaryCards()}
+
+        {/* Advanced Filters */}
+        {renderAdvancedFilters()}
+
+        {/* Main Content Layout */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Charts Section */}
+          <div className="w-full lg:w-2/3 space-y-6">
+            {/* Data Table */}
+            {renderDataTable()}
+
+            {/* Crop Distribution Map */}
+            {/* {renderCropDistributionMap()} */}
+          </div>
+
+          {/* Sidebar - Charts and Recent Activity */}
+          <div className="w-full lg:w-1/3 space-y-6">
+            {/* Recent Activity */}
+            {renderRecentActivity()}
+          </div>
+        </div>
+
+        {/* Modals */}
+        {renderPredictionModal()}
+        {renderDetailsModal()}
       </div>
-
-      {/* Summary Cards */}
-      {renderSummaryCards()}
-
-      {/* Main Content Grid */}
-      <div className="flex flex-col lg:flex-row gap-6 mb-6">
-        {/* Left side - Recent Activity */}
-        {renderRecentActivity()}
-
-        {/* Right side - Charts */}
-        {renderCharts()}
-
-        {/* Crop Distribution Map */}
-        {renderCropDistributionMap()}
-      </div>
-
-      {/* Advanced Filters */}
-      {renderAdvancedFilters()}
-
-      {/* Data Table */}
-      {renderDataTable()}
-
-      {/* View Details Modal */}
-      {viewDetailsModalOpen && renderDetailsModal()}
-
-      {/* Add Prediction Modal */}
-      {isModalOpen && renderPredictionModal()}
     </div>
   );
 }

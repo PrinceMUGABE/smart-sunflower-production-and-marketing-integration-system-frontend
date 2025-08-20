@@ -49,6 +49,8 @@ import {
   Bar,
 } from "recharts";
 import img from "../../../assets/pictures/sunflower2.jpg";
+import { useTranslation } from "react-i18next";
+
 
 const COLORS = [
   "#0088FE",
@@ -73,12 +75,12 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="p-4 text-yellow-100 bg-yellow-800 rounded-lg">
-          <h3 className="font-semibold">Something went wrong</h3>
+          <h3 className="font-semibold">{this.props.t('error.somethingWentWrong')}</h3>
           <button
             onClick={() => window.location.reload()}
             className="mt-2 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
           >
-            Refresh Page
+            {this.props.t('common.refreshPage')}
           </button>
         </div>
       );
@@ -105,7 +107,7 @@ const SummaryCard = ({ icon, title, value, bgColor, textColor }) => (
 );
 
 const AddEditStockModal = React.memo(
-  ({ isOpen, onClose, onSubmit, title, formData, handleInputChange }) => (
+  ({ isOpen, onClose, onSubmit, title, formData, handleInputChange, t }) => (
     <div
       className={`fixed inset-0 z-50 overflow-y-auto ${
         isOpen ? "block" : "hidden"
@@ -128,7 +130,7 @@ const AddEditStockModal = React.memo(
           <div className="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex justify-between items-start">
               <h3 className="text-lg leading-6 font-medium text-yellow-300">
-                {title} Stock Record
+                {title === "Add" ? t('stock.addStockRecord') : t('stock.editStockRecord')}
               </h3>
               <button
                 onClick={onClose}
@@ -140,7 +142,7 @@ const AddEditStockModal = React.memo(
             <form onSubmit={onSubmit} className="mt-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-yellow-200 mb-1">
-                  Harvest Date
+                  {t('stock.harvestDate')}
                 </label>
                 <input
                   type="date"
@@ -153,7 +155,7 @@ const AddEditStockModal = React.memo(
               </div>
               <div>
                 <label className="block text-sm font-medium text-yellow-200 mb-1">
-                  Quantity (kg)
+                  {t('stock.quantity')} (kg)
                 </label>
                 <input
                   type="number"
@@ -168,7 +170,7 @@ const AddEditStockModal = React.memo(
               </div>
               <div>
                 <label className="block text-sm font-medium text-yellow-200 mb-1">
-                  Quality Grade
+                  {t('stock.qualityGrade')}
                 </label>
                 <select
                   name="quality_grade"
@@ -177,15 +179,15 @@ const AddEditStockModal = React.memo(
                   required
                   className="w-full px-3 py-2 bg-yellow-800 border border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-yellow-200"
                 >
-                  <option value="">Select grade</option>
-                  <option value="grade_a">Grade A (Premium)</option>
-                  <option value="grade_b">Grade B (Standard)</option>
-                  <option value="grade_c">Grade C (Basic)</option>
+                  <option value="">{t('stock.selectGrade')}</option>
+                  <option value="grade_a">{t('stock.gradeA')}</option>
+                  <option value="grade_b">{t('stock.gradeB')}</option>
+                  <option value="grade_c">{t('stock.gradeC')}</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-yellow-200 mb-1">
-                  Moisture Content (%)
+                  {t('stock.moistureContent')} (%)
                 </label>
                 <input
                   type="number"
@@ -201,7 +203,7 @@ const AddEditStockModal = React.memo(
               </div>
               <div>
                 <label className="block text-sm font-medium text-yellow-200 mb-1">
-                  Oil Content (%)
+                  {t('stock.oilContent')} (%)
                 </label>
                 <input
                   type="number"
@@ -218,7 +220,7 @@ const AddEditStockModal = React.memo(
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-yellow-200 mb-1">
-                    District
+                    {t('location.district')}
                   </label>
                   <input
                     type="text"
@@ -231,7 +233,7 @@ const AddEditStockModal = React.memo(
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-yellow-200 mb-1">
-                    Sector
+                    {t('location.sector')}
                   </label>
                   <input
                     type="text"
@@ -246,7 +248,7 @@ const AddEditStockModal = React.memo(
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-yellow-200 mb-1">
-                    Cell
+                    {t('location.cell')}
                   </label>
                   <input
                     type="text"
@@ -259,7 +261,7 @@ const AddEditStockModal = React.memo(
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-yellow-200 mb-1">
-                    Village
+                    {t('location.village')}
                   </label>
                   <input
                     type="text"
@@ -277,13 +279,13 @@ const AddEditStockModal = React.memo(
                   onClick={onClose}
                   className="px-4 py-2 bg-yellow-700 text-yellow-200 rounded-md hover:bg-yellow-600"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
                 >
-                  {title === "Add" ? "Add Stock" : "Update Stock"}
+                  {title === "Add" ? t('stock.addStock') : t('stock.updateStock')}
                 </button>
               </div>
             </form>
@@ -295,7 +297,7 @@ const AddEditStockModal = React.memo(
 );
 
 const AddMovementModal = React.memo(
-  ({ isOpen, onClose, onSubmit, formData, handleInputChange, stockId }) => (
+  ({ isOpen, onClose, onSubmit, formData, handleInputChange, stockId, t }) => (
     <div
       className={`fixed inset-0 z-50 overflow-y-auto ${
         isOpen ? "block" : "hidden"
@@ -318,7 +320,7 @@ const AddMovementModal = React.memo(
           <div className="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div className="flex justify-between items-start">
               <h3 className="text-lg leading-6 font-medium text-yellow-300">
-                Record Stock Movement
+                {t('stock.recordStockMovement')}
               </h3>
               <button
                 onClick={onClose}
@@ -330,7 +332,7 @@ const AddMovementModal = React.memo(
             <form onSubmit={onSubmit} className="mt-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-yellow-200 mb-1">
-                  Movement Type
+                  {t('stock.movementType')}
                 </label>
                 <select
                   name="movement_type"
@@ -339,15 +341,15 @@ const AddMovementModal = React.memo(
                   required
                   className="w-full px-3 py-2 bg-yellow-800 border border-yellow-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-yellow-200"
                 >
-                  <option value="">Select movement type</option>
-                  <option value="in">Stock In</option>
-                  <option value="out">Stock Out</option>
-                  <option value="transfer">Transfer</option>
+                  <option value="">{t('stock.selectMovementType')}</option>
+                  <option value="in">{t('stock.stockIn')}</option>
+                  <option value="out">{t('stock.stockOut')}</option>
+                  <option value="transfer">{t('stock.transfer')}</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-yellow-200 mb-1">
-                  Quantity (kg)
+                  {t('stock.quantity')} (kg)
                 </label>
                 <input
                   type="number"
@@ -365,7 +367,7 @@ const AddMovementModal = React.memo(
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-yellow-200 mb-1">
-                        To District
+                        {t('stock.toDistrict')}
                       </label>
                       <input
                         type="text"
@@ -378,7 +380,7 @@ const AddMovementModal = React.memo(
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-yellow-200 mb-1">
-                        To Sector
+                        {t('stock.toSector')}
                       </label>
                       <input
                         type="text"
@@ -393,7 +395,7 @@ const AddMovementModal = React.memo(
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-yellow-200 mb-1">
-                        To Cell
+                        {t('stock.toCell')}
                       </label>
                       <input
                         type="text"
@@ -406,7 +408,7 @@ const AddMovementModal = React.memo(
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-yellow-200 mb-1">
-                        To Village
+                        {t('stock.toVillage')}
                       </label>
                       <input
                         type="text"
@@ -422,7 +424,7 @@ const AddMovementModal = React.memo(
               )}
               <div>
                 <label className="block text-sm font-medium text-yellow-200 mb-1">
-                  Notes
+                  {t('common.notes')}
                 </label>
                 <textarea
                   name="notes"
@@ -438,13 +440,13 @@ const AddMovementModal = React.memo(
                   onClick={onClose}
                   className="px-4 py-2 bg-yellow-700 text-yellow-200 rounded-md hover:bg-yellow-600"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
                 >
-                  Record Movement
+                  {t('stock.recordMovement')}
                 </button>
               </div>
             </form>
@@ -474,6 +476,7 @@ function Farmer_Manage_Stocks() {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const storedUserData = localStorage.getItem("userData");
@@ -497,7 +500,7 @@ function Farmer_Manage_Stocks() {
       setStocks(Array.isArray(res.data.stocks) ? res.data.stocks : []);
     } catch (err) {
       console.error("Error fetching stocks:", err);
-      setMessage("Failed to fetch stock data");
+      setMessage(t('messages.failedToFetchStock'));
       setMessageType("error");
     } finally {
       setLoading(false);
@@ -505,18 +508,18 @@ function Farmer_Manage_Stocks() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this stock record?"))
+    if (!window.confirm(t('confirmations.deleteStockRecord')))
       return;
     try {
       await axios.delete(`http://127.0.0.1:8000/stock/delete/${id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       await fetchStocks();
-      setMessage("Stock record deleted successfully");
+      setMessage(t('messages.stockRecordDeleted'));
       setMessageType("success");
       setCurrentPage(1);
     } catch (err) {
-      setMessage(err.response?.data.error || "An error occurred");
+      setMessage(err.response?.data.error || t('messages.errorOccurred'));
       setMessageType("error");
     }
   };
@@ -649,19 +652,6 @@ function Farmer_Manage_Stocks() {
       }, {})
     ).map(([district, count]) => ({ name: district, value: count }));
 
-    // Prepare data for quality grade distribution
-    // const gradeData = Object.entries(
-    //   stocks.reduce((acc, stock) => {
-    //     const grade = stock.quality_grade || "Unknown";
-    //     acc[grade] = (acc[grade] || 0) + 1;
-    //     return acc;
-    //   }, {})
-    // ).map(([grade, count]) => ({
-    //   grade,
-    //   count,
-    //   label: grade.replace("grade_", "Grade ").toUpperCase(),
-    // }));
-
     // Prepare data for quantity trend over time
     const quantityTrendData = stocks
       .map((stock) => ({
@@ -674,89 +664,7 @@ function Farmer_Manage_Stocks() {
 
     return (
       <div className="w-full lg:w-1/3 space-y-6">
-        {/* <ErrorBoundary>
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-yellow-800 h-72">
-            <h3 className="text-sm font-semibold mb-4 text-yellow-400 flex items-center">
-              <FontAwesomeIcon icon={faChartPie} className="mr-2" />
-              District Distribution
-            </h3>
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie
-                  data={districtData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label={{
-                    position: "outside",
-                    offset: 10,
-                    fill: "#e5e7eb",
-                  }}
-                >
-                  {districtData.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1f2937",
-                    borderColor: "#374151",
-                    color: "#f9fafb",
-                  }}
-                />
-                <Legend
-                  verticalAlign="bottom"
-                  height={36}
-                  wrapperStyle={{ color: "#e5e7eb" }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </ErrorBoundary> */}
-
-        {/* <ErrorBoundary>
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-yellow-800 h-72">
-            <h3 className="text-sm font-semibold mb-4 text-yellow-400 flex items-center">
-              <FontAwesomeIcon icon={faBoxes} className="mr-2" />
-              Quality Grade Distribution
-            </h3>
-            <ResponsiveContainer>
-              <BarChart data={gradeData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis
-                  dataKey="label"
-                  padding={{ left: 20, right: 20 }}
-                  tick={{ fontSize: 11, fill: "#CBD5E1" }}
-                  stroke="#475569"
-                />
-                <YAxis
-                  tick={{ fontSize: 11, fill: "#CBD5E1" }}
-                  padding={{ top: 20, bottom: 20 }}
-                  stroke="#475569"
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1E293B",
-                    borderColor: "#334155",
-                    borderRadius: "0.5rem",
-                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-                <Bar
-                  dataKey="count"
-                  name="Number of Stocks"
-                  fill="#FFD700"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </ErrorBoundary> */}
+        {/* Charts can be uncommented and used if needed */}
       </div>
     );
   };
@@ -857,19 +765,19 @@ function Farmer_Manage_Stocks() {
         await axios.post("http://127.0.0.1:8000/stock/create/", formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        showToast("Stock record added successfully", "success");
+        showToast(t('messages.stockRecordAdded'), "success");
       } else if (isEditModalOpen && currentRecord) {
         await axios.put(
           `http://127.0.0.1:8000/stock/update/${currentRecord.id}/`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        showToast("Stock record updated successfully", "success");
+        showToast(t('messages.stockRecordUpdated'), "success");
       }
       await fetchStocks();
       closeModal();
     } catch (err) {
-      showToast(err.response?.data.error || "An error occurred", "error");
+      showToast(err.response?.data.error || t('messages.errorOccurred'), "error");
     }
   };
 
@@ -880,8 +788,15 @@ function Farmer_Manage_Stocks() {
     return "bg-green-900 text-green-300";
   };
 
+  const getStatusText = (current, original) => {
+    if (parseFloat(current || 0) === 0) return t('stock.status.empty');
+    const percentage = (parseFloat(current || 0) / parseFloat(original || 1)) * 100;
+    if (percentage <= 20) return t('stock.status.lowStock');
+    return t('stock.status.available');
+  };
+
   return (
-    <ErrorBoundary>
+    <ErrorBoundary t={t}>
       <div
         className="p-6 min-h-screen"
         style={{
@@ -894,11 +809,10 @@ function Farmer_Manage_Stocks() {
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="mb-6 p-6 bg-yellow-900 rounded-lg shadow-xl border-b-4 border-yellow-500">
             <h1 className="text-center text-yellow-400 font-bold text-2xl mb-2">
-              Sunflower Stock Management
+              {t('stock.title')}
             </h1>
             <p className="text-center text-yellow-200 text-sm max-w-2xl mx-auto">
-              Comprehensive system for monitoring and analyzing sunflower stock
-              data
+              {t('stock.description')}
             </p>
           </div>
 
@@ -921,7 +835,7 @@ function Farmer_Manage_Stocks() {
                 />
                 <div>
                   <p className="font-medium">
-                    {messageType === "success" ? "Success" : "Error"}
+                    {messageType === "success" ? t('common.success') : t('common.error')}
                   </p>
                   <p className="text-sm opacity-90">{message}</p>
                 </div>
@@ -938,28 +852,28 @@ function Farmer_Manage_Stocks() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <SummaryCard
               icon={faWarehouse}
-              title="Total Stocks"
+              title={t('stock.totalStocks')}
               value={summaryMetrics.total}
               bgColor="bg-yellow-900"
               textColor="text-yellow-300"
             />
             <SummaryCard
               icon={faMapMarkerAlt}
-              title="Districts"
+              title={t('stock.districts')}
               value={summaryMetrics.districts}
               bgColor="bg-yellow-900"
               textColor="text-yellow-300"
             />
             <SummaryCard
               icon={faBoxes}
-              title="Current Quantity (kg)"
+              title={t('stock.currentQuantityKg')}
               value={summaryMetrics.totalQuantity}
               bgColor="bg-yellow-900"
               textColor="text-yellow-300"
             />
             <SummaryCard
               icon={faChartPie}
-              title="Utilization Rate"
+              title={t('stock.utilizationRate')}
               value={`${summaryMetrics.utilizationRate}%`}
               bgColor="bg-yellow-900"
               textColor="text-yellow-300"
@@ -973,7 +887,7 @@ function Farmer_Manage_Stocks() {
                   <div className="flex items-center">
                     <span className="text-yellow-400 flex items-center">
                       <FontAwesomeIcon icon={faWarehouse} className="mr-2" />
-                      <span className="font-semibold">Filtered Records:</span>
+                      <span className="font-semibold">{t('stock.filteredRecords')}:</span>
                       <span className="ml-2 px-3 py-1 bg-yellow-600 text-white rounded-full">
                         {filteredSortedData.length}
                       </span>
@@ -990,7 +904,7 @@ function Farmer_Manage_Stocks() {
                       </div>
                       <input
                         type="text"
-                        placeholder="Search records..."
+                        placeholder={t('common.searchRecords')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10 pr-4 py-2 w-full text-yellow-200 bg-yellow-800 border border-yellow-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 placeholder-yellow-500"
@@ -1003,21 +917,21 @@ function Farmer_Manage_Stocks() {
                         className="py-2 bg-yellow-600 px-4 rounded-lg text-white flex items-center justify-center hover:bg-yellow-700 transition duration-200 w-full sm:w-auto"
                       >
                         <FontAwesomeIcon icon={faFilter} className="mr-2" />
-                        Filters
+                        {t('common.filters')}
                       </button>
                       {filterMenuVisible && (
                         <div className="absolute right-0 mt-2 bg-yellow-800 text-yellow-200 shadow-lg rounded-lg p-4 z-10 border border-yellow-700 w-64">
                           <h4 className="font-semibold mb-3 pb-2 border-b border-yellow-700">
-                            Advanced Filters
+                            {t('common.advancedFilters')}
                           </h4>
 
                           <div className="mb-3">
                             <label className="block text-sm font-medium mb-1">
-                              District
+                              {t('location.district')}
                             </label>
                             <input
                               type="text"
-                              placeholder="Enter district"
+                              placeholder={t('location.enterDistrict')}
                               value={filters.district}
                               onChange={(e) =>
                                 setFilters({
@@ -1031,7 +945,7 @@ function Farmer_Manage_Stocks() {
 
                           <div className="mb-3">
                             <label className="block text-sm font-medium mb-1">
-                              Quality Grade
+                              {t('stock.qualityGrade')}
                             </label>
                             <select
                               value={filters.quality_grade}
@@ -1043,16 +957,16 @@ function Farmer_Manage_Stocks() {
                               }
                               className="w-full px-3 py-2 bg-yellow-700 border border-yellow-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-yellow-200"
                             >
-                              <option value="">All Grades</option>
-                              <option value="grade_a">Grade A</option>
-                              <option value="grade_b">Grade B</option>
-                              <option value="grade_c">Grade C</option>
+                              <option value="">{t('stock.allGrades')}</option>
+                              <option value="grade_a">{t('stock.gradeA')}</option>
+                              <option value="grade_b">{t('stock.gradeB')}</option>
+                              <option value="grade_c">{t('stock.gradeC')}</option>
                             </select>
                           </div>
 
                           <div className="mb-3">
                             <label className="block text-sm font-medium mb-1">
-                              Sort By
+                              {t('common.sortBy')}
                             </label>
                             <div className="flex gap-2">
                               <select
@@ -1066,16 +980,16 @@ function Farmer_Manage_Stocks() {
                                 className="flex-1 px-3 py-2 bg-yellow-700 border border-yellow-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-yellow-200"
                               >
                                 <option value="harvest__harvest_date">
-                                  Harvest Date
+                                  {t('stock.harvestDate')}
                                 </option>
                                 <option value="harvest__district">
-                                  District
+                                  {t('location.district')}
                                 </option>
                                 <option value="harvest__quality_grade">
-                                  Quality Grade
+                                  {t('stock.qualityGrade')}
                                 </option>
                                 <option value="current_quantity">
-                                  Current Quantity
+                                  {t('stock.currentQuantity')}
                                 </option>
                               </select>
                               <button
@@ -1091,8 +1005,8 @@ function Farmer_Manage_Stocks() {
                                 className="px-3 py-2 bg-yellow-700 border border-yellow-600 rounded-lg hover:bg-yellow-600 text-yellow-200"
                                 title={
                                   filters.sortDirection === "asc"
-                                    ? "Ascending"
-                                    : "Descending"
+                                    ? t('common.ascending')
+                                    : t('common.descending')
                                 }
                               >
                                 <FontAwesomeIcon
@@ -1119,13 +1033,13 @@ function Farmer_Manage_Stocks() {
                               }}
                               className="px-3 py-1 bg-yellow-700 text-yellow-300 rounded hover:bg-yellow-600 text-sm"
                             >
-                              Reset
+                              {t('common.reset')}
                             </button>
                             <button
                               onClick={() => setFilterMenuVisible(false)}
                               className="px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm"
                             >
-                              Apply
+                              {t('common.apply')}
                             </button>
                           </div>
                         </div>
@@ -1140,7 +1054,7 @@ function Farmer_Manage_Stocks() {
                         className="py-2 bg-yellow-600 px-4 rounded-lg text-white flex items-center justify-center hover:bg-yellow-700 transition duration-200 w-full sm:w-auto"
                       >
                         <FontAwesomeIcon icon={faDownload} className="mr-2" />
-                        Export
+                        {t('common.export')}
                       </button>
                       {downloadMenuVisible && (
                         <div className="absolute right-0 mt-2 bg-yellow-800 text-yellow-200 shadow-lg rounded-lg p-2 z-10 border border-yellow-700 w-32">
@@ -1165,7 +1079,7 @@ function Farmer_Manage_Stocks() {
                       className="py-2 bg-green-600 px-4 rounded-lg text-white flex items-center justify-center hover:bg-green-700 transition duration-200 w-full sm:w-auto"
                     >
                       <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                      Add Stock
+                      {t('stock.addStock')}
                     </button>
                   </div>
                 </div>
@@ -1174,11 +1088,11 @@ function Farmer_Manage_Stocks() {
                 {(filters.district || filters.quality_grade) && (
                   <div className="flex flex-wrap gap-2 mb-4 bg-yellow-800 p-3 rounded-lg border border-yellow-700">
                     <span className="text-yellow-400 text-sm">
-                      Active Filters:
+                      {t('common.activeFilters')}:
                     </span>
                     {filters.district && (
                       <span className="px-2 py-1 bg-yellow-700 text-yellow-200 text-xs rounded-full flex items-center">
-                        District: {filters.district}
+                        {t('location.district')}: {filters.district}
                         <button
                           className="ml-1 text-yellow-300 hover:text-yellow-100"
                           onClick={() =>
@@ -1191,10 +1105,8 @@ function Farmer_Manage_Stocks() {
                     )}
                     {filters.quality_grade && (
                       <span className="px-2 py-1 bg-yellow-700 text-yellow-200 text-xs rounded-full flex items-center">
-                        Grade:{" "}
-                        {filters.quality_grade
-                          .replace("grade_", "Grade ")
-                          .toUpperCase()}
+                        {t('stock.grade')}:{" "}
+                        {t(`stock.${filters.quality_grade}`)}
                         <button
                           className="ml-1 text-yellow-300 hover:text-yellow-100"
                           onClick={() =>
@@ -1216,7 +1128,7 @@ function Farmer_Manage_Stocks() {
                         })
                       }
                     >
-                      Clear All
+                      {t('common.clearAll')}
                     </button>
                   </div>
                 )}
@@ -1238,7 +1150,7 @@ function Farmer_Manage_Stocks() {
                                 icon={faCalendarAlt}
                                 className="mr-2"
                               />
-                              Harvest Date
+                              {t('stock.harvestDate')}
                             </div>
                           </th>
                           <th className="px-6 py-3">
@@ -1247,25 +1159,16 @@ function Farmer_Manage_Stocks() {
                                 icon={faMapMarkerAlt}
                                 className="mr-2"
                               />
-                              Location
+                              {t('common.location')}
                             </div>
                           </th>
-                          {/* <th className="px-6 py-3">
+                          <th className="px-6 py-3">
                             <div className="flex items-center">
                               <FontAwesomeIcon
                                 icon={faBoxes}
                                 className="mr-2"
                               />
-                              Quantity (kg)
-                            </div>
-                          </th> */}
-                          <th className="px-6 py-3">
-                            <div className="flex items-center">
-                              <FontAwesomeIcon
-                                icon={faSeedling}
-                                className="mr-2"
-                              />
-                              Quality
+                              {t('stock.quantity')} (kg)
                             </div>
                           </th>
                           <th className="px-6 py-3">
@@ -1274,17 +1177,17 @@ function Farmer_Manage_Stocks() {
                                 icon={faExchangeAlt}
                                 className="mr-2"
                               />
-                              Status
+                              {t('common.status')}
                             </div>
                           </th>
-                          <th className="px-6 py-3 rounded-tr-lg">Actions</th>
+                          <th className="px-6 py-3 rounded-tr-lg">{t('common.actions')}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {currentItems.length === 0 ? (
                           <tr className="bg-yellow-900 border-b border-yellow-800 hover:bg-yellow-800 transition-colors duration-200">
                             <td
-                              colSpan="7"
+                              colSpan="6"
                               className="text-center py-8 text-yellow-400 bg-yellow-900"
                             >
                               <div className="flex flex-col items-center">
@@ -1293,7 +1196,7 @@ function Farmer_Manage_Stocks() {
                                   className="text-4xl mb-3 text-yellow-600"
                                 />
                                 <p>
-                                  No stock records found matching your criteria
+                                  {t('stock.noRecordsFound')}
                                 </p>
                                 {(filters.district ||
                                   filters.quality_grade ||
@@ -1310,7 +1213,7 @@ function Farmer_Manage_Stocks() {
                                     }}
                                     className="mt-2 text-yellow-300 hover:underline"
                                   >
-                                    Clear all filters
+                                    {t('common.clearAllFilters')}
                                   </button>
                                 )}
                               </div>
@@ -1333,11 +1236,11 @@ function Farmer_Manage_Stocks() {
                               <td className="px-6 py-4 text-yellow-200">
                                 <div className="flex flex-col">
                                   <span className="font-semibold">
-                                    {stock.location?.district || "N/A"}
+                                    {stock.location?.district || t('common.notAvailable')}
                                   </span>
                                   <span className="text-xs text-yellow-400">
-                                    {stock.location?.sector || "N/A"},{" "}
-                                    {stock.location?.cell || "N/A"}
+                                    {stock.location?.sector || t('common.notAvailable')},{" "}
+                                    {stock.location?.cell || t('common.notAvailable')}
                                   </span>
                                 </div>
                               </td>
@@ -1350,7 +1253,7 @@ function Farmer_Manage_Stocks() {
                                     kg
                                   </span>
                                   <span className="text-xs text-yellow-400">
-                                    Original:{" "}
+                                    {t('stock.original')}:{" "}
                                     {parseFloat(
                                       stock.original_quantity || 0
                                     ).toFixed(2)}{" "}
@@ -1358,11 +1261,6 @@ function Farmer_Manage_Stocks() {
                                   </span>
                                 </div>
                               </td>
-                              {/* <td className="px-6 py-4 text-yellow-200">
-                                {stock.quality_grade
-                                  ?.replace("grade_", "Grade ")
-                                  .toUpperCase()}
-                              </td> */}
                               <td className="px-6 py-4">
                                 <span
                                   className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
@@ -1370,39 +1268,29 @@ function Farmer_Manage_Stocks() {
                                     parseFloat(stock.original_quantity || 0)
                                   )}`}
                                 >
-                                  {parseFloat(stock.current_quantity || 0) === 0
-                                    ? "Empty"
-                                    : (parseFloat(stock.current_quantity || 0) /
-                                        parseFloat(
-                                          stock.original_quantity || 1
-                                        )) *
-                                        100 <=
-                                      20
-                                    ? "Low Stock"
-                                    : "Available"}
+                                  {getStatusText(stock.current_quantity, stock.original_quantity)}
                                 </span>
                               </td>
-
                               <td className="px-6 py-4">
                                 <div className="flex space-x-3">
                                   <Link
                                     to={`/farmer/stocks/${stock.id}/movements`}
                                     className="text-blue-400 hover:text-blue-300 transition"
-                                    title="View Movements"
+                                    title={t('stock.viewMovements')}
                                   >
                                     <FontAwesomeIcon icon={faHistory} />
                                   </Link>
                                   <button
                                     onClick={() => openEditModal(stock)}
                                     className="text-blue-400 hover:text-blue-300 transition"
-                                    title="Edit"
+                                    title={t('common.edit')}
                                   >
                                     <FontAwesomeIcon icon={faEdit} />
                                   </button>
                                   <button
                                     onClick={() => handleDelete(stock.id)}
                                     className="text-red-400 hover:text-red-300 transition"
-                                    title="Delete"
+                                    title={t('common.delete')}
                                   >
                                     <FontAwesomeIcon icon={faTrash} />
                                   </button>
@@ -1424,7 +1312,7 @@ function Farmer_Manage_Stocks() {
                       disabled={currentPage === 1}
                       className="px-3 py-2 rounded-l-md border-r border-yellow-700 text-yellow-300 hover:bg-yellow-800 disabled:opacity-50"
                     >
-                      First
+                      {t('common.first')}
                     </button>
                     <button
                       onClick={() =>
@@ -1433,7 +1321,7 @@ function Farmer_Manage_Stocks() {
                       disabled={currentPage === 1}
                       className="px-3 py-2 border-r border-yellow-700 text-yellow-300 hover:bg-yellow-800 disabled:opacity-50"
                     >
-                      Previous
+                      {t('common.previous')}
                     </button>
                     {/* Page numbers */}
                     {Array.from(
@@ -1467,7 +1355,7 @@ function Farmer_Manage_Stocks() {
                       }
                       className="px-3 py-2 border-r border-yellow-700 text-yellow-300 hover:bg-yellow-800 disabled:opacity-50"
                     >
-                      Next
+                      {t('common.next')}
                     </button>
                     <button
                       onClick={() =>
@@ -1480,7 +1368,7 @@ function Farmer_Manage_Stocks() {
                       }
                       className="px-3 py-2 rounded-r-md text-yellow-300 hover:bg-yellow-800 disabled:opacity-50"
                     >
-                      Last
+                      {t('common.last')}
                     </button>
                   </nav>
                 </div>
@@ -1493,7 +1381,7 @@ function Farmer_Manage_Stocks() {
           <div className="bg-yellow-900 p-6 rounded-lg shadow-lg border border-yellow-800 mt-6">
             <h3 className="text-sm font-semibold mb-4 text-yellow-400 flex items-center">
               <FontAwesomeIcon icon={faHistory} className="mr-2" />
-              Recent Stock Activity
+              {t('stock.recentActivity')}
             </h3>
             <div className="space-y-3">
               {stocks.slice(0, 5).map((stock, index) => (
@@ -1509,12 +1397,11 @@ function Farmer_Manage_Stocks() {
                       {stock.location?.district} - {stock.location?.sector}
                     </p>
                     <p className="text-yellow-300 text-xs">
-                      {parseFloat(stock.current_quantity || 0).toFixed(2)} kg
-                      remaining (Original:{" "}
+                      {parseFloat(stock.current_quantity || 0).toFixed(2)} kg {t('stock.remaining')} ({t('stock.original')}:{" "}
                       {parseFloat(stock.original_quantity || 0).toFixed(2)} kg)
                     </p>
                     <p className="text-yellow-400 text-xs">
-                      Last updated on{" "}
+                      {t('stock.lastUpdatedOn')}{" "}
                       {new Date(stock.last_updated).toLocaleDateString()}
                     </p>
                   </div>
@@ -1531,6 +1418,7 @@ function Farmer_Manage_Stocks() {
         title={isAddModalOpen ? "Add" : "Edit"}
         formData={formData}
         handleInputChange={handleInputChange}
+        t={t}
       />
     </ErrorBoundary>
   );
