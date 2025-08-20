@@ -1046,7 +1046,7 @@ function Farmer_Manage_Stocks() {
                       )}
                     </div>
 
-                    <div className="relative">
+                    {/* <div className="relative">
                       <button
                         onClick={() =>
                           setDownloadMenuVisible(!downloadMenuVisible)
@@ -1072,7 +1072,7 @@ function Farmer_Manage_Stocks() {
                           ))}
                         </div>
                       )}
-                    </div>
+                    </div> */}
 
                     <button
                       onClick={openAddModal}

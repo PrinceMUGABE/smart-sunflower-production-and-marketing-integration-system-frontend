@@ -1106,7 +1106,14 @@
 
 
   "common":{
-    "actions": "Action"
+    "actions": "Action",
+    "cancel": "Annuler",
+    "filters": "Filtres",
+    "searchRecords": "Recherche"
+  },
+
+  "filters":{
+    "advanced_filters": "Filtres avancés"
   }
 
 

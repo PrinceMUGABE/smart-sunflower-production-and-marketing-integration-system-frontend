@@ -1182,7 +1182,7 @@ const Farmer_Stock_Management = () => {
                 </button>
 
                 {/* Download Dropdown */}
-                <div className="relative">
+                {/* <div className="relative">
                   <button
                     onClick={() => setDownloadMenuVisible(!downloadMenuVisible)}
                     className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 flex items-center"
@@ -1223,7 +1223,7 @@ const Farmer_Stock_Management = () => {
                       </div>
                     </div>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
 

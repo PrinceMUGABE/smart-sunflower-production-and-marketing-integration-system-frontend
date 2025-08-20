@@ -1093,6 +1093,18 @@
   },
 
   "common":{
-    "actions": "Action"
+    "actions": "Action",
+    "cancel": "Cancel",
+    "status": "Status",
+    "filters": "Filters",
+    "searchRecords": "Search"
+  },
+  "location": {
+    "cell": "Cell",
+    "village": "Village"
+  },
+
+  "filters":{
+    "advanced_filters": "Advanced Filters"
   }
 }

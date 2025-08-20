@@ -1110,8 +1110,21 @@
   },
 
   "common":{
-    "actions": "Igikorwa"
+    "actions": "Igikorwa",
+    "cancel": "Hagarika",
+    "filters": "Yungurura",
+    "searchRecords": "Shakisha"
+  },
+  "location": {
+    "cell": "Akagari",
+    "village": "Umudugudu"
+  },
+
+
+  "filters":{
+    "advanced_filters": "Yungurura"
   }
+
 
     
 

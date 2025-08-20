@@ -1000,13 +1000,13 @@ function Farmer_Manage_predictions() {
             </div>
 
             <div className="relative inline-block">
-              <button
+              {/* <button
                 onClick={() => setDownloadMenuVisible(!downloadMenuVisible)}
                 className="flex items-center px-4 py-2 bg-yellow-800 border border-gray-700 rounded-lg text-gray-200 hover:bg-yellow-700 transition"
               >
                 <FontAwesomeIcon icon={faDownload} className="mr-2" />
                 {t('buttons.export')}
-              </button>
+              </button> */}
               {downloadMenuVisible && (
                 <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-yellow-800 ring-1 ring-gray-700 z-10">
                   <div className="py-1">
